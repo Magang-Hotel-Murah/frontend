@@ -8,7 +8,7 @@ const Login = ({ onLogin }) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState(""); // Changed to string for general error
+  const [errors, setErrors] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
@@ -16,9 +16,8 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrors(""); // Clear previous errors
+    setErrors("");
 
-    // Validate empty fields
     if (!email.trim() && !password.trim()) {
       setErrors("Isi email & password terlebih dahulu");
       setIsShaking(true);
@@ -43,7 +42,6 @@ const Login = ({ onLogin }) => {
       return;
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setErrors("Format email tidak valid");
@@ -61,7 +59,6 @@ const Login = ({ onLogin }) => {
         setTimeout(() => setIsShaking(false), 500);
       } else {
         setErrors("");
-        console.log("Login berhasil, redirect ke /home");
         navigate("/home");
       }
     } catch (error) {
@@ -92,7 +89,6 @@ const Login = ({ onLogin }) => {
         <div className={`bg-white py-8 px-6 shadow-xl rounded-xl border border-gray-100 transition-all duration-300 ${
           isShaking ? 'animate-shake border-red-300 shadow-red-100' : ''
         }`}>
-          {/* Error Message Display */}
           {errors && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-600 text-center font-medium">
@@ -121,7 +117,6 @@ const Login = ({ onLogin }) => {
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    // Clear errors when user starts typing
                     if (errors) setErrors("");
                   }}
                   className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors ${
@@ -153,7 +148,6 @@ const Login = ({ onLogin }) => {
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    // Clear errors when user starts typing
                     if (errors) setErrors("");
                   }}
                   className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors ${
