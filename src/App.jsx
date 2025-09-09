@@ -1,47 +1,91 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@layouts';
-import { Home } from '@pages';
-import { User } from '@pages';
-import { Login } from '@pages';
-import { Transaction } from '@pages';
+import './index.css';
+import { Home, User, Transaction } from '@pages';
+import { Login, Register, ForgotPassword } from '@auth';
 import { useAuth } from '@hooks';
+import { ProtectedRoute } from './components';
+
 
 const App = () => {
-  const [activeMenu, setActiveMenu] = useState('home');
-  const { isAuthenticated, user, login, logout } = useAuth();
-
-  const renderContent = () => {
-    switch (activeMenu) {
-      case 'home':
-        return <Home />;
-      case 'transactions':
-        return <Transaction/>;
-      case 'users':
-        return <User/>;
-      case 'settings':
-        return(
-          <div>
-            <h1>Halaman Setting</h1>
-          </div>
-        );
-      default:
-        return <Home />;
-    }
-  };
-
-  if (!isAuthenticated) {
-    return <Login onLogin={login} />;
-  }
+  const { isAuthenticated, user, login, logout, register, forgotPassword } = useAuth();
 
   return (
-    <MainLayout 
-      activeMenu={activeMenu} 
-      setActiveMenu={setActiveMenu}
-      user={user}
-      onLogout={logout}
-    >
-      {renderContent()}
-    </MainLayout>
+    <Router>
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            isAuthenticated ? 
+            <Navigate to="/home" replace /> : 
+            <Login onLogin={login}/>
+          }
+        />
+        
+        <Route 
+          path="/register" 
+          element={
+            isAuthenticated ? 
+            <Navigate to="/home" replace /> : 
+            <Register onRegister={register}/>
+          }
+        />
+
+        <Route 
+          path="/forgot-password" 
+          element={
+            isAuthenticated ? 
+            <Navigate to="/home" replace /> : 
+            <ForgotPassword onForgotPassword={forgotPassword}/>
+          }
+        />
+
+        <Route 
+          path="/home" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <MainLayout user={user} onLogout={logout}>
+                <Home/>
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route 
+          path="/transaction" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <MainLayout user={user} onLogout={logout}>
+                <Transaction/>
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route 
+          path="/user" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <MainLayout user={user} onLogout={logout}>
+                <User/>
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route 
+          path="/setting" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <MainLayout user={user} onLogout={logout}>
+                <h1>Halaman Setting</h1>
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Router>
   );
 };
 

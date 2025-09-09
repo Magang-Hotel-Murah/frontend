@@ -1,42 +1,105 @@
-import React from 'react';
-import { Home, Users, Settings, BarChart3 } from 'lucide-react';
+import React from "react";
+import { Home, Users, Settings, BarChart3, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
-const Sidebar = ({ isOpen, activeMenu, setActiveMenu }) => {
+const Sidebar = ({
+  isOpen,
+  onClose,
+  activeMenu,
+  setActiveMenu,
+  isCollapsed,
+}) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    switch(location.pathname){
+      case "/home":
+        setActiveMenu("home");
+      break;
+      case "/transaction":
+        setActiveMenu("transactions");
+      break
+      case "/user":
+        setActiveMenu("users");
+      break;
+      case "/setting":
+        setActiveMenu("settings");
+      break
+    }
+  }, [location.pathname, setActiveMenu]);
+
+
+
+  const handleMenuClick = (itemId) => {
+    setActiveMenu(itemId);
+
+    switch (itemId) {
+      case "home":
+        navigate("/home");
+        break;
+      case "transactions":
+        navigate("/transaction");
+        break;
+      case "users":
+        navigate("/user");
+        break;
+      case "settings":
+        navigate("/setting");
+        break;
+      default:
+        console.log("Unknown menu item:", itemId);
+    }
+  };
+
   const menuItems = [
-    { id: 'home', name: 'Dashboard', icon: Home },
-    { id: 'transactions', name: 'Transaksi', icon: BarChart3 },
-    { id: 'users', name: 'Pengguna', icon: Users },
-    { id: 'settings', name: 'Pengaturan', icon: Settings },
+    { id: "home", name: "Dashboard", icon: Home },
+    { id: "transactions", name: "Transaksi", icon: BarChart3 },
+    { id: "users", name: "Pengguna", icon: Users },
+    { id: "settings", name: "Pengaturan", icon: Settings },
   ];
 
   return (
     <>
       {isOpen && (
-        <div 
-          className="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"
-          onClick={() => setActiveMenu('home')}
+        <div
+          className="fixed inset-0 z-20 bg-primary-800 bg-opacity-50 lh:hidden"
+          onClick={onClose}
         />
       )}
-      
-      <aside className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform bg-white border-r border-gray-200 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0`}>
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-white">
+      <aside
+        className={`fixed top-0 left-0 z-40 h-screen pt-20 transition-all duration-300 bg-primary-500 border-r border-gray-100 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 ${
+          isCollapsed ? "lg:w-16" : "lg:w-64"
+        }`}
+      >
+        <div className="h-full px-3 pb-4 overflow-y-auto bg-primary-500">
           <ul className="space-y-2 font-medium">
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
                 <li key={item.id}>
                   <button
-                    onClick={() => setActiveMenu(item.id)}
-                    className={`flex items-center w-full p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${
-                      activeMenu === item.id ? 'bg-blue-100 text-blue-700' : ''
+                    onClick={() => handleMenuClick(item.id)}
+                    className={`flex items-center w-full p-2 text-gray-100 rounded-lg hover:bg-primary-800 group ${
+                      activeMenu === item.id
+                        ? "bg-primary-700 text-gray-100"
+                        : ""
                     }`}
+                    title={isCollapsed ? item.name : ""}
                   >
-                    <Icon className={`w-5 h-5 transition duration-75 ${
-                      activeMenu === item.id ? 'text-blue-700' : 'text-gray-500 group-hover:text-gray-900'
-                    }`} />
-                    <span className="ml-3">{item.name}</span>
+                    <Icon
+                      className={`w-5 h-5 transition duration-75 ${
+                        activeMenu === item.id
+                          ? "text-primary-100"
+                          : "text-gray-100 group-hover:text-gray-100"
+                      } ${isCollapsed ? "mx-auto" : ""}`}
+                    />
+                    {!isCollapsed && (
+                      <span className="ml-3">{item.name}</span>
+                    )}
                   </button>
                 </li>
               );

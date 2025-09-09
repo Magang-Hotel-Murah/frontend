@@ -21,11 +21,11 @@ const NavbarBooking = ({ activeTab, setActiveTab }) => {
               className={`
                 relative flex items-center gap-2 px-6 py-4 font-medium text-sm
                 transition-all duration-300 ease-in-out whitespace-nowrap
-                hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50
+                hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50
                 ${
                   activeTab === tab.key
-                    ? 'text-blue-600 bg-gradient-to-r from-blue-50 to-indigo-50'
-                    : 'text-gray-600 hover:text-blue-500'
+                    ? 'text-primary-600 bg-gradient-to-r bg-primary-50'
+                    : 'text-gray-600 hover:text-primary-500'
                 }
               `}
             >
@@ -33,18 +33,18 @@ const NavbarBooking = ({ activeTab, setActiveTab }) => {
                 size={18} 
                 className={`
                   transition-all duration-300
-                  ${activeTab === tab.key ? 'text-blue-600 scale-110' : 'text-gray-500'}
+                  ${activeTab === tab.key ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-800'}
                 `} 
               />
               <span className="font-semibold">{tab.label}</span>
               
               {activeTab === tab.key && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-t-full transition-all duration-300" />
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gradient-to-r bg-primary-500 rounded-t-full transition-all duration-300" />
               )}
               
               <div className={`
                 absolute inset-0 rounded-lg transition-all duration-300
-                ${activeTab === tab.key ? 'bg-blue-500/5' : 'hover:bg-blue-500/5'}
+                ${activeTab === tab.key ? 'bg-primary-500/5' : 'hover:bg-primary-500/5'}
               `} />
             </button>
           );
