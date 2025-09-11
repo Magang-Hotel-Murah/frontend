@@ -75,7 +75,7 @@ const Sidebar = ({
           isCollapsed ? "lg:w-16" : "lg:w-64"
         }`}
       >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-primary-500">
+        <div className="h-full px-3 pb-4 overflow-y-auto bg-primary-500 mt-2">
           <ul className="space-y-2 font-medium">
             {menuItems.map((item) => {
               const Icon = item.icon;

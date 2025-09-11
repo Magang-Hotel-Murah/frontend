@@ -22,7 +22,10 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@auth': path.resolve(__dirname, './src/pages/auth'),
       '@transaksi' : path.resolve(__dirname, './src/pages/transaksi'),
-      '@pengguna' : path.resolve(__dirname, './src/pages/pengguna'),
+      '@users' : path.resolve(__dirname, './src/pages/users'),
+      '@ui' : path.resolve(__dirname, './src/components/ui'),
+      '@alert' : path.resolve(__dirname, './src/components/alert'),
+      '@settings' : path.resolve(__dirname, './src/pages/settings'),
     },
   },
 })

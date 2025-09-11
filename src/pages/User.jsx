@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, Plus, Edit, Trash2, Eye, X, Save, Filter } from "lucide-react";
 import axios from "axios";
-import { Create, Update, View } from "@pengguna";
+import { Create, Update, View } from "@users";
 
 const Users = () => {
   const [users, setUsers] = useState([]);

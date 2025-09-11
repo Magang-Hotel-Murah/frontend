@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@layouts';
 import './index.css';
-import { Home, User, Transaction } from '@pages';
+import { Home, User, Transaction, Setting } from '@pages';
 import { Login, Register, ForgotPassword } from '@auth';
 import { useAuth } from '@hooks';
 import { ProtectedRoute } from './components';
@@ -79,7 +79,7 @@ const App = () => {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <MainLayout user={user} onLogout={logout}>
-                <h1>Halaman Setting</h1>
+                <Setting/>
               </MainLayout>
             </ProtectedRoute>
           }

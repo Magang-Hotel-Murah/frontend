@@ -19,7 +19,7 @@ export const useAuth = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         setUser(response.data.user);
-        console.log("User set:", response.data.user);
+        // console.log("User set:", response.data.user);
         return true;
       }
       return false;
@@ -65,6 +65,7 @@ export const useAuth = () => {
     user,
     login,
     logout, 
+    register,
     isAuthenticated: !!user
   };
 };

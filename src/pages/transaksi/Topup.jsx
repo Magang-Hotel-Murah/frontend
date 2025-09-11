@@ -7,7 +7,6 @@ const Topup = () => {
         Form Booking Topup PPOB
       </h3>
       <p className="text-gray-600">Ini adalah konten khusus untuk booking hotel.</p>
-      {/* Tambahkan form / tabel sesuai kebutuhan */}
     </div>
   );
 };

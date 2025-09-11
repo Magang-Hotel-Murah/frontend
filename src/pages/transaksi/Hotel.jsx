@@ -1,108 +1,122 @@
-import React, { useState, useMemo } from "react";
-import { Search, Filter, Calendar, Download, Eye, MoreVertical } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Search, Filter, Calendar, Download, Eye, MoreVertical, Plus, Loader2, AlertCircle } from "lucide-react";
+import axios from "axios";
 
 const Hotel = () => {
-  // Sample data - dalam implementasi nyata, data ini akan dari API
-  const [transactions] = useState([
-    {
-      id: 1,
-      transactionable_id: "HTL001",
-      transactionable_type: "hotel",
-      external_id: "EXT-HTL-001",
-      amount: 1500000,
-      currency: "IDR",
-      payment_method: "Credit Card",
-      payment_status: "completed",
-      transaction_date: "2024-08-20",
-      created_at: "2024-08-20 10:30:00",
-      updated_at: "2024-08-20 10:32:00",
-      hotel_name: "Grand Hyatt Jakarta",
-      guest_name: "Ahmad Rizki"
-    },
-    {
-      id: 2,
-      transactionable_id: "HTL002",
-      transactionable_type: "hotel",
-      external_id: "EXT-HTL-002",
-      amount: 2250000,
-      currency: "IDR",
-      payment_method: "Bank Transfer",
-      payment_status: "pending",
-      transaction_date: "2024-08-21",
-      created_at: "2024-08-21 14:15:00",
-      updated_at: "2024-08-21 14:15:00",
-      hotel_name: "The Ritz-Carlton Jakarta",
-      guest_name: "Sari Dewi"
-    },
-    {
-      id: 3,
-      transactionable_id: "HTL003",
-      transactionable_type: "hotel",
-      external_id: "EXT-HTL-003",
-      amount: 950000,
-      currency: "IDR",
-      payment_method: "E-Wallet",
-      payment_status: "completed",
-      transaction_date: "2024-08-22",
-      created_at: "2024-08-22 09:45:00",
-      updated_at: "2024-08-22 09:47:00",
-      hotel_name: "Hotel Indonesia Kempinski",
-      guest_name: "Budi Santoso"
-    },
-    {
-      id: 4,
-      transactionable_id: "HTL004",
-      transactionable_type: "hotel",
-      external_id: "EXT-HTL-004",
-      amount: 3200000,
-      currency: "IDR",
-      payment_method: "Credit Card",
-      payment_status: "failed",
-      transaction_date: "2024-08-23",
-      created_at: "2024-08-23 16:20:00",
-      updated_at: "2024-08-23 16:22:00",
-      hotel_name: "Mandarin Oriental Jakarta",
-      guest_name: "Lisa Andriani"
-    },
-    {
-      id: 5,
-      transactionable_id: "HTL005",
-      transactionable_type: "hotel",
-      external_id: "EXT-HTL-005",
-      amount: 1800000,
-      currency: "IDR",
-      payment_method: "Bank Transfer",
-      payment_status: "completed",
-      transaction_date: "2024-08-24",
-      created_at: "2024-08-24 11:10:00",
-      updated_at: "2024-08-24 11:12:00",
-      hotel_name: "Four Seasons Hotel Jakarta",
-      guest_name: "David Kurniawan"
-    }
-  ]);
-
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
 
-  // Filter transaksi hanya untuk hotel dan berdasarkan filter lainnya
-  const filteredTransactions = useMemo(() => {
-    return transactions
-      .filter(transaction => transaction.transactionable_type === "hotel") // Filter hanya hotel
-      .filter(transaction => {
-        const matchesSearch = 
-          transaction.external_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          transaction.hotel_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          transaction.guest_name.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        const matchesStatus = statusFilter === "all" || transaction.payment_status === statusFilter;
-        const matchesPaymentMethod = paymentMethodFilter === "all" || transaction.payment_method === paymentMethodFilter;
-        
-        return matchesSearch && matchesStatus && matchesPaymentMethod;
+
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://127.0.0.1:8000/api/transactions",{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+      console.log(response.data)
+      if (!response.status==='ok') {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.data;
+      
+      const hotelTransactions = data
+        .filter(transaction => transaction.transactionable_type === 'hotel')
+        .map(transaction => ({
+          ...transaction,
+          hotel_name: transaction.transactionable?.name || `Hotel ${transaction.transactionable_id}`,
+          guest_name: transaction.transactionable?.guest_name || `Guest ${transaction.id}`,
+          external_id: transaction.external_id || `EXT-HTL-${transaction.id.toString().padStart(3, '0')}`
+        }));
+      
+      setTransactions(hotelTransactions);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching transactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateTransactionStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(`http://127.0.0.1:8000/api/transactions/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payment_status: status
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      await fetchTransactions();
+    } catch (err) {
+      console.error('Error updating transaction:', err);
+      setError(err.message);
+    }
+  };
+
+  // Delete transaction
+  const deleteTransaction = async (id) => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.delete(`http://127.0.0.1:8000/api/transactions/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Refresh transactions after delete
+      await fetchTransactions();
+    } catch (err) {
+      console.error('Error deleting transaction:', err);
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(transaction => {
+      const matchesSearch = 
+        (transaction.external_id?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (transaction.hotel_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (transaction.guest_name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (transaction.id.toString().includes(searchTerm));
+      
+      const matchesStatus = statusFilter === "all" || transaction.payment_status === statusFilter;
+      const matchesPaymentMethod = paymentMethodFilter === "all" || transaction.payment_method === paymentMethodFilter;
+      
+      return matchesSearch && matchesStatus && matchesPaymentMethod;
+    });
   }, [transactions, searchTerm, statusFilter, paymentMethodFilter]);
 
-  const formatCurrency = (amount, currency) => {
+  const formatCurrency = (amount, currency = 'IDR') => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: currency,
@@ -112,19 +126,23 @@ const Hotel = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      completed: "bg-emerald-100 text-emerald-800 border-emerald-200",
-      pending: "bg-amber-100 text-amber-800 border-amber-200",
+      paid: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      unpaid: "bg-amber-100 text-amber-800 border-amber-200",
       failed: "bg-red-100 text-red-800 border-red-200"
     };
     
+    const displayStatus = status === 'paid' ? 'Paid' : status === 'unpaid' ? 'Unpaid' : 'Failed';
+    
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${statusConfig[status]}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${statusConfig[status] || statusConfig.unpaid}`}>
+        {displayStatus}
       </span>
     );
   };
 
   const getPaymentMethodBadge = (method) => {
+    if (!method) return <span className="px-2 py-1 rounded-md text-xs font-medium border bg-gray-100 text-gray-800">-</span>;
+    
     const methodConfig = {
       "Credit Card": "bg-purple-100 text-purple-800 border-purple-200",
       "Bank Transfer": "bg-blue-100 text-blue-800 border-blue-200",
@@ -132,21 +150,60 @@ const Hotel = () => {
     };
     
     return (
-      <span className={`px-2 py-1 rounded-md text-xs font-medium border ${methodConfig[method]}`}>
+      <span className={`px-2 py-1 rounded-md text-xs font-medium border ${methodConfig[method] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
         {method}
       </span>
     );
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-xl shadow-sm">
+          <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+          <span className="text-slate-700">Memuat transaksi...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-xl shadow-sm border border-red-200">
+          <AlertCircle className="w-5 h-5 text-red-600" />
+          <div>
+            <p className="text-red-800 font-medium">Error memuat data</p>
+            <p className="text-red-600 text-sm">{error}</p>
+            <button 
+              onClick={fetchTransactions}
+              className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors"
+            >
+              Coba Lagi
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br">
-      <div className=" mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center justify-between">
-            {/* <div>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-800">Transaksi Hotel</h1>
               <p className="text-slate-600 mt-2">Kelola dan pantau semua transaksi pemesanan hotel</p>
-            </div> */}
+            </div>
             <div className="flex items-center gap-3">
+              <button 
+                onClick={fetchTransactions}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-all duration-200 shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="text-sm font-medium">Refresh</span>
+              </button>
               <button className="flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl transition-all duration-200 shadow-sm">
                 <Download className="w-4 h-4" />
                 <span className="text-sm font-medium">Export</span>
@@ -155,10 +212,8 @@ const Hotel = () => {
           </div>
         </div>
 
-        {/* Filters */}
         <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 p-6 mb-6 shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
               <input
@@ -170,19 +225,17 @@ const Hotel = () => {
               />
             </div>
 
-            {/* Status Filter */}
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
             >
               <option value="all">Semua Status</option>
-              <option value="completed">Completed</option>
-              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
               <option value="failed">Failed</option>
             </select>
 
-            {/* Payment Method Filter */}
             <select
               value={paymentMethodFilter}
               onChange={(e) => setPaymentMethodFilter(e.target.value)}
@@ -194,7 +247,6 @@ const Hotel = () => {
               <option value="E-Wallet">E-Wallet</option>
             </select>
 
-            {/* Results Count */}
             <div className="flex items-center justify-end">
               <span className="text-sm text-slate-600">
                 {filteredTransactions.length} transaksi ditemukan
@@ -203,7 +255,6 @@ const Hotel = () => {
           </div>
         </div>
 
-        {/* Table */}
         <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -260,11 +311,25 @@ const Hotel = () => {
                       {getPaymentMethodBadge(transaction.payment_method)}
                     </td>
                     <td className="py-4 px-6">
-                      {getStatusBadge(transaction.payment_status)}
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(transaction.payment_status)}
+                        <select
+                          value={transaction.payment_status}
+                          onChange={(e) => updateTransactionStatus(transaction.id, e.target.value)}
+                          className="text-xs border border-slate-200 rounded px-1 py-0.5"
+                        >
+                          <option value="unpaid">Unpaid</option>
+                          <option value="paid">Paid</option>
+                          <option value="failed">Failed</option>
+                        </select>
+                      </div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="text-sm text-slate-800">
-                        {new Date(transaction.transaction_date).toLocaleDateString('id-ID')}
+                        {transaction.transaction_date ? 
+                          new Date(transaction.transaction_date).toLocaleDateString('id-ID') :
+                          new Date(transaction.created_at).toLocaleDateString('id-ID')
+                        }
                       </div>
                       <div className="text-xs text-slate-500 mt-1">
                         {new Date(transaction.created_at).toLocaleTimeString('id-ID', { 
@@ -275,11 +340,18 @@ const Hotel = () => {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
-                        <button className="p-1.5 hover:bg-slate-200 rounded-lg transition-colors duration-200">
-                          <Eye className="w-4 h-4 text-slate-600" />
+                        <button 
+                          className="p-1.5 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                          title="Lihat Detail"
+                        >
+                          <Eye className="w-4 h-4 text-blue-600" />
                         </button>
-                        <button className="p-1.5 hover:bg-slate-200 rounded-lg transition-colors duration-200">
-                          <MoreVertical className="w-4 h-4 text-slate-600" />
+                        <button 
+                          onClick={() => deleteTransaction(transaction.id)}
+                          className="p-1.5 hover:bg-red-100 rounded-lg transition-colors duration-200"
+                          title="Hapus Transaksi"
+                        >
+                          <MoreVertical className="w-4 h-4 text-red-600" />
                         </button>
                       </div>
                     </td>
@@ -289,7 +361,7 @@ const Hotel = () => {
             </table>
           </div>
 
-          {filteredTransactions.length === 0 && (
+          {filteredTransactions.length === 0 && !loading && (
             <div className="text-center py-12">
               <div className="text-slate-400 mb-2">
                 <Calendar className="w-12 h-12 mx-auto mb-4" />
@@ -300,17 +372,16 @@ const Hotel = () => {
           )}
         </div>
 
-        {/* Pagination */}
         {filteredTransactions.length > 0 && (
           <div className="mt-6 flex items-center justify-between">
             <div className="text-sm text-slate-600">
-              Menampilkan {filteredTransactions.length} dari {filteredTransactions.length} transaksi
+              Menampilkan {filteredTransactions.length} dari {transactions.length} transaksi
             </div>
             <div className="flex items-center gap-2">
               <button className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50">
                 Sebelumnya
               </button>
-              <span className="px-4 py-2 bg-primary-500 text-white rounded-lg">1</span>
+              <span className="px-4 py-2 bg-blue-500 text-white rounded-lg">1</span>
               <button className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50">
                 Selanjutnya
               </button>

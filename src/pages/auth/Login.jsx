@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  LogIn,
-  UserIcon,
-} from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, LogIn } from "lucide-react";
 import logo from "../../assets/hotelmurah.png";
 import { useNavigate } from "react-router-dom";
 
+// Import Alert Components
 import { 
   SuccessAlert, 
   ErrorAlert, 
@@ -18,18 +12,18 @@ import {
   AlertStyles 
 } from "@alert";
 
-const Register = ({ onRegister }) => {
+const Login = ({ onLogin }) => {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  // Alert states
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showLoadingAlert, setShowLoadingAlert] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('info');
   const [toastMessage, setToastMessage] = useState('');
@@ -38,49 +32,65 @@ const Register = ({ onRegister }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!name.trim()) {
-      showToastNotification('error', 'Nama tidak boleh kosong');
+    // Validasi form dengan toast notifications
+    if (!email.trim() && !password.trim()) {
+      showToastNotification('error', 'Email dan password harus diisi');
       return;
     }
-    
+
     if (!email.trim()) {
-      showToastNotification('error', 'Email tidak boleh kosong');
+      showToastNotification('error', 'Email harus diisi');
       return;
     }
-    
+
     if (!password.trim()) {
-      showToastNotification('error', 'Password tidak boleh kosong');
+      showToastNotification('error', 'Password harus diisi');
       return;
     }
-    
-    if (password.length < 6) {
-      showToastNotification('error', 'Password minimal 6 karakter');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showToastNotification('error', 'Format email tidak valid');
       return;
     }
 
     setIsLoading(true);
     setShowLoadingAlert(true);
-    setError("");
-    
+
     try {
-      const success = await onRegister(name, email, password);
+      const success = await onLogin(email, password);
       setShowLoadingAlert(false);
       
-      if (success) {
-        setShowSuccessAlert(true);
-        showToastNotification('success', 'Registrasi berhasil!');
-      } else {
-        setErrorMessage("Gagal mendaftarkan akun. Email mungkin sudah terdaftar.");
+      if (!success) {
+        setErrorMessage("Email atau password yang Anda masukkan salah. Silakan periksa kembali dan coba lagi.");
         setShowErrorAlert(true);
+      } else {
+        setShowSuccessAlert(true);
+        showToastNotification('success', 'Login berhasil! Mengarahkan ke dashboard...');
+        // Navigate setelah delay singkat untuk menampilkan success message
+        setTimeout(() => {
+          navigate("/home");
+        }, 1500);
       }
     } catch (error) {
-      console.error("Register error:", error);
       setShowLoadingAlert(false);
-      setErrorMessage("Terjadi kesalahan pada server. Silakan coba lagi.");
+      console.error("Login error:", error);
+      
+      // Berbagai jenis error handling
+      if (error.message === 'Network Error') {
+        setErrorMessage("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
+      } else if (error.response?.status === 429) {
+        setErrorMessage("Terlalu banyak percobaan login. Silakan coba lagi setelah beberapa menit.");
+      } else if (error.response?.status === 500) {
+        setErrorMessage("Terjadi kesalahan pada server. Silakan coba lagi nanti.");
+      } else {
+        setErrorMessage("Terjadi kesalahan yang tidak terduga. Silakan coba lagi.");
+      }
+      
       setShowErrorAlert(true);
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   const showToastNotification = (type, message) => {
@@ -89,62 +99,42 @@ const Register = ({ onRegister }) => {
     setShowToast(true);
   };
 
-  const handleSuccessAlertClose = () => {
-    setShowSuccessAlert(false);
-    navigate("/");
-  };
-
   const handleErrorAlertClose = () => {
     setShowErrorAlert(false);
     setErrorMessage('');
   };
 
+  const handleSuccessAlertClose = () => {
+    setShowSuccessAlert(false);
+    navigate("/home");
+  };
+
+  const handleForgotPassword = () => {
+    showToastNotification('info', 'Fitur reset password akan segera tersedia');
+    // navigate("/forgot-password"); // Uncomment jika halaman sudah ada
+  };
+
   return (
     <>
+      {/* Include Alert Styles */}
       <AlertStyles />
       
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-indigo-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-4">
               <img src={logo} alt="hotelmurah" />
             </div>
-            <h2
-              className="text-3xl font-bold"
-              style={{ color: "var(--primary-500)" }}
-            >
+            <h2 className="text-3xl font-bold" style={{ color: "var(--primary-500)" }}>
               hotelmurah.com
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Registrasi untuk bisa login ke Admin Dashboard Transaksi
+              Sign in untuk masuk ke halaman admin
             </p>
           </div>
 
           <div className="bg-white py-8 px-6 shadow-xl rounded-xl border border-gray-100">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Nama
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <UserIcon className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
-                    placeholder="Masukkan nama lengkap"
-                  />
-                </div>
-              </div>
-
               <div>
                 <label
                   htmlFor="email"
@@ -163,7 +153,7 @@ const Register = ({ onRegister }) => {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
+                    className="block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
                     placeholder="Masukkan alamat email"
                   />
                 </div>
@@ -187,8 +177,8 @@ const Register = ({ onRegister }) => {
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
-                    placeholder="Masukkan password (min. 6 karakter)"
+                    className="block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
+                    placeholder="Masukkan password"
                   />
                   <button
                     type="button"
@@ -204,25 +194,52 @@ const Register = ({ onRegister }) => {
                 </div>
               </div>
 
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                  <label
+                    htmlFor="remember-me"
+                    className="ml-2 block text-sm text-gray-700"
+                  >
+                    Remember me
+                  </label>
+                </div>
+
+                <div className="text-sm">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="font-medium text-primary-500 hover:underline transition-colors"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              </div>
+              
               <div>
                 <button
                   type="submit"
-                  disabled={isLoading || !name || !email || !password}
+                  disabled={isLoading || !email || !password}
                   className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white transition-all duration-200 ${
-                    isLoading || !name || !email || !password
+                    isLoading || !email || !password
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-primary-500 hover:bg-[#2e406f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#37518C] transform hover:scale-105"
+                      : "bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#37518C] transform hover:scale-105"
                   }`}
                 >
                   {isLoading ? (
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Mendaftar...
+                      Masuk...
                     </div>
                   ) : (
                     <div className="flex items-center">
                       <LogIn className="h-4 w-4 mr-2" />
-                      Daftar Akun
+                      Masuk
                     </div>
                   )}
                 </button>
@@ -232,40 +249,45 @@ const Register = ({ onRegister }) => {
 
           <div className="text-center">
             <p className="text-xs text-gray-500">
-              Sudah mempunyai akun?{" "}
+              Belum mempunyai akun?{" "}
               <button
-                onClick={() => navigate("/")}
-                className="font-medium hover:text-primary-500 text-primary-600 underline"
+                type="button"
+                onClick={() => navigate("/register")}
+                className="font-medium hover:text-primary-500 text-primary-600 hover:underline"
               >
-                Masuk di sini
+                Daftar di sini
               </button>
             </p>
           </div>
         </div>
       </div>
 
+      {/* Success Alert */}
       <SuccessAlert
         show={showSuccessAlert}
         onClose={handleSuccessAlertClose}
-        title="Registrasi Berhasil!"
-        message="Akun Anda berhasil dibuat. Silakan login untuk melanjutkan ke dashboard."
-        buttonText="Lanjut ke Login"
+        title="Login Berhasil!"
+        message="Selamat datang kembali! Anda akan diarahkan ke dashboard."
+        buttonText="Lanjut ke Dashboard"
       />
 
+      {/* Error Alert */}
       <ErrorAlert
         show={showErrorAlert}
         onClose={handleErrorAlertClose}
-        title="Registrasi Gagal"
+        title="Login Gagal"
         message={errorMessage}
         buttonText="Coba Lagi"
       />
 
+      {/* Loading Alert */}
       <LoadingAlert
         show={showLoadingAlert}
-        title="Mendaftarkan Akun..."
-        message="Mohon tunggu, kami sedang memproses registrasi Anda."
+        title="Memverifikasi..."
+        message="Mohon tunggu, kami sedang memverifikasi akun Anda."
       />
 
+      {/* Toast Notification */}
       <ToastAlert
         show={showToast}
         onClose={() => setShowToast(false)}
@@ -278,4 +300,4 @@ const Register = ({ onRegister }) => {
   );
 };
 
-export default Register;
+export default Login;

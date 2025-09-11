@@ -30,7 +30,7 @@ const NavbarBooking = ({ activeTab, setActiveTab }) => {
               `}
             >
               <Icon 
-                size={18} 
+                size={18}  
                 className={`
                   transition-all duration-300
                   ${activeTab === tab.key ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-800'}
