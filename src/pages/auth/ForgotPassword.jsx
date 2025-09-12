@@ -113,7 +113,6 @@ const ForgotPassword = () => {
 
         {step === 2 && (
           <form onSubmit={handleResetPassword} className="space-y-4">
-            {/* OTP */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Kode OTP
@@ -129,7 +128,6 @@ const ForgotPassword = () => {
               />
             </div>
 
-            {/* Password Baru */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password Baru
@@ -158,7 +156,6 @@ const ForgotPassword = () => {
               </div>
             </div>
 
-            {/* Konfirmasi Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Konfirmasi Password

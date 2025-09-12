@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Search, Filter, Calendar, Download, Eye, MoreVertical, Plus, Loader2, AlertCircle } from "lucide-react";
+import { Search, Filter, Calendar, Download, Eye, MoreVertical, RefreshCcw, Loader2, AlertCircle } from "lucide-react";
 import axios from "axios";
 
 const Hotel = () => {
@@ -16,7 +16,7 @@ const Hotel = () => {
       setLoading(true);
       setError(null);
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://127.0.0.1:8000/api/transactions",{
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/transactions`,{
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -49,7 +49,7 @@ const Hotel = () => {
   const updateTransactionStatus = async (id, status) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(`http://127.0.0.1:8000/api/transactions/${id}`, {
+      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/transactions/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const Hotel = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.delete(`http://127.0.0.1:8000/api/transactions/${id}`, {
+      const response = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/transactions/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -89,7 +89,6 @@ const Hotel = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Refresh transactions after delete
       await fetchTransactions();
     } catch (err) {
       console.error('Error deleting transaction:', err);
@@ -158,9 +157,9 @@ const Hotel = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br flex items-center justify-center">
         <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-xl shadow-sm">
-          <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+          <Loader2 className="w-5 h-5 animate-spin text-primary-600" />
           <span className="text-slate-700">Memuat transaksi...</span>
         </div>
       </div>
@@ -169,7 +168,7 @@ const Hotel = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br flex items-center justify-center">
         <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-xl shadow-sm border border-red-200">
           <AlertCircle className="w-5 h-5 text-red-600" />
           <div>
@@ -188,20 +187,20 @@ const Hotel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br">
+      <div className=" mx-auto">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">Transaksi Hotel</h1>
-              <p className="text-slate-600 mt-2">Kelola dan pantau semua transaksi pemesanan hotel</p>
+              {/* <h1 className="text-3xl font-bold text-slate-800">Transaksi Hotel</h1>
+              <p className="text-slate-600 mt-2">Kelola dan pantau semua transaksi pemesanan hotel</p> */}
             </div>
             <div className="flex items-center gap-3">
               <button 
                 onClick={fetchTransactions}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-all duration-200 shadow-sm"
+                className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-gray-100 px-4 py-2 rounded-xl transition-all duration-200 shadow-sm"
               >
-                <Plus className="w-4 h-4" />
+                <RefreshCcw className="w-4 h-4" />
                 <span className="text-sm font-medium">Refresh</span>
               </button>
               <button className="flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl transition-all duration-200 shadow-sm">
@@ -221,14 +220,14 @@ const Hotel = () => {
                 placeholder="Cari transaksi..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+                className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+              className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200"
             >
               <option value="all">Semua Status</option>
               <option value="paid">Paid</option>
@@ -239,7 +238,7 @@ const Hotel = () => {
             <select
               value={paymentMethodFilter}
               onChange={(e) => setPaymentMethodFilter(e.target.value)}
-              className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+              className="px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200"
             >
               <option value="all">Semua Metode Pembayaran</option>
               <option value="Credit Card">Credit Card</option>
@@ -341,10 +340,10 @@ const Hotel = () => {
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
                         <button 
-                          className="p-1.5 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                          className="p-1.5 hover:bg-primary-100 rounded-lg transition-colors duration-200"
                           title="Lihat Detail"
                         >
-                          <Eye className="w-4 h-4 text-blue-600" />
+                          <Eye className="w-4 h-4 text-primary-600" />
                         </button>
                         <button 
                           onClick={() => deleteTransaction(transaction.id)}
@@ -381,7 +380,7 @@ const Hotel = () => {
               <button className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50">
                 Sebelumnya
               </button>
-              <span className="px-4 py-2 bg-blue-500 text-white rounded-lg">1</span>
+              <span className="px-4 py-2 bg-primary-500 text-white rounded-lg">1</span>
               <button className="px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors duration-200 disabled:opacity-50">
                 Selanjutnya
               </button>

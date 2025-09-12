@@ -10,7 +10,7 @@ export const useAuth = () => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/login", { 
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, { 
         email, 
         password 
       });
@@ -19,7 +19,6 @@ export const useAuth = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         setUser(response.data.user);
-        // console.log("User set:", response.data.user);
         return true;
       }
       return false;
@@ -31,7 +30,7 @@ export const useAuth = () => {
 
   const register = async (name, email, password) => {
     try{
-      const response = await axios.post("http://127.0.0.1:8000/api/register", { 
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/register`, { 
         name,
         email, 
         password 
@@ -47,7 +46,7 @@ export const useAuth = () => {
   const logout = async () => {
     try{
       const token = localStorage.getItem("token");
-      await axios.post("http://127.0.0.1:8000/api/logout", {}, {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/logout`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
