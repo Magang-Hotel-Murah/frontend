@@ -10,7 +10,7 @@ const Appearance = ({
   isSaving 
 }) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-4 mb-4 mr-4 ml-4">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Theme</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

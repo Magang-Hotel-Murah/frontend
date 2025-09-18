@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@layouts';
 import './index.css';
-import { Home, User, Transaction, Setting } from '@pages';
+import { Home, User, Transaction, Setting, Booking } from '@pages';
 import { Login, Register, ForgotPassword } from '@auth';
 import { useAuth } from '@hooks';
 import { ProtectedRoute } from './components';
@@ -58,6 +58,17 @@ const App = () => {
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <MainLayout user={user} onLogout={logout}>
                 <Transaction/>
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/booking" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <MainLayout user={user} onLogout={logout}>
+                <Booking/>
               </MainLayout>
             </ProtectedRoute>
           }

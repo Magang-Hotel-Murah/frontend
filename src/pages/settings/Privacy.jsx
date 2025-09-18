@@ -2,7 +2,7 @@ import React from 'react';
 
 const Privacy = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-4 mb-4 mr-4 ml-4">
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Pengaturan Privasi</h3>
         <div className="space-y-4">

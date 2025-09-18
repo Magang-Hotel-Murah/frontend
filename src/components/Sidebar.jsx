@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Users, Settings, BarChart3, X } from "lucide-react";
+import { Home, Users, Settings, BarChart3, BookIcon, Book } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
@@ -21,6 +21,9 @@ const Sidebar = ({
       case "/transaction":
         setActiveMenu("transactions");
       break
+      case "/booking":
+        setActiveMenu("bookings");
+      break
       case "/user":
         setActiveMenu("users");
       break;
@@ -38,16 +41,19 @@ const Sidebar = ({
     switch (itemId) {
       case "home":
         navigate("/home");
-        break;
+      break;
       case "transactions":
         navigate("/transaction");
-        break;
+      break;
+      case "bookings":
+        navigate("/booking");
+      break;
       case "users":
         navigate("/user");
-        break;
+      break;
       case "settings":
         navigate("/setting");
-        break;
+      break;
       default:
         console.log("Unknown menu item:", itemId);
     }
@@ -56,6 +62,7 @@ const Sidebar = ({
   const menuItems = [
     { id: "home", name: "Dashboard", icon: Home },
     { id: "transactions", name: "Transaksi", icon: BarChart3 },
+    { id: "bookings", name:"Booking", icon: BookIcon},
     { id: "users", name: "Pengguna", icon: Users },
     { id: "settings", name: "Pengaturan", icon: Settings },
   ];

@@ -46,7 +46,6 @@ const Setting = () => {
     { id: 'security', label: 'Keamanan', icon: Lock },
     { id: 'notifications', label: 'Notifikasi', icon: Bell },
     { id: 'appearance', label: 'Tampilan', icon: Palette },
-    { id: 'privacy', label: 'Privasi', icon: Shield },
     { id: 'data', label: 'Data', icon: Download }
   ];
 
@@ -129,8 +128,6 @@ const Setting = () => {
         return <Notifications {...props} />;
       case 'appearance':
         return <Appearance {...props} />;
-      case 'privacy':
-        return <Privacy {...props} />;
       case 'data':
         return <Data {...props} />;
       default:
