@@ -3,7 +3,6 @@ import { Eye, EyeOff, Lock, Mail, LogIn } from "lucide-react";
 import logo from "../../assets/hotelmurah.png";
 import { useNavigate } from "react-router-dom";
 
-// Import Alert Components
 import { 
   SuccessAlert, 
   ErrorAlert, 
@@ -20,7 +19,6 @@ const Login = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Alert states
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showLoadingAlert, setShowLoadingAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -32,7 +30,6 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validasi form dengan toast notifications
     if (!email.trim() && !password.trim()) {
       showToastNotification('error', 'Email dan password harus diisi');
       return;
@@ -67,7 +64,6 @@ const Login = ({ onLogin }) => {
       } else {
         setShowSuccessAlert(true);
         showToastNotification('success', 'Login berhasil! Mengarahkan ke dashboard...');
-        // Navigate setelah delay singkat untuk menampilkan success message
         setTimeout(() => {
           navigate("/home");
         }, 1500);
@@ -76,7 +72,6 @@ const Login = ({ onLogin }) => {
       setShowLoadingAlert(false);
       console.error("Login error:", error);
       
-      // Berbagai jenis error handling
       if (error.message === 'Network Error') {
         setErrorMessage("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
       } else if (error.response?.status === 429) {
@@ -110,13 +105,12 @@ const Login = ({ onLogin }) => {
   };
 
   const handleForgotPassword = () => {
-    showToastNotification('info', 'Fitur reset password akan segera tersedia');
-    // navigate("/forgot-password"); // Uncomment jika halaman sudah ada
+    setShowSuccessAlert(false);
+    navigate("/forgot-password"); 
   };
 
   return (
     <>
-      {/* Include Alert Styles */}
       <AlertStyles />
       
       <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-indigo-50 flex items-center justify-center p-4">
@@ -262,7 +256,6 @@ const Login = ({ onLogin }) => {
         </div>
       </div>
 
-      {/* Success Alert */}
       <SuccessAlert
         show={showSuccessAlert}
         onClose={handleSuccessAlertClose}
@@ -271,7 +264,6 @@ const Login = ({ onLogin }) => {
         buttonText="Lanjut ke Dashboard"
       />
 
-      {/* Error Alert */}
       <ErrorAlert
         show={showErrorAlert}
         onClose={handleErrorAlertClose}
@@ -280,14 +272,12 @@ const Login = ({ onLogin }) => {
         buttonText="Coba Lagi"
       />
 
-      {/* Loading Alert */}
       <LoadingAlert
         show={showLoadingAlert}
         title="Memverifikasi..."
         message="Mohon tunggu, kami sedang memverifikasi akun Anda."
       />
 
-      {/* Toast Notification */}
       <ToastAlert
         show={showToast}
         onClose={() => setShowToast(false)}

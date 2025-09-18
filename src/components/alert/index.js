@@ -7,8 +7,7 @@ export {
   LoadingAlert,
   ActionAlert,
   ToastAlert,
-  AlertStyles,
-  useAlert
+  AlertStyles
 } from './CustomAlert';
 
 export { default as AlertComponents } from './CustomAlert';

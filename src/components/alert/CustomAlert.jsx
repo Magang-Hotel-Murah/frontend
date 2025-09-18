@@ -11,7 +11,7 @@ import {
   Save,
   Mail,
   Bell,
-  Settings
+  Settings,
 } from 'lucide-react';
 
 const BaseAlert = ({ 
@@ -157,15 +157,15 @@ export const InfoAlert = ({
   <BaseAlert show={show} onClose={onClose}>
     <div className="p-6 text-center">
       {showIcon && (
-        <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
-          <Info className="h-8 w-8 text-blue-600" />
+        <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
+          <Info className="h-8 w-8 text-primary-600" />
         </div>
       )}
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
       <p className="text-sm text-gray-600 mb-6">{message}</p>
       <button
         onClick={onClose}
-        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+        className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg hover:bg-primary-700 transition-colors duration-200 font-medium"
       >
         {buttonText}
       </button>
@@ -187,17 +187,42 @@ export const ConfirmationAlert = ({
 }) => {
   const colorClasses = {
     red: 'bg-red-600 hover:bg-red-700',
-    blue: 'bg-blue-600 hover:bg-blue-700',
+    blue: 'bg-primary-600 hover:bg-primary-700',
     green: 'bg-green-600 hover:bg-green-700',
     yellow: 'bg-yellow-600 hover:bg-yellow-700'
   };
+
+  const bgIconClasses = {
+    red: "bg-red-100",
+    blue: "bg-primary-100",
+    green: "bg-green-100",
+    yellow: "bg-yellow-100",
+  };
+
+  const textIconClasses = {
+    red: "text-red-600",
+    blue: "text-primary-600",
+    green: "text-green-600",
+    yellow: "text-yellow-600",
+  };
+
+  const icons = {
+    red: AlertTriangle,
+    blue: Info,
+    green: CheckCircle,
+    yellow: AlertCircle,
+  };
+
+  const Icon = icons[confirmColor];
 
   return (
     <BaseAlert show={show} onClose={onClose} showCloseButton={false}>
       <div className="p-6 text-center">
         {showIcon && (
-          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
-            <AlertTriangle className="h-8 w-8 text-red-600" />
+          <div
+            className={`mx-auto flex items-center justify-center h-16 w-16 rounded-full ${bgIconClasses[confirmColor]} mb-4`}
+          >
+            <Icon className={`h-8 w-8 ${textIconClasses[confirmColor]}`} />
           </div>
         )}
         <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
@@ -230,6 +255,7 @@ export const ConfirmationAlert = ({
   );
 };
 
+
 export const LoadingAlert = ({ 
   show, 
   title = "Memproses...", 
@@ -237,8 +263,8 @@ export const LoadingAlert = ({
 }) => (
   <BaseAlert show={show} onClose={() => {}} showCloseButton={false} backdropBlur={true}>
     <div className="p-6 text-center">
-      <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
       <p className="text-sm text-gray-600">{message}</p>
@@ -253,7 +279,7 @@ export const ActionAlert = ({
   message, 
   actions = [],
   icon = null,
-  iconBgColor = 'bg-blue-100',
+  iconBgColor = 'bg-primary-100',
   size = 'md'
 }) => (
   <BaseAlert show={show} onClose={onClose} size={size}>
@@ -270,7 +296,7 @@ export const ActionAlert = ({
           <button
             key={index}
             onClick={action.onClick}
-            className={`w-full py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center ${action.className || 'bg-blue-600 text-white hover:bg-blue-700'}`}
+            className={`w-full py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center ${action.className || 'bg-primary-600 text-white hover:bg-primary-700'}`}
           >
             {action.icon && <span className="mr-2">{action.icon}</span>}
             {action.label}
@@ -304,7 +330,7 @@ export const ToastAlert = ({
     success: 'bg-green-500 text-white',
     error: 'bg-red-500 text-white',
     warning: 'bg-yellow-500 text-white',
-    info: 'bg-blue-500 text-white'
+    info: 'bg-primary-500 text-white'
   };
 
   const positionClasses = {

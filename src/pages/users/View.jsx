@@ -1,99 +1,98 @@
-import React, { useState } from "react";
-import { X, Save } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import axios from "axios";
 
+const View = ({ user, onClose }) => {
+  const [userData, setUserData] = useState(null);
 
-const Create =  ({ onClose, onSuccess }) => {
-    const [formData, setFormData] = useState({
-        "name": "",
-        "email": "",
-        "role": "",
-        "password": "",
-        "deleted_at": null,
-    });
-    
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (user?.id) {
+      axios
+        .get(`${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => setUserData(res.data))
+        .catch((err) => {
+          console.error("Gagal memuat user:", err);
+        });
+    }
+  }, [user]);
 
-    const handleSubmit = async () => {
-        try{
-            const response = await axios.post("http://127.0.0.1:8080/api/user", formData);
-            onSuccess(response.data);
-            onClose();
-        } catch(error){
-            console.log(error);
-            alert("Gagal menambahkan user");
-        }
-    };
-
+  if (!userData) {
     return (
-        <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
-            <div className="absolute inset-0 backdrop-blur-sm bg-black/20"></div>
-            <div className="relative bg-white rounded-lg w-full max-w-md shadow-lg">
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Tambah User Baru</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-                        <X className="w-5 h-5"/>
-                    </button>
-                </div>
-
-                <div className="p-6 space-y-4">
-                    <input 
-                        type="text"
-                        name="name"
-                        placeholder="Nama"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg" 
-                    />
-                    <input 
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg" 
-                    />
-                    <input 
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg" 
-                    />
-                    <select 
-                        name="role" 
-                        value={formData.role}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    >
-                        <option value="User">User</option>
-                        <option value="Admin">Admin</option>
-                    </select>
-                    <select 
-                        name="status" 
-                        value={formData.deleted_at}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    >
-                        <option value="Active">Aktif</option>
-                        <option value="Unactive">Non-Aktif</option>
-                    </select>
-                    <div className="flex justify-end gap-3 mt-6">
-                        <button onClick={onClose} className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg">
-                            Batal
-                        </button>
-                        <button onClick={handleSubmit} className="px-4 py-2 bg-primary-600 text-gray-100 rounded-lg flex items-center gap-2">
-                            <Save className="w-4 h-4"/> Tambah
-                        </button>
-                    </div>
-                </div>
-            </div>
+      <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+        <div className="absolute inset-0 backdrop-blur-sm bg-black/20"></div>
+        <div className="relative bg-white rounded-lg w-full max-w-md shadow-lg p-6">
+          <p className="text-gray-600">Loading...</p>
         </div>
+      </div>
     );
+  }
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+      <div className="absolute inset-0 backdrop-blur-sm bg-black/20"></div>
+      <div className="relative bg-white rounded-lg w-full max-w-md shadow-lg">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Detail User</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div>
+            <p className="text-sm text-gray-500">Nama</p>
+            <p className="text-base font-medium text-gray-900">
+              {userData.name}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-500">Email</p>
+            <p className="text-base font-medium text-gray-900">
+              {userData.email}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-500">Role</p>
+            <p className="text-base font-medium text-gray-900">
+              {userData.role}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-500">Status</p>
+            <span
+              className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                userData.deleted_at
+                  ? "bg-red-100 text-red-700"
+                  : "bg-green-100 text-green-700"
+              }`}
+            >
+              {userData.deleted_at ? "Non-Aktif" : "Aktif"}
+            </span>
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default Create;
+export default View;
