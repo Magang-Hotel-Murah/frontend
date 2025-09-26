@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavbarBooking } from "@components";
+import { NavbarTransaction } from "@components";
 import { Hotel, Kereta, Pesawat, Topup } from "@transaksi";
 
 const Transactions = () => {
@@ -9,16 +9,12 @@ const Transactions = () => {
     switch (activeTab) {
       case "hotel":
         return <Hotel />;
-        break;
       case "kereta":
         return <Kereta />;
-        break;
       case "pesawat":
         return <Pesawat />;
-        break;
       case "topup":
         return <Topup />;
-        break;
       default:
         return null;
     }
@@ -27,7 +23,7 @@ const Transactions = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white overflow-hidden">
-        <NavbarBooking activeTab={activeTab} setActiveTab={setActiveTab} />
+        <NavbarTransaction activeTab={activeTab} setActiveTab={setActiveTab} />
 
         <div className="p-8">
           {renderContent()}

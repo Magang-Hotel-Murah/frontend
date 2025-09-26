@@ -1,4 +1,4 @@
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
 class ApiService {
   async request(endpoint, options = {}) {
@@ -17,7 +17,7 @@ class ApiService {
       config.body = JSON.stringify(config.body);
     }
 
-    const response = await fetch(url, config);
+      const response = await fetch(url, config);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -30,38 +30,36 @@ class ApiService {
     return response.json();
   }
 
-  // Meeting Rooms API
   async getRooms() {
-    return this.request('/meeting-rooms');
+    return this.request('/meeting-room');
   }
 
   async getRoom(id) {
-    return this.request(`/meeting-rooms/${id}`);
+    return this.request(`/meeting-room/${id}`);
   }
 
   async createRoom(data) {
-    return this.request('/meeting-rooms', {
+    return this.request('/meeting-room', {
       method: 'POST',
       body: data,
     });
   }
 
   async updateRoom(id, data) {
-    return this.request(`/meeting-rooms/${id}`, {
+    return this.request(`/meeting-room/${id}`, {
       method: 'PUT',
       body: data,
     });
   }
 
   async deleteRoom(id) {
-    return this.request(`/meeting-rooms/${id}`, {
+    return this.request(`/meeting-room/${id}`, {
       method: 'DELETE',
     });
   }
 
-  // Reservations API
   async getReservations() {
-    return this.request('/meeting-room-reservations');
+    return this.request('/meeting-room/reservations');
   }
 
   async getReservationsByRoom(roomId) {
@@ -69,22 +67,16 @@ class ApiService {
   }
 
   async createReservation(data) {
-    return this.request('/meeting-room-reservations', {
+    return this.request('/meeting-room/reserv', {
       method: 'POST',
       body: data,
     });
   }
 
   async updateReservationStatus(id, status) {
-    return this.request(`/meeting-room-reservations/${id}/status`, {
+    return this.request(`/meeting-room/${id}/status`, {
       method: 'PUT',
       body: { status },
-    });
-  }
-
-  async deleteReservation(id) {
-    return this.request(`/meeting-room-reservations/${id}`, {
-      method: 'DELETE',
     });
   }
 }

@@ -21,7 +21,6 @@ const Hotel = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data)
       if (!response.status==='ok') {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -70,7 +69,6 @@ const Hotel = () => {
     }
   };
 
-  // Delete transaction
   const deleteTransaction = async (id) => {
     if (!window.confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
       return;
@@ -158,10 +156,7 @@ const Hotel = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br flex items-center justify-center">
-        <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-xl shadow-sm">
-          <Loader2 className="w-5 h-5 animate-spin text-primary-600" />
-          <span className="text-slate-700">Memuat transaksi...</span>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
       </div>
     );
   }

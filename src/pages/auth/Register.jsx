@@ -1,21 +1,14 @@
-import React, { useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  LogIn,
-  UserIcon,
-} from "lucide-react";
+import React, { use, useState } from "react";
+import { Eye, EyeOff, Lock, Mail, LogIn, UserIcon } from "lucide-react";
 import logo from "../../assets/hotelmurah.png";
 import { useNavigate } from "react-router-dom";
 
-import { 
-  SuccessAlert, 
-  ErrorAlert, 
-  LoadingAlert, 
+import {
+  SuccessAlert,
+  ErrorAlert,
+  LoadingAlert,
   ToastAlert,
-  AlertStyles 
+  AlertStyles,
 } from "@alert";
 
 const Register = ({ onRegister }) => {
@@ -23,54 +16,62 @@ const Register = ({ onRegister }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showLoadingAlert, setShowLoadingAlert] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState('info');
-  const [toastMessage, setToastMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [toastType, setToastType] = useState("info");
+  const [toastMessage, setToastMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!name.trim()) {
-      showToastNotification('error', 'Nama tidak boleh kosong');
+      showToastNotification("error", "Nama tidak boleh kosong");
       return;
     }
-    
+
     if (!email.trim()) {
-      showToastNotification('error', 'Email tidak boleh kosong');
+      showToastNotification("error", "Email tidak boleh kosong");
       return;
     }
-    
+
     if (!password.trim()) {
-      showToastNotification('error', 'Password tidak boleh kosong');
+      showToastNotification("error", "Password tidak boleh kosong");
       return;
     }
-    
+
     if (password.length < 6) {
-      showToastNotification('error', 'Password minimal 6 karakter');
+      showToastNotification("error", "Password minimal 6 karakter");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showToastNotification("error", "Konfirmasi password tidak sama");
       return;
     }
 
     setIsLoading(true);
     setShowLoadingAlert(true);
     setError("");
-    
+
     try {
-      const success = await onRegister(name, email, password);
+      const success = await onRegister(name, email, password, confirmPassword);
       setShowLoadingAlert(false);
-      
+
       if (success) {
         setShowSuccessAlert(true);
-        showToastNotification('success', 'Registrasi berhasil!');
+        showToastNotification("success", "Registrasi berhasil!");
       } else {
-        setErrorMessage("Gagal mendaftarkan akun. Email mungkin sudah terdaftar.");
+        setErrorMessage(
+          "Gagal mendaftarkan akun. Email mungkin sudah terdaftar."
+        );
         setShowErrorAlert(true);
       }
     } catch (error) {
@@ -96,13 +97,13 @@ const Register = ({ onRegister }) => {
 
   const handleErrorAlertClose = () => {
     setShowErrorAlert(false);
-    setErrorMessage('');
+    setErrorMessage("");
   };
 
   return (
     <>
       <AlertStyles />
-      
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
@@ -187,6 +188,41 @@ const Register = ({ onRegister }) => {
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
+                    placeholder="Masukkan password (min. 6 karakter)"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Konfirmasi Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     className="block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
                     placeholder="Masukkan password (min. 6 karakter)"
                   />

@@ -26,6 +26,7 @@ export default defineConfig({
       '@ui' : path.resolve(__dirname, './src/components/ui'),
       '@alert' : path.resolve(__dirname, './src/components/alert'),
       '@settings' : path.resolve(__dirname, './src/pages/settings'),
+      '@booking' : path.resolve(__dirname, './src/pages/book'),
     },
   },
 })

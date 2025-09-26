@@ -28,13 +28,16 @@ export const useAuth = () => {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, confirmPassword) => {
     try{
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/register`, { 
         name,
         email, 
-        password 
+        password,
+        password_confirmation: confirmPassword, 
       });
+
+      console.log(response.data);
       if (response.data.success){
         return true;
       }

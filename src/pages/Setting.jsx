@@ -25,14 +25,7 @@ const Setting = () => {
   });
   const [theme, setTheme] = useState('light');
   const [language, setLanguage] = useState('id');
-  const [profileData, setProfileData] = useState({
-    fullName: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+62 812 3456 7890',
-    company: 'PT. Example',
-    position: 'Manager',
-    avatar: null
-  });
+  const [profileData, setProfileData] = useState({});
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',

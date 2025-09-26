@@ -1,12 +1,10 @@
 import React from 'react';
-import { Hotel, Plane, Train, CreditCard } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 
-const NavbarBooking = ({ activeTab, setActiveTab }) => {
+const NavbarMeeting = ({ activeTab, setActiveTab }) => {
   const tabs = [
-    { key: 'hotel', label: 'Hotel', icon: Hotel },
-    { key: 'flight', label: 'Tiket Pesawat', icon: Plane },
-    { key: 'train', label: 'Tiket Kereta', icon: Train },
-    { key: 'ppob', label: 'PPOB', icon: CreditCard }
+    { key: 'reservation', label: 'Reservasi', icon: Calendar },
+    { key: 'meeting-room', label: 'Ruangan Meeting', icon: MapPin }
   ];
 
   return (
@@ -56,4 +54,4 @@ const NavbarBooking = ({ activeTab, setActiveTab }) => {
   );
 };
 
-export default NavbarBooking;
+export default NavbarMeeting;

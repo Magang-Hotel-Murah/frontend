@@ -49,7 +49,7 @@ const Users = () => {
       );
       setUsers(response.data);
     } catch (error) {
-      console.error("Gagal Menampilkan Pengguna Hotel Murah", err);
+      console.error("Gagal Menampilkan Pengguna Hotel Murah", error);
     }
   };
 
@@ -65,11 +65,16 @@ const Users = () => {
     setIsModalOpen(false);
   };
 
+  // PERBAIKAN 3: Perbaiki handleSuccess untuk update data yang benar
   const handleSuccess = (updatedUser) => {
     if (modalMode === "edit") {
-      setUsers((prev) =>
-        prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => 
+          user.id === updatedUser.id ? updatedUser : user
+        )
       );
+      // Tampilkan toast notification
+      showToastNotification("success", "User berhasil diperbarui!");
     }
   };
 
@@ -89,19 +94,25 @@ const Users = () => {
           },
         });
 
-        setUsers((prev) => prev.filter((u) => u.id !== id));
+        // PERBAIKAN 4: Update state users dengan benar
+        setUsers((prevUsers) => 
+          prevUsers.map((user) => 
+            user.id === id 
+              ? { ...user, deleted_at: user.deleted_at ? null : new Date().toISOString() }
+              : user
+          )
+        );
+        
         setShowConfirmActive(false);
         setIsActive(false);
-        showToastNotification("success", "User berhasil dihapus!");
+        showToastNotification("success", "Status user berhasil diubah!");
 
-        setTimeout(() => {
-          navigate("/user");
-        }, 1000);
       } catch (error) {
         setIsActive(false);
+        setShowConfirmActive(false);
         showToastNotification(
           "error",
-          "Gagal menghapus user. Silahkan coba lagi."
+          "Gagal mengubah status user. Silahkan coba lagi."
         );
       }
     }, 1500);
@@ -112,13 +123,22 @@ const Users = () => {
     setShowToast(true);
   };
 
-  const filteredUsers = users.filter(
-    (u) =>
-      (u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (filterRole === "" || u.role === filterRole) &&
-      (filterStatus === "" || u.deleted_at === filterStatus)
-  );
+  // PERBAIKAN 5: Perbaiki filter status
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesRole = filterRole === "" || user.role === filterRole;
+    
+    const matchesStatus = (() => {
+      if (filterStatus === "") return true;
+      if (filterStatus === "active") return user.deleted_at === null;
+      if (filterStatus === "non-active") return user.deleted_at !== null;
+      return true;
+    })();
+
+    return matchesSearch && matchesRole && matchesStatus;
+  });
 
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
@@ -126,11 +146,10 @@ const Users = () => {
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   const getRoleColor = (role) => {
-    switch (role) {
-      case "Admin":
+    switch (role.toLowerCase()) {
+      case "admin":
         return "bg-red-100 text-red-800";
-
-      case "User":
+      case "user":
         return "bg-yellow-100 text-yellow-800";
       default:
         return "bg-blue-100 text-blue-800";

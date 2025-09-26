@@ -1,25 +1,235 @@
-import React from 'react';
-import { User, Camera, Save } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { User, Camera, Save, AlertCircle } from "lucide-react";
 
-const Profile = ({ 
-  profileData, 
-  handleProfileChange, 
-  handleAvatarChange, 
-  handleSave, 
-  isSaving 
-}) => {
+const Profile = () => {
+  const [profileData, setProfileData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    division_id: "",
+    position_id: "",
+    photo: null,
+  });
+
+  const [divisions, setDivisions] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const getAuthToken = () => {
+    return localStorage.getItem("token");
+  };
+
+  const apiCall = async (endpoint, options = {}) => {
+    const token = getAuthToken();
+    const defaultOptions = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    };
+
+    const mergedOptions = {
+      ...defaultOptions,
+      ...options,
+      headers: {
+        ...defaultOptions.headers,
+        ...options.headers,
+      },
+    };
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}${endpoint}`,
+      mergedOptions
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  };
+
+  const getCurrentUser = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const response = await apiCall(`/user-profile/${user.id}`);
+      return response;
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      throw error;
+    }
+  };
+
+  const loadProfile = async () => {
+    try {
+      setLoading(true);
+
+      const currentUser = await getCurrentUser();
+
+      const profileResponse = await apiCall(`/user-profile/${currentUser.id}`);
+
+      setProfileData({
+        fullName: currentUser.user.name || "",
+        email: currentUser.user.email || "",
+        phone: profileResponse.phone || "",
+        address: profileResponse.address || "",
+        division_id: profileResponse.division_id || "",
+        position_id: profileResponse.position_id || "",
+        photo: profileResponse.photo || null,
+      });
+    } catch (error) {
+      if (error.message.includes("404")) {
+        // Profile doesn't exist yet - this is okay
+        const currentUser = await getCurrentUser();
+        setProfileData((prev) => ({
+          ...prev,
+          fullName: currentUser.name || "",
+          email: currentUser.email || "",
+        }));
+      } else {
+        setError("Failed to load profile data");
+        console.error("Error loading profile:", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load divisions and positions for dropdowns
+  const loadDropdownData = async () => {
+    try {
+      // You'll need to create these endpoints in your Laravel backend
+      const [divisionsResponse, positionsResponse] = await Promise.all([
+        apiCall("/divisions"),
+        apiCall("/positions"),
+      ]);
+
+      setDivisions(divisionsResponse);
+      setPositions(positionsResponse);
+    } catch (error) {
+      console.error("Error loading dropdown data:", error);
+    }
+  };
+
+  // Handle profile field changes
+  const handleProfileChange = (field, value) => {
+    setProfileData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+    setError("");
+    setSuccess("");
+  };
+
+  // Handle avatar upload
+  const handleAvatarChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileData((prev) => ({
+          ...prev,
+          photo: e.target.result,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Save profile
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      setError("");
+      setSuccess("");
+
+      const currentUser = await getCurrentUser();
+
+      const updateData = {
+        division_id: profileData.division_id,
+        position_id: profileData.position_id,
+        phone: profileData.phone,
+        address: profileData.address,
+        photo: profileData.photo,
+      };
+
+      try {
+        await apiCall(`/user-profiles/${currentUser.id}`, {
+          method: "PUT",
+          body: JSON.stringify(updateData),
+        });
+        setSuccess("Profil berhasil diperbarui!");
+      } catch (updateError) {
+        if (updateError.message.includes("404")) {
+          await apiCall("/user-profile", {
+            method: "POST",
+            body: JSON.stringify(updateData),
+          });
+          setSuccess("Profil berhasil dibuat!");
+        } else {
+          throw updateError;
+        }
+      }
+    } catch (error) {
+      setError("Gagal menyimpan profil. Silakan coba lagi.");
+      console.error("Error saving profile:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProfile();
+    loadDropdownData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 mt-4 mb-4 mr-4 ml-4">
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-center space-x-2 text-red-700">
+          <AlertCircle className="w-5 h-5" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-md p-4 flex items-center space-x-2 text-green-700">
+          <AlertCircle className="w-5 h-5" />
+          <span>{success}</span>
+        </div>
+      )}
+
+      {/* Avatar Section */}
       <div className="flex items-center space-x-6">
         <div className="relative">
           <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-            {profileData.avatar ? (
-              <img src={profileData.avatar} alt="Avatar" className="w-full h-full object-cover" />
+            {profileData.photo ? (
+              <img
+                src={profileData.photo}
+                alt="Avatar"
+                className="w-full h-full object-cover"
+              />
             ) : (
               <User className="w-12 h-12 text-gray-600" />
             )}
           </div>
-          <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-blue-600 transition-colors">
+          <label
+            htmlFor="avatar-upload"
+            className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-blue-600 transition-colors"
+          >
             <Camera className="w-4 h-4" />
           </label>
           <input
@@ -36,6 +246,7 @@ const Profile = ({
         </div>
       </div>
 
+      {/* Profile Form */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -44,11 +255,12 @@ const Profile = ({
           <input
             type="text"
             value={profileData.fullName}
-            onChange={(e) => handleProfileChange('fullName', e.target.value)}
+            onChange={(e) => handleProfileChange("fullName", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled // This should be updated in user table, not profile
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Email
@@ -56,11 +268,12 @@ const Profile = ({
           <input
             type="email"
             value={profileData.email}
-            onChange={(e) => handleProfileChange('email', e.target.value)}
+            onChange={(e) => handleProfileChange("email", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled // This should be updated in user table, not profile
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Nomor Telepon
@@ -68,44 +281,68 @@ const Profile = ({
           <input
             type="tel"
             value={profileData.phone}
-            onChange={(e) => handleProfileChange('phone', e.target.value)}
+            onChange={(e) => handleProfileChange("phone", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Perusahaan
+            Divisi
           </label>
-          <input
-            type="text"
-            value={profileData.company}
-            onChange={(e) => handleProfileChange('company', e.target.value)}
+          <select
+            value={profileData.division_id}
+            onChange={(e) => handleProfileChange("division_id", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          >
+            <option value="">Pilih Divisi</option>
+            {divisions.map((division) => (
+              <option key={division.id} value={division.id}>
+                {division.name}
+              </option>
+            ))}
+          </select>
         </div>
-        
-        <div className="md:col-span-2">
+
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Posisi
           </label>
-          <input
-            type="text"
-            value={profileData.position}
-            onChange={(e) => handleProfileChange('position', e.target.value)}
+          <select
+            value={profileData.position_id}
+            onChange={(e) => handleProfileChange("position_id", e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Pilih Posisi</option>
+            {positions.map((position) => (
+              <option key={position.id} value={position.id}>
+                {position.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Alamat
+          </label>
+          <textarea
+            value={profileData.address}
+            onChange={(e) => handleProfileChange("address", e.target.value)}
+            rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
-      
+
       <div className="flex justify-end">
         <button
-          onClick={() => handleSave('profile')}
+          onClick={handleSave}
           disabled={isSaving}
           className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 flex items-center space-x-2"
         >
           <Save className="w-4 h-4" />
-          <span>{isSaving ? 'Menyimpan...' : 'Simpan Profil'}</span>
+          <span>{isSaving ? "Menyimpan..." : "Simpan Profil"}</span>
         </button>
       </div>
     </div>

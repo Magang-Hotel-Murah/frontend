@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { X, Save } from "lucide-react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { LoadingAlert, ToastAlert, AlertStyles } from "@alert";
+import { LoadingAlert, SuccessAlert, ErrorAlert, AlertStyles } from "@alert";
 
 const Update = ({ user, onClose, onSuccess }) => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: user.name,
     email: user.email,
@@ -14,9 +12,9 @@ const Update = ({ user, onClose, onSuccess }) => {
   });
 
   const [showLoadingAlert, setShowLoadingAlert] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState("info");
-  const [toastMessage, setToastMessage] = useState("");
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +22,7 @@ const Update = ({ user, onClose, onSuccess }) => {
   };
 
   const handleSubmit = async () => {
-    setShowLoadingAlert(true); // tampilkan loading dulu
+    setShowLoadingAlert(true);
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
@@ -38,20 +36,18 @@ const Update = ({ user, onClose, onSuccess }) => {
       );
 
       onSuccess(response.data);
-      setShowLoadingAlert(false); // matikan loading
-      showToastNotification("success", "User berhasil diperbarui!");
-      onClose();
+
+      setShowLoadingAlert(false);
+      setShowSuccessAlert(true);
+      setTimeout(() => {
+        onClose();
+      }, 1500);
     } catch (error) {
       console.error(error);
-      setShowLoadingAlert(false); // matikan loading
-      showToastNotification("error", "Gagal mengupdate user");
+      setShowLoadingAlert(false);
+      setErrorMessage(error.response?.data?.message || "Gagal mengupdate user");
+      setShowErrorAlert(true);
     }
-  };
-
-  const showToastNotification = (type, message) => {
-    setToastType(type);
-    setToastMessage(message);
-    setShowToast(true);
   };
 
   return (
@@ -133,21 +129,6 @@ const Update = ({ user, onClose, onSuccess }) => {
         </div>
       </div>
 
-      <SuccessAlert
-        show={showSuccessAlert}
-        onClose={handleSuccessAlertClose}
-        title="Login Berhasil!"
-        message="Selamat datang kembali! Anda akan diarahkan ke dashboard."
-        buttonText="Lanjut ke Dashboard"
-      />
-
-      <ErrorAlert
-        show={showErrorAlert}
-        onClose={handleErrorAlertClose}
-        title="Login Gagal"
-        message={errorMessage}
-        buttonText="Coba Lagi"
-      />
       {/* Loading Alert */}
       <LoadingAlert
         show={showLoadingAlert}
@@ -155,13 +136,20 @@ const Update = ({ user, onClose, onSuccess }) => {
         message="Mohon tunggu, perubahan sedang diproses."
       />
 
-      <ToastAlert
-        show={showToast}
-        onClose={() => setShowToast(false)}
-        message={toastMessage}
-        type={toastType}
-        position="top-right"
-        duration={4000}
+      {/* Success Alert */}
+      <SuccessAlert
+        show={showSuccessAlert}
+        onClose={() => setShowSuccessAlert(false)}
+        title="Berhasil"
+        message="User berhasil diperbarui!"
+      />
+
+      {/* Error Alert */}
+      <ErrorAlert
+        show={showErrorAlert}
+        onClose={() => setShowErrorAlert(false)}
+        title="Gagal"
+        message={errorMessage}
       />
     </>
   );
