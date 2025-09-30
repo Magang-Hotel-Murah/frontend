@@ -1,22 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  Calendar,
-  Download,
-  Eye,
-  MoreVertical,
-  RefreshCcw,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+import { Download, RefreshCcw, AlertCircle } from "lucide-react";
 import axios from "axios";
 import { paginateData, filterBySearch } from "@utils";
 import { TransactionFilter, TransactionTable } from "@contenttransaction";
 import { Pagination } from "@common";
+import { useTransactions } from "@hooks";
 
 const Hospitality = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { transactions, loading, error, fetchTransactions, updateTransactionStatus, deleteTransaction } = useTransactions("hotel");
+
 
   const [filterStatus, setFilterStatus] = useState("");
   const [filterPaymentMethod, setFilterPaymentMethod] = useState("");
@@ -25,112 +17,11 @@ const Hospitality = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  const fetchTransactions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.status === "ok") {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.data;
-
-      const hotelTransactions = data
-        .filter((transaction) => transaction.transactionable_type === "hotel")
-        .map((transaction) => ({
-          ...transaction,
-          hotel_name:
-            transaction.transactionable?.name ||
-            `Hotel ${transaction.transactionable_id}`,
-          guest_name:
-            transaction.transactionable?.guest_name ||
-            `Guest ${transaction.id}`,
-          external_id:
-            transaction.external_id ||
-            `EXT-HTL-${transaction.id.toString().padStart(3, "0")}`,
-        }));
-
-      setTransactions(hotelTransactions);
-    } catch (err) {
-      setError(err.message);
-      console.error("Error fetching transactions:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateTransactionStatus = async (id, status) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            payment_status: status,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      await fetchTransactions();
-    } catch (err) {
-      console.error("Error updating transaction:", err);
-      setError(err.message);
-    }
-  };
-
-  const deleteTransaction = async (id) => {
-    if (!window.confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      await fetchTransactions();
-    } catch (err) {
-      console.error("Error deleting transaction:", err);
-      setError(err.message);
-    }
-  };
-
+  
   const handleViewDetail = (transaction) => {
     console.log("View detail:", transaction);
     // Implement modal or navigation to detail page
   };
-
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
 
   const filteredTransactions = filterBySearch(transactions, searchTerm, [
     "external_id",
@@ -206,7 +97,7 @@ const Hospitality = () => {
         />
 
         <br />
-        
+
         <TransactionTable
           transactions={currentTransaction}
           loading={loading}

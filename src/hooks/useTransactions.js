@@ -1,15 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
 import ApiService from "../services/ApiService";
-import transformTransaction from '@utils';
+import { transformTransaction } from '@utils';
 
-export const useTransactions = () => {
+export const useTransactions = (type = null) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
 
   const fetchTransactions = async () => {
     try {
@@ -31,12 +27,7 @@ export const useTransactions = () => {
 
   const updateTransactionStatus = async (id, status) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/${id}`,
-        { payment_status: status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await ApiService.updateTransaction(id, { payment_status: status });
       await fetchTransactions();
     } catch (err) {
       console.error("Error updating transaction:", err);
@@ -49,11 +40,7 @@ export const useTransactions = () => {
       return;
     }
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await ApiService.deleteTransaction(id);
       await fetchTransactions();
     } catch (err) {
       console.error("Error deleting transaction:", err);
@@ -63,36 +50,12 @@ export const useTransactions = () => {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
-
-  const filteredTransactions = useMemo(() => {
-    return transactions.filter((t) => {
-      const matchesSearch =
-        t.external_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.hotel_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.id.toString().includes(searchTerm);
-
-      const matchesStatus =
-        statusFilter === "all" || t.payment_status === statusFilter;
-      const matchesPaymentMethod =
-        paymentMethodFilter === "all" || t.payment_method === paymentMethodFilter;
-
-      return matchesSearch && matchesStatus && matchesPaymentMethod;
-    });
-  }, [transactions, searchTerm, statusFilter, paymentMethodFilter]);
+  }, [type]);
 
   return {
     transactions,
-    filteredTransactions,
     loading,
     error,
-    searchTerm,
-    setSearchTerm,
-    statusFilter,
-    setStatusFilter,
-    paymentMethodFilter,
-    setPaymentMethodFilter,
     fetchTransactions,
     updateTransactionStatus,
     deleteTransaction,
