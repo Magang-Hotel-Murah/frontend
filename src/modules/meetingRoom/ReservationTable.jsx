@@ -1,0 +1,145 @@
+import React from "react";
+import { BaseTable } from "@common";
+import { Calendar, Users, Clock, Check, X, Trash2 } from "lucide-react";
+
+const ReservationTable = ({
+  reservations,
+  onApprove,
+  onReject,
+  onDelete,
+  loading,
+}) => {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "approved":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString("id-ID"),
+      time: date.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+  };
+
+  const columns = [
+    {
+      header: "Meeting Room",
+      render: (row) => (
+        <div className="flex items-center">
+          <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+            <Calendar className="h-5 w-5 text-blue-600" />
+          </div>
+          <div className="ml-3">
+            <div className="text-sm font-medium text-gray-900">
+              {row.room?.name}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "User",
+      render: (row) => (
+        <div className="flex items-center">
+          <Users className="h-4 w-4 text-gray-400 mr-2" />
+          <div>
+            <div className="text-sm font-medium text-gray-900">
+              {row.user?.name}
+            </div>
+            <div className="text-sm text-gray-500">
+              {row.user?.division?.name}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "Date & Time",
+      render: (row) => {
+        const start = formatDateTime(row.start_time);
+        const end = formatDateTime(row.end_time);
+        return (
+          <div className="flex items-center">
+            <Clock className="h-4 w-4 text-gray-400 mr-2" />
+            <div>
+              <div className="text-sm font-medium text-gray-900">
+                {start.date}
+              </div>
+              <div className="text-sm text-gray-500">
+                {start.time} - {end.time}
+              </div>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      header: "Status",
+      render: (row) => (
+        <span
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+            row.status
+          )}`}
+        >
+          {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
+        </span>
+      ),
+    },
+    {
+      header: "Actions",
+      headerClassName: "text-right",
+      render: (row) => (
+        <div className="flex justify-end gap-2">
+          {row.status === "pending" && (
+            <>
+              <button
+                onClick={() => onApprove(row.id)}
+                className="text-green-600 hover:text-green-900 p-1"
+                title="Approve"
+              >
+                <Check className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onReject(row.id)}
+                className="text-red-600 hover:text-red-900 p-1"
+                title="Reject"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => onDelete(row.id)}
+            className="text-red-600 hover:text-red-900 p-1"
+            title="Delete"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <BaseTable
+      columns={columns}
+      data={reservations}
+      loading={loading}
+      isFullscreenLoading={true}
+    />
+  );
+};
+
+export default ReservationTable;

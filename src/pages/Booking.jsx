@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { NavbarMeeting } from "@components";
+import { TabNavigation } from "@common";
 import { Reservation, MeetingRoom } from "@booking";
+import { Calendar, Presentation } from "lucide-react";
 
 const Booking = () => {
-  const [activeTab, setActiveTab] = React.useState("reservation");
+  const [activeTab, setActiveTab] = useState("reservation");
+
+  const tabs = [
+    { key: "reservation", label: "Reservasi", icon: Calendar },
+    { key: "meeting-room", label: "Ruang Meeting", icon: Presentation },
+  ];
 
   const renderContent = () => {
     switch (activeTab) {
@@ -19,9 +25,14 @@ const Booking = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white overflow-hidden">
-        <NavbarMeeting activeTab={activeTab} setActiveTab={setActiveTab} />
+        <TabNavigation
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          variant="underline"
+        />
 
-        <div className="p-8">
+        <div className="mt-5">
           {renderContent()}
         </div>
       </div>

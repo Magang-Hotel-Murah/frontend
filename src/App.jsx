@@ -5,7 +5,7 @@ import './index.css';
 import { Home, User, Transaction, Setting, Booking } from '@pages';
 import { Login, Register, ForgotPassword } from '@auth';
 import { useAuth } from '@hooks';
-import { ProtectedRoute } from './components';
+import { ProtectedRoute } from '@components/layout';
 
 
 const App = () => {

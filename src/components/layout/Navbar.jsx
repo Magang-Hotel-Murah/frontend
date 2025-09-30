@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Logo from "../assets/hotelmurah.png";
+import Logo from "../../assets/hotelmurah.png";
 import { Menu, X, Bell, User, LogOut, ChevronLeft, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

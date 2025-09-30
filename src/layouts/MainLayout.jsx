@@ -1,5 +1,5 @@
 import React, { useState, useEffect, use } from 'react';
-import { Navbar, Sidebar } from '@components';
+import { Navbar, Sidebar } from '@components/layout';
 import { useToggle } from '@hooks';
 import { useLocation } from 'react-router-dom';
 import { set } from 'react-hook-form';
