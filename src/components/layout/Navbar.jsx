@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Logo from "../../assets/hotelmurah.png";
+import Logo from "../../assets/logo.png";
 import { Menu, X, Bell, User, LogOut, ChevronLeft, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -78,13 +78,13 @@ const Navbar = ({ user, onLogout, toggleCollapse, isCollapsed }) => {
     <>
       <AlertStyles />
       
-      <nav className="bg-primary-500 border-b border-gray-200 fixed w-full z-50 top-0">
+      <nav className="bg-white border-b border-primary-500 fixed w-full z-50 top-0">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-start">
               <button
                 onClick={toggleCollapse}
-                className="hidden lg:block p-2 text-gray-100 rounded-lg hover:bg-primary-700 mr-2 transition-colors"
+                className="hidden lg:block p-2 text-gray-500 rounded-lg hover:bg-primary-50 mr-2 transition-colors"
                 title={isCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
               >
                 {isCollapsed ? (
@@ -94,9 +94,9 @@ const Navbar = ({ user, onLogout, toggleCollapse, isCollapsed }) => {
                 )}
               </button>
               <a href="#" className="flex ml-2 md:mr-24">
-                <img src={Logo} alt="hotelmurah" className="h-8 w-auto mr-2" />
-                <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-gray-100">
-                  hotelmurah.com
+                <img src={Logo} alt="meetwise" className="h-8 w-auto mr-2" />
+                <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-gray-500">
+                  MeetWise
                 </span>
               </a>
             </div>
@@ -104,7 +104,7 @@ const Navbar = ({ user, onLogout, toggleCollapse, isCollapsed }) => {
             <div className="flex items-center space-x-4">
               <button 
                 onClick={handleNotificationClick}
-                className="p-2 text-gray-100 hover:bg-primary-700 rounded-lg relative transition-colors"
+                className="p-2 text-gray-500 hover:bg-primary-50 rounded-lg relative transition-colors"
                 title="Notifikasi"
               >
                 <Bell className="w-5 h-5" />
@@ -114,23 +114,23 @@ const Navbar = ({ user, onLogout, toggleCollapse, isCollapsed }) => {
               <div className="flex items-center space-x-3">
                 <button
                   onClick={handleProfileClick}
-                  className="flex items-center space-x-3 hover:bg-primary-700 rounded-lg p-2 transition-colors"
+                  className="flex items-center space-x-3 hover:bg-primary-50 rounded-lg p-2 transition-colors"
                   title="Menu Profil"
                 >
-                  <div className="w-8 h-8 bg-primary-800 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-gray-500" />
                   </div>
                   <div className="hidden md:block text-left">
-                    <p className="text-sm font-medium text-gray-100">
+                    <p className="text-sm font-medium text-gray-500">
                       {user?.name || "PT. Hotel Murah Travelindo"}
                     </p>
-                    <p className="text-xs text-gray-300">{user?.role || "Admin"}</p>
+                    <p className="text-xs text-gray-400">{user?.role || "Admin"}</p>
                   </div>
                 </button>
 
                 <button
                   onClick={handleLogoutClick}
-                  className="p-2 text-gray-100 hover:bg-red-600 hover:bg-opacity-80 rounded-lg transition-colors"
+                  className="p-2 text-gray-500 hover:bg-red-500 hover:bg-opacity-80 rounded-lg transition-colors"
                   title="Logout"
                 >
                   <LogOut className="w-4 h-4" />

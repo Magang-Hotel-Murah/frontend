@@ -1,18 +1,18 @@
-import React, { useState, useEffect, use } from 'react';
-import { Navbar, Sidebar } from '@components/layout';
-import { useToggle } from '@hooks';
-import { useLocation } from 'react-router-dom';
-import { set } from 'react-hook-form';
-import { object } from 'yup';
+import React, { useState, useEffect, use } from "react";
+import { Navbar, Sidebar, Footer } from "@layout";
+import { useToggle } from "@hooks";
+import { useLocation } from "react-router-dom";
+import { set } from "react-hook-form";
+import { object } from "yup";
 const MainLayout = ({ children, user, onLogout }) => {
-  const [sidebarOpen, toggleSidebar, openSidebar, closeSidebar] = useToggle(false);
-  const [activeMenu, setActiveMenu] =  useState("");
+  const [sidebarOpen, toggleSidebar, openSidebar, closeSidebar] =
+    useToggle(false);
+  const [activeMenu, setActiveMenu] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
   const routeToMenuMap = {
     "/home": "home",
-    "/transaction": "transactions",
     "/booking": "bookings",
     "/user": "users",
     "/setting": "settings",
@@ -20,59 +20,66 @@ const MainLayout = ({ children, user, onLogout }) => {
 
   useEffect(() => {
     const currentPath = location.pathname;
-    const foundMenu = Object.keys(routeToMenuMap).find((route) => currentPath.startsWith (route)) || "home";
+    const foundMenu =
+      Object.keys(routeToMenuMap).find((route) =>
+        currentPath.startsWith(route)
+      ) || "home";
     setActiveMenu(routeToMenuMap[foundMenu]);
   }, [location]);
 
   useEffect(() => {
-    if(activeMenu) {
+    if (activeMenu) {
       localStorage.setItem("activeMenu", activeMenu);
     }
   }, [activeMenu]);
-            
+
   useEffect(() => {
-  const handleResize = () => {
-    setIsCollapsed(window.innerWidth < 1280);
-  };
-  
-  handleResize();
+    const handleResize = () => {
+      setIsCollapsed(window.innerWidth < 1280);
+    };
 
-  window.addEventListener('resize', handleResize);
+    handleResize();
 
-  return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleCollapse = () => {
-    if(window.innerWidth >= 1024) {
+    if (window.innerWidth >= 1024) {
       setIsCollapsed(!isCollapsed);
     }
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Navbar 
-        toggleSidebar={toggleSidebar} 
+      <Navbar
+        mode="dashboard"
+        toggleSidebar={toggleSidebar}
         sidebarOpen={sidebarOpen}
         user={user}
         onLogout={onLogout}
         toggleCollapse={toggleCollapse}
         isCollapsed={isCollapsed}
       />
-      <Sidebar 
-        isOpen={sidebarOpen} 
+      <Sidebar
+        isOpen={sidebarOpen}
         onClose={closeSidebar}
-        activeMenu={activeMenu} 
-        setActiveMenu={setActiveMenu} 
+        activeMenu={activeMenu}
+        setActiveMenu={setActiveMenu}
         isCollapsed={isCollapsed}
       />
-      
-      <div className={`p-4 mt-20 transition-all duration-300 ${
-        isCollapsed ? "lg:ml-16" : "lg:ml-64"
-      }`}>
+
+      <div
+        className={`p-4 mt-20 transition-all duration-300 ${
+          isCollapsed ? "lg:ml-16" : "lg:ml-64"
+        }`}
+      >
         <div className="p-4 border-2 border-dashed border-gray-200 rounded-lg min-h-screen bg-white">
           {children}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, LogIn } from "lucide-react";
-import logo from "../../assets/hotelmurah.png";
+import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 
 import { 
@@ -120,7 +120,7 @@ const Login = ({ onLogin }) => {
               <img src={logo} alt="hotelmurah" />
             </div>
             <h2 className="text-3xl font-bold" style={{ color: "var(--primary-500)" }}>
-              hotelmurah.com
+              MeetWise
             </h2>
             <p className="mt-2 text-sm text-gray-600">
               Sign in untuk masuk ke halaman admin
@@ -222,7 +222,7 @@ const Login = ({ onLogin }) => {
                   className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white transition-all duration-200 ${
                     isLoading || !email || !password
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#37518C] transform hover:scale-105"
+                      : "bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:bg-primary-700 transform hover:scale-105"
                   }`}
                 >
                   {isLoading ? (

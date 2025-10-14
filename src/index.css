@@ -11,25 +11,30 @@
 }
 
 @theme {
-  --color-primary-50: #eef2f8;
-  --color-primary-100: #d9e1ee;
-  --color-primary-500: #37518c;
-  --color-primary-500: #37518c;
-  --color-primary-600: #2f4678;
-  --color-primary-700: #273a64;
-  --color-primary-800: #1f2e50;
-  --color-primary-900: #17223c;
+  --color-primary-50:  #fff4e6;  /* sangat terang, untuk background lembut */
+  --color-primary-100: #ffe0b3;  /* oranye pastel */
+  --color-primary-200: #ffcc80;  /* oranye muda */
+  --color-primary-300: #ffb84d;  /* oranye sedang */
+  --color-primary-400: #ff9933;  /* oranye cerah */
+  --color-primary-500: #ff751a;  /* oranye kemerahan utama */
+  --color-primary-600: #e65c00;  /* oranye gelap */
+  --color-primary-700: #cc5200;  /* oranye kemerahan pekat */
+  --color-primary-800: #b34700;  /* cenderung merah tua */
+  --color-primary-900: #802b00;  /* merah kecoklatan tua */
 }
 
+
 :root {
-  --primary-50: #eef2f8;
-  --primary-100: #d9e1ee;
-  --primary-500: #37518c;
-  --primary-500: #37518c;
-  --primary-600: #2f4678;
-  --primary-700: #273a64;
-  --primary-800: #1f2e50;
-  --primary-900: #17223c;
+  --primary-50: #fff4e6;
+  --primary-100: #ffe0b3;
+  --primary-200: #ffcc80;
+  --primary-300: #ff9933;
+  --primary-400: #ff9933;
+  --primary-500: #ff751a;
+  --primary-600: #e65c00;
+  --primary-700: #cc5200;
+  --primary-800: #b34700;
+  --primary-900: #802b00;
 }
 
 .text-primary-50 {

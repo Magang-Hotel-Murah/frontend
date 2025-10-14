@@ -1,46 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Loader } from 'lucide-react';
 
 const Button = ({ 
   children, 
   variant = 'primary', 
-  size = 'md', 
+  size = 'medium', 
   disabled = false, 
   loading = false,
-  className = '',
-  ...props 
+  onClick,
+  type = 'button',
+  className = ''
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200';
+  const baseStyles = 'font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-900 focus:ring-gray-500',
-    danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500',
-    outline: 'border border-gray-300 hover:bg-gray-50 text-gray-700 focus:ring-blue-500'
+    primary: 'bg-primary-600 hover:bg-primary-700 text-white shadow-sm hover:shadow-md',
+    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800 shadow-sm',
+    danger: 'bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow-md',
+    success: 'bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow-md',
+    outline: 'border-2 border-primary-600 text-blue-600 hover:bg-blue-50',
+    started:'bg-white text-primary-600 rounded-full font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 inline-flex items-center gap-2',
+    ghost: 'text-gray-700 hover:bg-gray-100',
+    demo: 'bg-white text-gray-700 rounded-full font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 border-2 border-gray-200',
+    gradient:'group bg-gradient-to-r from-primary-600 to-yellow-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2'
   };
-
+  
   const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
+    small: 'px-3 py-1.5 text-sm',
+    medium: 'px-4 py-2 text-base',
+    large: 'px-6 py-3 text-lg'
   };
-
-  const classes = `
-    ${baseClasses}
-    ${variants[variant]}
-    ${sizes[size]}
-    ${disabled || loading ? 'opacity-50 cursor-not-allowed' : ''}
-    ${className}
-  `.trim().replace(/\s+/g, ' ');
-
+  
   return (
-    <button 
-      className={classes}
+    <button
+      type={type}
       disabled={disabled || loading}
-      {...props}
+      onClick={onClick}
+      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
     >
-      {loading && (
-        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-      )}
+      {loading && <Loader className="animate-spin" size={16} />}
       {children}
     </button>
   );

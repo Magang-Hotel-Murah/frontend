@@ -30,6 +30,52 @@ class ApiService {
     return response.json();
   }
 
+  //Auth
+  async login(email, password) {
+    return this.request("/login", {
+      method: "POST",
+      body: { email, password },
+    });
+  }
+
+  async register(name, email, password, confirmPassword, company_name) {
+    return this.request("/register/admin", {
+      method: "POST",
+      body: {
+        name,
+        email,
+        password,
+        password_confirmation: confirmPassword,
+        company_name,
+      },
+    });
+  }
+
+  async logout() {
+    return this.request("/logout", {
+      method: "POST",
+    });
+  }
+
+  async forgotPassword(email) {
+    return this.request("/forgot-password", {
+      method: "POST",
+      body: { email },
+    });
+  }
+
+  async resetPassword(email, otp, password, passwordConfirm) {
+    return this.request("/reset-password", {
+      method: "POST",
+      body: {
+        email,
+        otp,
+        password,
+        password_confirmation: passwordConfirm,
+      },
+    });
+  }
+
   //USER
   async getUsers() {
     return this.request("/users?with_deleted=true");
@@ -78,17 +124,17 @@ class ApiService {
 
   //DIVISION
   async getDivisions() {
-    return this.request('/divisions');
+    return this.request("/divisions");
   }
 
   //POSITION
   async getPositions() {
-    return this.request('/positions');
+    return this.request("/positions");
   }
 
   //TRANSACTION
-  async getTransactions() {
-    return this.request("/transactions");
+  async getTransactions(type) {
+    return this.request(`/transactions?type=${type}`);
   }
 
   async getTransaction() {
@@ -97,15 +143,15 @@ class ApiService {
 
   async updateTransaction(id, data) {
     return this.request(`/transactions/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: data,
-    })
+    });
   }
 
   async deleteTransaction(id) {
     return this.request(`/transactions/${id}`, {
-      method: 'DELETE',
-    })
+      method: "DELETE",
+    });
   }
 
   //MEETING ROOM

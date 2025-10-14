@@ -1,85 +1,103 @@
-import React from 'react';
-import { Users, Settings, BarChart3 } from 'lucide-react';
+import React, { useState } from "react";
+import { Search, Users } from "lucide-react";
+import { Card, Input, TextArea, Loading, Button } from "@ui";
+import { AlertStyles, LoadingAlert } from "@alert";
 
 const Home = () => {
-  const stats = [
-    { title: 'Total Pengguna', value: '2,345', change: '+12%', color: 'text-blue-600' },
-    { title: 'Revenue', value: 'Rp. 2.000.000,00', change: '+8%', color: 'text-green-600' },
-    { title: 'Pesanan', value: '1,234', change: '-2%', color: 'text-red-600' },
-    { title: 'Conversion', value: '3.2%', change: '+5%', color: 'text-purple-600' },
-  ];
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [description, setDescription] = useState("");
+
+  const handleLoadData = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      alert("Data berhasil dimuat!");
+    }, 2000);
+  };
 
   return (
-    <div>
-      {/* <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Selamat Datang Admin</p>
-      </div> */}
+    <>
+      <AlertStyles />
+      <div>
+        {loading && <Loading message="Sedang memuat data..." />}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</p>
-              </div>
-              <div className={`text-sm font-medium ${stat.color}`}>
-                {stat.change}
-              </div>
+        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+
+        {/* Card dengan Input */}
+        <Card className="mb-6">
+          <Card.Header>Statistik Reservasi</Card.Header>
+          <Card.Body>
+            <p>Jumlah Reservasi Aktif: 12</p>
+            <p>Ruangan Tersedia: 5</p>
+          </Card.Body>
+          <Card.Footer>
+            <Button variant="primary" onClick={handleLoadData}>
+              Muat Ulang Data
+            </Button>
+          </Card.Footer>
+        </Card>
+
+        <Card className="mb-6">
+          <Card.Header>
+            <div className="flex justify-between items-center">
+              <span>Statistik Reservasi</span>
+              <Input
+                label=""
+                placeholder="Cari reservasi..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                icon={Search}
+                className="w-64"
+              />
             </div>
-          </div>
-        ))}
-      </div>
+          </Card.Header>
+          <Card.Body>
+            <p>Jumlah Reservasi Aktif: 12</p>
+            <p>Ruangan Tersedia: 5</p>
+          </Card.Body>
+        </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
-          <div className="space-y-4">
-            {[
-              { user: 'John Doe', action: 'created a new user account', time: '2 hours ago' },
-              { user: 'Jane Smith', action: 'updated product inventory', time: '4 hours ago' },
-              { user: 'Mike Johnson', action: 'processed 5 orders', time: '6 hours ago' },
-            ].map((activity, index) => (
-              <div key={index} className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">
-                    <span className="font-medium">{activity.user}</span> {activity.action}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Card className="mb-6">
+          <Card.Header>Tambah Catatan</Card.Header>
+          <Card.Body>
+            <TextArea
+              label="Deskripsi"
+              placeholder="Tuliskan catatan atau keterangan di sini..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              helperText="Catatan ini hanya bisa dilihat oleh admin."
+            />
+          </Card.Body>
+        </Card>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { title: 'Add User', icon: Users, color: 'bg-blue-500' },
-              { title: 'View Reports', icon: BarChart3, color: 'bg-green-500' },
-              { title: 'Settings', icon: Settings, color: 'bg-purple-500' },
-              { title: 'Analytics', icon: BarChart3, color: 'bg-orange-500' },
-            ].map((action, index) => {
-              const Icon = action.icon;
-              return (
-                <button
-                  key={index}
-                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <div className={`w-8 h-8 ${action.color} rounded-lg flex items-center justify-center mb-2`}>
-                    <Icon className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">{action.title}</p>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <Card className="mb-6">
+          <Card.Header>Isi Terakhir</Card.Header>
+          <Card.Body>
+            <p>
+              {description
+                ? description
+                : "Belum ada catatan yang ditambahkan."}
+            </p>
+          </Card.Body>
+        </Card>
+
+        <Card>
+          <Card.Header>Informasi Terbaru</Card.Header>
+          <Card.Body>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Meeting Room A akan direnovasi minggu depan.</li>
+              <li>Fitur notifikasi otomatis telah diaktifkan.</li>
+            </ul>
+          </Card.Body>
+          <Card.Footer>
+            <button className="text-primary-600 hover:underline font-medium">
+              Lihat Semua Pengumuman
+            </button>
+          </Card.Footer>
+        </Card>
       </div>
-    </div>
+    </>
   );
 };
 

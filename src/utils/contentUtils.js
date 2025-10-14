@@ -5,6 +5,7 @@
  */
 export const getNestedValue = (obj, path) => {
   if (!obj) return ""; // kalau obj undefined/null
+  if(typeof obj !== "string") return "";
 
   const value = path.split(".").reduce((acc, key) => {
     return acc && acc[key] !== undefined ? acc[key] : null;

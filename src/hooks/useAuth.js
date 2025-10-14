@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState } from "react";
 import axios from "axios";
+import ApiService from "../services/ApiService";
 
 export const useAuth = () => {
   const [user, setUser] = useState(() => {
@@ -10,53 +11,65 @@ export const useAuth = () => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, { 
-        email, 
-        password 
-      });
-      
-      if(response.data.success){
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/login`,
+        {
+          email,
+          password,
+        }
+      );
+
+      if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         setUser(response.data.user);
         return true;
       }
       return false;
-    } catch(error) {
+    } catch (error) {
       console.error("Login error:", error);
       return false;
     }
   };
 
-  const register = async (name, email, password, confirmPassword) => {
-    try{
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/register`, { 
+  const register = async (
+    name,
+    email,
+    password,
+    confirmPassword,
+    company_name
+  ) => {
+    try {
+      const response = await ApiService.register(
         name,
-        email, 
+        email,
         password,
-        password_confirmation: confirmPassword, 
-      });
+        confirmPassword,
+        company_name
+      );
 
-      console.log(response.data);
-      if (response.data.success){
-        return true;
-      }
-    }catch{
+      return response.success;
+    } catch (error) {
+      console.error("Register Error:", error);
       return false;
-    };
+    }
   };
 
   const logout = async () => {
-    try{
+    try {
       const token = localStorage.getItem("token");
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/logout`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-    }catch (error) {
+      );
+    } catch (error) {
       console.error("Logout error:", error);
-    }finally {
+    } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       setUser(null);
@@ -66,8 +79,8 @@ export const useAuth = () => {
   return {
     user,
     login,
-    logout, 
+    logout,
     register,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
   };
 };

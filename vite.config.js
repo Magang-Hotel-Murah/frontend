@@ -15,24 +15,29 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+
       '@service' : path.resolve(__dirname, './src/service'),
+
       '@utils': path.resolve(__dirname, './src/utils'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@layouts': path.resolve(__dirname, './src/layouts'),
-      '@pages': path.resolve(__dirname, './src/pages'),
+      
       '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@auth': path.resolve(__dirname, './src/pages/auth'),
-      '@transaksi' : path.resolve(__dirname, './src/pages/transaksi'),
-      '@users' : path.resolve(__dirname, './src/pages/users'),
+
+      '@layouts': path.resolve(__dirname, './src/layouts'),
+      
+      '@components': path.resolve(__dirname, './src/components'),
       '@ui' : path.resolve(__dirname, './src/components/ui'),
       '@alert' : path.resolve(__dirname, './src/components/alert'),
-      '@settings' : path.resolve(__dirname, './src/pages/settings'),
-      '@booking' : path.resolve(__dirname, './src/pages/book'),
       '@common' : path.resolve(__dirname, './src/components/common'),
-      '@contentuser' : path.resolve(__dirname, './src/modules/user'),
-      '@contentroom' : path.resolve(__dirname, './src/modules/meetingRoom'),
-      '@contenttransaction' : path.resolve(__dirname, './src/modules/transaksi'),
+      '@layout': path.resolve(__dirname, './src/components/layout'),
 
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@auth': path.resolve(__dirname, './src/pages/auth'),
+      '@users' : path.resolve(__dirname, './src/pages/users'),
+      '@settings' : path.resolve(__dirname, './src/pages/settings'),
+      '@booking' : path.resolve(__dirname, './src/pages/bookings'),
+      
+      '@contentuser' : path.resolve(__dirname, './src/modules/user'),
+      '@contentroom' : path.resolve(__dirname, './src/modules/bookings'),
 
     },
   },
