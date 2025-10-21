@@ -8,7 +8,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { Footer } from "../components/layout";
+import { Footer } from "@layout";
 import { NavbarL } from "@layout";
 import { Button } from "@ui";
 import { useNavigate } from "react-router-dom";

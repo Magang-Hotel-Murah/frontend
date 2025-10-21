@@ -1,6 +1,6 @@
 import React from "react";
 
-const AddReservation = () => {
+const Create = () => {
   return (
     <div>
       <h3 className="text-xl font-semibold text-gray-700 mb-4">
@@ -11,4 +11,4 @@ const AddReservation = () => {
   );
 };
 
-export default AddReservation;
+export default Create;

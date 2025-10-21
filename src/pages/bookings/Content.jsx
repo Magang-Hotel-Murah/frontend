@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { Plus } from "lucide-react";
 import { useReservations } from "@hooks";
 import { CreateReservationModal } from "@ui";
 import { Pagination } from "@common";
-import { ReservationTable, ReservationFilter } from "@contentroom";
+import { Table, Filter } from "@contentbooking";
 import { AlertStyles } from "@alert";
 import { paginateData, filterBySearch } from "@utils";
+import { Detail } from "@bookings";
 
-export const Reservation = () => {
+export const Content = () => {
   const {
     reservations,
     rooms,
@@ -17,13 +18,39 @@ export const Reservation = () => {
     deleteReservation,
   } = useReservations();
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState(null);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+
   const [showCreateModal, setShowCreateModal] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterRoom, setFilterRoom] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+
+  const handleOpenModal = (mode, reservation = null) => {
+    setModalMode(mode);
+    setSelectedReservation(reservation);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalMode(null);
+    setSelectedReservation(null);
+    setIsModalOpen(false);
+  };
+
+  const handleCreateReservation = async (newReservation) => {
+    try {
+      await createReservation(newReservation);
+      setShowCreateModal(false);
+    } catch (error) {
+      console.error("Error creating reservation:", error);
+    }
+  };
 
   const filteredReservations = filterBySearch(reservations, searchTerm, [
     "user.name",
@@ -46,15 +73,6 @@ export const Reservation = () => {
     itemsPerPage
   );
 
-  const handleCreateReservation = async (newReservation) => {
-    try {
-      await createReservation(newReservation);
-      setShowCreateModal(false);
-    } catch (error) {
-      console.error("Error creating reservation:", error);
-    }
-  };
-
   return (
     <>
       <AlertStyles />
@@ -72,7 +90,7 @@ export const Reservation = () => {
 
         <br />
 
-        <ReservationFilter
+        <Filter
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           setFilterRoom={setFilterRoom}
@@ -85,8 +103,9 @@ export const Reservation = () => {
 
         <br />
 
-        <ReservationTable
+        <Table
           reservations={currentReservations}
+          onDetail={(reservations) => handleOpenModal("detail", reservations)}
           onApprove={(id) => updateReservationStatus(id, "approved")}
           onReject={(id) => updateReservationStatus(id, "rejected")}
           onDelete={deleteReservation}
@@ -101,6 +120,16 @@ export const Reservation = () => {
           totalItems={filteredReservations.length}
         />
 
+        {isModalOpen && selectedReservation && (
+          <>
+            {modalMode === "detail" && (
+              <Detail
+                reservations={selectedReservation}
+                onClose={handleCloseModal}
+              />
+            )}
+          </>
+        )}
         <CreateReservationModal
           showModal={showCreateModal}
           setShowModal={setShowCreateModal}
@@ -112,4 +141,4 @@ export const Reservation = () => {
   );
 };
 
-export default Reservation;
+export default Content;

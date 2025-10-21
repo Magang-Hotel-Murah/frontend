@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,8 +7,16 @@ import {
 } from "react-router-dom";
 import { MainLayout } from "@layouts";
 import "./index.css";
-import { Home, User, Setting, Booking, LandingPage } from "@pages";
-import { Login, Register, ForgotPassword } from "@auth";
+import {
+  Home,
+  User,
+  Setting,
+  Booking,
+  LandingPage,
+  InviteUser,
+  Room,
+} from "@pages";
+import { Login, Register, ForgotPassword, ActivateAccount } from "@auth";
 import { useAuth } from "@hooks";
 import { ProtectedRoute } from "@components/layout";
 
@@ -23,6 +31,17 @@ const App = () => {
           path="/"
           element={
             isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />
+          }
+        />
+
+        <Route
+          path="/activate-account"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/home" replace />
+            ) : (
+              <ActivateAccount />
+            )
           }
         />
 
@@ -71,6 +90,21 @@ const App = () => {
         />
 
         <Route
+          path="/room"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              user={user}
+              allowedRoles={["company_admin"]}
+            >
+              <MainLayout user={user} onLogout={logout}>
+                <Room />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/booking"
           element={
             <ProtectedRoute
@@ -80,6 +114,21 @@ const App = () => {
             >
               <MainLayout user={user} onLogout={logout}>
                 <Booking />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/invite-user"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              user={user}
+              allowedRoles={["company_admin"]}
+            >
+              <MainLayout user={user} onLogout={logout}>
+                <InviteUser />
               </MainLayout>
             </ProtectedRoute>
           }
@@ -106,15 +155,13 @@ const App = () => {
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
               user={user}
-              allowedRoles={
-                [
-                  "super_admin", 
-                  "company_admin",
-                  "finance_officer",
-                  "employee",
-                  "support_staff",
-                ]
-              }
+              allowedRoles={[
+                "super_admin",
+                "company_admin",
+                "finance_officer",
+                "employee",
+                "support_staff",
+              ]}
             >
               <MainLayout user={user} onLogout={logout}>
                 <Setting />
@@ -123,7 +170,7 @@ const App = () => {
           }
         />
 
-        <Route path="*" element={<Navigate to="/" replace/>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

@@ -1,41 +1,21 @@
 import React from "react";
 import { BaseTable } from "@common";
-import { Calendar, Users, Clock, Check, X, Trash2 } from "lucide-react";
+import { Calendar, Users, Clock, Check, X, Trash2, Eye } from "lucide-react";
+import { Button } from "@ui";
+import { formatDateTimeHour, getStatusTableBooking } from "@utils";
 
-const ReservationTable = ({
+const Table = ({
   reservations,
+  onDetail,
   onApprove,
   onReject,
   onDelete,
   loading,
 }) => {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    return {
-      date: date.toLocaleDateString("id-ID"),
-      time: date.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-  };
 
   const columns = [
     {
-      header: "Meeting Room",
+      header: "Ruangan",
       render: (row) => (
         <div className="flex items-center">
           <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -50,7 +30,7 @@ const ReservationTable = ({
       ),
     },
     {
-      header: "User",
+      header: "Karyawan",
       render: (row) => (
         <div className="flex items-center">
           <Users className="h-4 w-4 text-gray-400 mr-2" />
@@ -66,10 +46,10 @@ const ReservationTable = ({
       ),
     },
     {
-      header: "Date & Time",
+      header: "Mulai - Berakhir",
       render: (row) => {
-        const start = formatDateTime(row.start_time);
-        const end = formatDateTime(row.end_time);
+        const start = formatDateTimeHour(row.start_time);
+        const end = formatDateTimeHour(row.end_time);
         return (
           <div className="flex items-center">
             <Clock className="h-4 w-4 text-gray-400 mr-2" />
@@ -89,7 +69,7 @@ const ReservationTable = ({
       header: "Status",
       render: (row) => (
         <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusTableBooking(
             row.status
           )}`}
         >
@@ -98,7 +78,7 @@ const ReservationTable = ({
       ),
     },
     {
-      header: "Actions",
+      header: "Aksi",
       headerClassName: "text-right",
       render: (row) => (
         <div className="flex justify-end gap-2">
@@ -121,6 +101,13 @@ const ReservationTable = ({
             </>
           )}
           <button
+            onClick={() => onDetail(row)}
+            className="text-gray-600 hover:text-gray-900 p-1"
+            title="Detail"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => onDelete(row.id)}
             className="text-red-600 hover:text-red-900 p-1"
             title="Delete"
@@ -142,4 +129,4 @@ const ReservationTable = ({
   );
 };
 
-export default ReservationTable;
+export default Table;

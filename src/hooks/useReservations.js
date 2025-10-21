@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import ApiService from '../services/ApiService';
+import { useState, useEffect, useCallback } from "react";
+import ApiService from "../services/ApiService";
 
 export const useReservations = () => {
   const [reservations, setReservations] = useState([]);
@@ -7,40 +7,61 @@ export const useReservations = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-
-  const fetchReservations = async () => {
+  const fetchReservations = useCallback(async (params = {}) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await ApiService.getReservations();
+            
+      const response = await ApiService.getReservations(params);
+
+      const data = response?.data?.data || response?.data || response || [];
+
       setReservations(data);
+      return data;
     } catch (err) {
       setError(err.message);
-      console.error('Error fetching reservations:', err);
+      console.error("Gagal mengambil data reservasi", err);
+      console.error("Response was:", response);
+      setReservations([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchRooms = async () => {
+    const getReservationById = useCallback(async (id) => {
     try {
       setLoading(true);
       setError(null);
+
+      const response = await ApiService.getReservationsById(id);
+      return response;
+    }catch(err) {
+      console.error("Gagal mengambil data reservasi", err);
+      setError(err);
+    }finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchRoom = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null)
       const data = await ApiService.getRooms();
       setRooms(data);
-    } catch (err) {
-      setError(err.message);
-      console.error('Error fetching rooms:', err);
-    } finally {
+    }catch(err) {
+      console.error("Gagal mengambil data ruangan:", err);
+      setError(null);
+    }finally{
       setLoading(false);
     }
-  };
+  }, []);
 
   const createReservation = async (reservationData) => {
     try {
       setLoading(true);
       const newReservation = await ApiService.createReservation(reservationData);
-      setReservations(prev => [...prev, newReservation]);
+      setReservations((prev) => [...prev, newReservation]);
       return newReservation;
     } catch (err) {
       setError(err.message);
@@ -54,11 +75,9 @@ export const useReservations = () => {
     try {
       setLoading(true);
       await ApiService.updateReservationStatus(id, status);
-      setReservations(prev => 
-        prev.map(reservation => 
-          reservation.id === id 
-            ? { ...reservation, status }
-            : reservation
+      setReservations((prev) =>
+        prev.map((reservation) =>
+          reservation.id === id ? { ...reservation, status } : reservation
         )
       );
     } catch (err) {
@@ -73,7 +92,7 @@ export const useReservations = () => {
     try {
       setLoading(true);
       await ApiService.deleteReservation(id);
-      setReservations(prev => prev.filter(reservation => reservation.id !== id));
+      setReservations((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
       setError(err.message);
       throw err;
@@ -82,27 +101,10 @@ export const useReservations = () => {
     }
   };
 
-  const loadInitialData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const [reservationsData, roomsData] = await Promise.all([
-        ApiService.getReservations(),
-        ApiService.getRooms()
-      ]);
-      setReservations(reservationsData);
-      setRooms(roomsData);
-    } catch (err) {
-      setError(err.message);
-      console.error('Error loading initial data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadInitialData();
-  }, []);
+    fetchReservations();
+    fetchRoom();
+  }, [fetchReservations, fetchRoom]);
 
   return {
     reservations,
@@ -110,10 +112,10 @@ export const useReservations = () => {
     loading,
     error,
     fetchReservations,
-    fetchRooms,
+    getReservationById,
+    fetchRoom,
     createReservation,
     updateReservationStatus,
     deleteReservation,
-    loadInitialData
   };
 };

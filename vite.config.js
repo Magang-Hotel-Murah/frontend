@@ -34,10 +34,13 @@ export default defineConfig({
       '@auth': path.resolve(__dirname, './src/pages/auth'),
       '@users' : path.resolve(__dirname, './src/pages/users'),
       '@settings' : path.resolve(__dirname, './src/pages/settings'),
-      '@booking' : path.resolve(__dirname, './src/pages/bookings'),
+      '@bookings' : path.resolve(__dirname, './src/pages/bookings'),
+      '@rooms': path.resolve(__dirname, './src/pages/rooms'),
+      '@invite': path.resolve(__dirname, './src/pages/invite'),
       
       '@contentuser' : path.resolve(__dirname, './src/modules/user'),
-      '@contentroom' : path.resolve(__dirname, './src/modules/bookings'),
+      '@contentbooking' : path.resolve(__dirname, './src/modules/bookings'),
+      '@contentroom' : path.resolve(__dirname, './src/modules/room'),
 
     },
   },

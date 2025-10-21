@@ -122,6 +122,29 @@ class ApiService {
     });
   }
 
+  //INVITE USER
+  async InviteUser(employees) {
+    return this.request("/invite-users", {
+      method: "POST",
+      body: {
+        employees: employees
+      }
+    });
+  }
+
+  //ACTIVE ACCOUNT
+  async ActiveAccount(token, name, password, passwordConfirm) {
+    return this.request("/activate-account?token=", {
+      method: "POST",
+      body: {
+        token,
+        name,
+        password,
+        password_confirmation: passwordConfirm,
+      },
+    });
+  }
+
   //DIVISION
   async getDivisions() {
     return this.request("/divisions");
@@ -130,28 +153,6 @@ class ApiService {
   //POSITION
   async getPositions() {
     return this.request("/positions");
-  }
-
-  //TRANSACTION
-  async getTransactions(type) {
-    return this.request(`/transactions?type=${type}`);
-  }
-
-  async getTransaction() {
-    return this.request(`/transactions/${id}`);
-  }
-
-  async updateTransaction(id, data) {
-    return this.request(`/transactions/${id}`, {
-      method: "PUT",
-      body: data,
-    });
-  }
-
-  async deleteTransaction(id) {
-    return this.request(`/transactions/${id}`, {
-      method: "DELETE",
-    });
   }
 
   //MEETING ROOM
@@ -185,11 +186,15 @@ class ApiService {
 
   //RESERVATION MEETING ROOM
   async getReservations() {
-    return this.request("/meeting-room/reservations");
+    return this.request("/meeting-room-reservations");
   }
 
   async getReservationsByRoom(roomId) {
     return this.request(`/meeting-room-reservations/${roomId}`);
+  }
+
+  async getReservationsById(id) {
+    return this.request(`/meeting-room-reservations/${id}`)
   }
 
   async createReservation(data) {
@@ -200,7 +205,7 @@ class ApiService {
   }
 
   async updateReservationStatus(id, status) {
-    return this.request(`/meeting-room/${id}/status`, {
+    return this.request(`/meeting-room-reservations/${id}/status`, {
       method: "PUT",
       body: { status },
     });

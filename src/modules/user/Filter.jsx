@@ -1,7 +1,7 @@
 import React from "react";
 import BaseFilters from "@common/BaseFilters";
 
-const UserFilters = ({
+const Filter = ({
   searchTerm,
   setSearchTerm,
   filterRole,
@@ -24,8 +24,11 @@ const UserFilters = ({
           onChange: (e) => setFilterRole(e.target.value),
           options: [
             { label: "Semua Role", value: "" },
-            { label: "Admin", value: "admin" },
-            { label: "User", value: "user" },
+            { label: "HR", value: "company_admin" },
+            { label: "Finance", value: "finance_officer"},
+            { label: "Karyawan", value: "employee" },
+            { label: "Staff Pendukung", value: "support_staff"},
+
           ],
         },
         {
@@ -44,4 +47,4 @@ const UserFilters = ({
   );
 };
 
-export default UserFilters;
+export default Filter;

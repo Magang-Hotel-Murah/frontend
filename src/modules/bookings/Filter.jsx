@@ -1,7 +1,7 @@
 import React from "react";
 import { BaseFilters } from "@common";
 
-const ReservationFilter = ({
+const Filter = ({
   searchTerm,
   setSearchTerm,
   filterStatus,
@@ -47,4 +47,4 @@ const ReservationFilter = ({
   );
 };
 
-export default ReservationFilter;
+export default Filter;

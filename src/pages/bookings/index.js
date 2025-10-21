@@ -1,3 +1,3 @@
-export { default as Reservation } from './Reservation';
-export { default as MeetingRoom } from './MeetingRoom';
-export { default as AddReservation} from './AddReservation';
+export { default as Content } from './Content';
+export { default as Create} from './Create';
+export { default as Detail } from './Detail';

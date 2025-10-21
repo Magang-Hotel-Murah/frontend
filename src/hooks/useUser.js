@@ -11,13 +11,34 @@ export const useUser = () => {
       setLoading(true);
       setError(null);
 
-      const  userData = await ApiService.getUsers();
+      const userData = await ApiService.getUsers();
 
-      setUsers(Array.isArray(userData.data) ? userData.data : Array.isArray(userData) ? userData :[]);
-
+      setUsers(
+        Array.isArray(userData.data)
+          ? userData.data
+          : Array.isArray(userData)
+          ? userData
+          : []
+      );
     } catch (err) {
       setError(err.message);
       console.error("Error laoding users:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getUserById = async (id) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await ApiService.getUser(id);
+      return response;
+    } catch (err) {
+      console.error("Gagal mengambil user:", err);
+      setError(err.message);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -29,16 +50,39 @@ export const useUser = () => {
     );
   };
 
+  const update_user = async (id, data) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await ApiService.updateUser(id, data);
+
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, ...data } : u))
+      );
+
+      return response;
+    } catch (err) {
+      console.error("Gagal update user:", err);
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
   const toggleUserStatus = async (id) => {
     try {
       setLoading(true);
       await ApiService.deleteUser(id);
       setUsers((prev) =>
-        prev.map((u) => 
+        prev.map((u) =>
           u.id === id
-            ? { ...u, deleted_at: u.deleted_at ? null : new Date().toISOString() }
+            ? {
+                ...u,
+                deleted_at: u.deleted_at ? null : new Date().toISOString(),
+              }
             : u
-          )
+        )
       );
     } catch (err) {
       console.error("Gagal toggle status user", err);
@@ -57,7 +101,9 @@ export const useUser = () => {
     users,
     loading,
     error,
+    getUserById,
     updateUser,
+    update_user,
     toggleUserStatus,
     loadInitialData,
   };

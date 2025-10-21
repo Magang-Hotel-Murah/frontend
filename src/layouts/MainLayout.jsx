@@ -4,6 +4,7 @@ import { useToggle } from "@hooks";
 import { useLocation } from "react-router-dom";
 import { set } from "react-hook-form";
 import { object } from "yup";
+
 const MainLayout = ({ children, user, onLogout }) => {
   const [sidebarOpen, toggleSidebar, openSidebar, closeSidebar] =
     useToggle(false);
@@ -14,6 +15,8 @@ const MainLayout = ({ children, user, onLogout }) => {
   const routeToMenuMap = {
     "/home": "home",
     "/booking": "bookings",
+    "/room" : "room",
+    "/invite-user": "invite-user",
     "/user": "users",
     "/setting": "settings",
   };
@@ -54,7 +57,6 @@ const MainLayout = ({ children, user, onLogout }) => {
   return (
     <div className="bg-gray-50 min-h-screen">
       <Navbar
-        mode="dashboard"
         toggleSidebar={toggleSidebar}
         sidebarOpen={sidebarOpen}
         user={user}
@@ -71,15 +73,14 @@ const MainLayout = ({ children, user, onLogout }) => {
       />
 
       <div
-        className={`p-4 mt-20 transition-all duration-300 ${
+        className={`p-3 mt-20 transition-all duration-300 ${
           isCollapsed ? "lg:ml-16" : "lg:ml-64"
         }`}
       >
-        <div className="p-4 border-2 border-dashed border-gray-200 rounded-lg min-h-screen bg-white">
+        <div className="p-3 border-2 border-dashed border-gray-200 rounded-lg min-h-screen bg-white">
           {children}
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

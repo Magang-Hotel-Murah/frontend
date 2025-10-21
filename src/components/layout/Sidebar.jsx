@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Users, Settings, BarChart3, BookIcon, Book } from "lucide-react";
+import { Home, Users, Settings, BarChart3, BookIcon, Book, UserPlus, Presentation } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
@@ -20,8 +20,14 @@ const Sidebar = ({
       case "/home":
         setActiveMenu("home");
         break;
+      case "/room":
+        setActiveMenu("room");
+        break;
       case "/booking":
         setActiveMenu("bookings");
+        break;
+      case "/invite-user":
+        setActiveMenu("invite-user");
         break;
       case "/user":
         setActiveMenu("users");
@@ -39,8 +45,14 @@ const Sidebar = ({
       case "home":
         navigate("/home");
         break;
+      case "room":
+        navigate("/room");
+        break;
       case "bookings":
         navigate("/booking");
+        break;
+      case "invite-user":
+        navigate("/invite-user");
         break;
       case "users":
         navigate("/user");
@@ -61,26 +73,28 @@ const Sidebar = ({
 
   const menuItemsByRole = {
     super_admin: [
-      { id: "home", name: "Dashboard", icon: Home },
+      { id: "home", name: "Home", icon: Home },
       { id: "bookings", name: "Booking", icon: BookIcon },
       { id: "users", name: "Pengguna", icon: Users },
       { id: "settings", name: "Pengaturan", icon: Settings },
     ],
     company_admin: [
-      { id: "home", name: "Dashboard", icon: Home },
+      { id: "home", name: "Home", icon: Home },
+      { id: "room", name: "Ruangan", icon: Presentation },
       { id: "bookings", name: "Booking", icon: BookIcon },
+      { id: "invite-user", name: "Undang Karyawan", icon: UserPlus },
       { id: "users", name: "Pengguna", icon: Users },
     ],
     employee: [
-      { id: "home", name: "Dashboard", icon: Home },
+      { id: "home", name: "Home", icon: Home },
       { id: "bookings", name: "Booking", icon: BookIcon },
     ],
     finance_officer: [
-      { id: "home", name: "Dashboard", icon: Home },
+      { id: "home", name: "Home", icon: Home },
       { id: "reports", name: "Laporan Keuangan", icon: BarChart3 },
     ],
     support_staff: [
-      { id: "home", name: "Dashboard", icon: Home },
+      { id: "home", name: "Home", icon: Home },
       { id: "support", name: "Tiket Bantuan", icon: Book },
     ],
   };

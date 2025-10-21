@@ -5,6 +5,7 @@ const Input = ({
   type = 'text', 
   placeholder, 
   value, 
+  name,
   onChange, 
   error,
   required = false,
@@ -28,6 +29,7 @@ const Input = ({
         )}
         <input
           type={type}
+          name={name}
           value={value}
           onChange={onChange}
           placeholder={placeholder}

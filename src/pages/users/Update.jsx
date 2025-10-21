@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { X, Save } from "lucide-react";
-import axios from "axios";
 import { LoadingAlert, SuccessAlert, ErrorAlert, AlertStyles } from "@alert";
+import { Button, Input, Card } from "@ui";
+import { useUser } from "@hooks";
 
 const Update = ({ user, onClose, onSuccess }) => {
+  const { update_user } = useUser();
   const [formData, setFormData] = useState({
     name: user.name,
     email: user.email,
@@ -24,18 +26,9 @@ const Update = ({ user, onClose, onSuccess }) => {
   const handleSubmit = async () => {
     setShowLoadingAlert(true);
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/users/${user.id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await update_user(user.id, formData);
 
-      onSuccess(response.data);
+      onSuccess(response);
 
       setShowLoadingAlert(false);
       setShowSuccessAlert(true);
@@ -44,99 +37,93 @@ const Update = ({ user, onClose, onSuccess }) => {
       }, 1500);
     } catch (error) {
       console.error(error);
-      setShowLoadingAlert(false);
       setErrorMessage(error.response?.data?.message || "Gagal mengupdate user");
       setShowErrorAlert(true);
+    } finally {
+      setShowLoadingAlert(false);
     }
   };
 
   return (
     <>
       <AlertStyles />
-      <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
-        <div className="absolute inset-0 backdrop-blur-sm bg-black/20"></div>
-        <div className="relative bg-white rounded-lg w-full max-w-md shadow-lg">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Update User</h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
 
-          <div className="p-6 space-y-4">
-            <div>
-              <p className="text-sm text-gray-500">Nama</p>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                readOnly
-              />
+      <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+        <div
+          className="absolute inset-0 backdrop-blur-xl transition-opacity"
+          onClick={onClose}
+        ></div>
+
+        <div className="relative rounded-lg w-full max-w-2xl shadow-lg overflow-y-auto">
+          <Card className="overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Ubah Data Pengguna
+              </h3>
+              <Button onClick={onClose} size="small" variant="ghost">
+                <X className="w-5 h-5" />
+              </Button>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Email</p>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                readOnly
-              />
+
+            <div className="p-6 space-y-4">
+              <div>
+                <p className="text-sm text-gray-500">Nama</p>
+                <Input type="text" name="name" value={formData.name} readOnly />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Email</p>
+                <Input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  readOnly
+                />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Role</p>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="company_admin">HR</option>
+                  <option value="finance_officer">Finance</option>
+                  <option value="employee">Karyawan</option>
+                  <option value="support_staff">Staff Pendukung</option>
+                </select>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Status</p>
+                <span
+                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                    formData.deleted_at
+                      ? "bg-red-100 text-red-700"
+                      : "bg-green-100 text-green-700"
+                  }`}
+                >
+                  {formData.deleted_at ? "Non-Aktif" : "Aktif"}
+                </span>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Role</p>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              >
-                <option value="admin">Admin</option>
-                <option value="user">User</option>
-              </select>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Status</p>
-              <span
-                className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  formData.deleted_at
-                    ? "bg-red-100 text-red-700"
-                    : "bg-green-100 text-green-700"
-                }`}
-              >
-                {formData.deleted_at ? "Non-Aktif" : "Aktif"}
-              </span>
-            </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="px-4 py-2 bg-primary-600 text-gray-100 rounded-lg flex items-center gap-2"
-              >
-                <Save className="w-4 h-4" /> Simpan Perubahan
-              </button>
-            </div>
-          </div>
+              <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                <Button size="small" variant="ghost" onClick={onClose}>
+                  Batal
+                </Button>
+                <Button size="small" variant="primary" onClick={handleSubmit}>
+                  <Save className="w-4 h-4" /> Simpan
+                </Button>
+              </div>
+          </Card>
         </div>
       </div>
 
-      {/* Loading Alert */}
       <LoadingAlert
         show={showLoadingAlert}
         title="Menyimpan..."
         message="Mohon tunggu, perubahan sedang diproses."
       />
 
-      {/* Success Alert */}
       <SuccessAlert
         show={showSuccessAlert}
         onClose={() => setShowSuccessAlert(false)}
@@ -144,7 +131,6 @@ const Update = ({ user, onClose, onSuccess }) => {
         message="User berhasil diperbarui!"
       />
 
-      {/* Error Alert */}
       <ErrorAlert
         show={showErrorAlert}
         onClose={() => setShowErrorAlert(false)}

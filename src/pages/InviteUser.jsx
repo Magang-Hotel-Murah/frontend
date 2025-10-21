@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import { TabNavigation } from "@common";
-import { Content } from "@bookings";
-import { Book } from "lucide-react";
+import { Content } from "@invite";
+import { UserPlus } from "lucide-react";
 
-const Booking = () => {
-  const [activeTab, setActiveTab] = useState("reservation");
+const InviteUser = () => {
+  const [activeTab, setActiveTab] = useState("invite-user");
 
   const tabs = [
-    { key: "reservation", label: "Booking", icon: Book },
+    { key: "invite-user", label: "Undang Karyawan", icon: UserPlus },
   ];
 
   const renderContent = () => {
     switch (activeTab) {
-      case "reservation":
+      case "invite-user":
         return <Content />;
       default:
         return null;
@@ -37,4 +37,4 @@ const Booking = () => {
   );
 };
 
-export default Booking;
+export default InviteUser;

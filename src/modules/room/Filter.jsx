@@ -1,7 +1,7 @@
 import React from "react";
 import { BaseFilters } from '@common';
 
-const RoomFilter = ({
+const Filter = ({
     searchTerm, 
     setSearchTerm,
     resultCount,
@@ -10,7 +10,7 @@ const RoomFilter = ({
     return (
         <BaseFilters
             searchConfig={{
-                placeholder: "Cari nama ruangan atau deskripsi...",
+                placeholder: "Cari nama ruangan...",
                 value: searchTerm,
                 onChange: (e) => setSearchTerm(e.target.value),
             }}
@@ -20,4 +20,4 @@ const RoomFilter = ({
     )
 }
 
-export default RoomFilter;
+export default Filter;

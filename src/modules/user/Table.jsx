@@ -1,28 +1,13 @@
 import React from "react";
 import BaseTable from "@common/BaseTable";
 import { Eye, Edit, XCircleIcon, ActivityIcon } from "lucide-react";
+import { getStatusActive, getRoleColor} from '@utils';
 
-const UserTable = ({ users, onView, onEdit, onToggleStatus, loading }) => {
-  const getRoleColor = (role) => {
-    switch (role.toLowerCase()) {
-      case "admin":
-        return "bg-red-100 text-red-800";
-      case "user":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-blue-100 text-blue-800";
-    }
-  };
-
-  const getStatusColor = (deleted_at) => {
-    return deleted_at === null
-      ? "bg-green-100 text-green-800"
-      : "bg-gray-300 text-gray-800";
-  };
+const Table = ({ users, onDetail, onEdit, onToggleStatus, loading }) => {
 
   const columns = [
     {
-      header: "User",
+      header: "Nama & Email",
       render: (row) => (
         <div>
           <div className="text-sm font-medium text-gray-900">{row.name}</div>
@@ -31,22 +16,32 @@ const UserTable = ({ users, onView, onEdit, onToggleStatus, loading }) => {
       ),
     },
     {
-      header: "Role",
-      render: (row) => (
-        <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(
-            row.role
-          )}`}
-        >
-          {row.role}
-        </span>
-      ),
+      header: "Jabatan",
+      render: (row) => {
+        const roleMap = {
+          company_admin: "HR",
+          employee: "Karyawan",
+          finance_officer: "Finance",
+          support_staff: "Staff Pendukung",
+        };
+
+        const roleLabel = roleMap[row.role] || row.role;
+        return (
+          <span
+            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(
+              row.role
+            )}`}
+          >
+            {roleLabel}
+          </span>
+        );
+      },
     },
     {
       header: "Status",
       render: (row) => (
         <span
-          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusActive(
             row.deleted_at
           )}`}
         >
@@ -63,14 +58,14 @@ const UserTable = ({ users, onView, onEdit, onToggleStatus, loading }) => {
       ),
     },
     {
-      header: "Actions",
+      header: "Aksi",
       headerClassName: "text-right",
       render: (row) => (
         <div className="flex justify-end gap-2">
           <button
-            onClick={() => onView(row)}
+            onClick={() => onDetail(row)}
             className="text-gray-600 hover:text-gray-900 p-1"
-            title="View"
+            title="Detail"
           >
             <Eye className="w-4 h-4" />
           </button>
@@ -101,12 +96,14 @@ const UserTable = ({ users, onView, onEdit, onToggleStatus, loading }) => {
     },
   ];
 
-  return <BaseTable 
-            columns={columns} 
-            data={users}
-            loading={loading}
-            isFullscreenLoading={true}
-          />;
+  return (
+    <BaseTable
+      columns={columns}
+      data={users}
+      loading={loading}
+      isFullscreenLoading={true}
+    />
+  );
 };
 
-export default UserTable;
+export default Table;
