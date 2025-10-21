@@ -37,9 +37,10 @@ export default defineConfig({
       '@bookings' : path.resolve(__dirname, './src/pages/bookings'),
       '@rooms': path.resolve(__dirname, './src/pages/rooms'),
       '@invite': path.resolve(__dirname, './src/pages/invite'),
+      '@home': path.resolve(__dirname, './src/pages/homes'),
       
       '@contentuser' : path.resolve(__dirname, './src/modules/user'),
-      '@contentbooking' : path.resolve(__dirname, './src/modules/bookings'),
+      '@contentbooking' : path.resolve(__dirname, './src/modules/booking'),
       '@contentroom' : path.resolve(__dirname, './src/modules/room'),
 
     },

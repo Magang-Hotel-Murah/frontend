@@ -2,23 +2,23 @@ import React from "react";
 import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
 
 export const getRoleColor = (role) => {
-    switch (role.toLowerCase()) {
-      case "company_admin":
-        return "bg-red-100 text-red-800";
-      case "finance_officer":
-        return "bg-yellow-100 text-yellow-800";
-      case "support_staff":
-        return "bg-purple-100 text-purple-800";
-      default:
-        return "bg-blue-100 text-blue-800";
-    }
-  };
+  switch (role.toLowerCase()) {
+    case "company_admin":
+      return "bg-red-100 text-red-800";
+    case "finance_officer":
+      return "bg-yellow-100 text-yellow-800";
+    case "support_staff":
+      return "bg-purple-100 text-purple-800";
+    default:
+      return "bg-blue-100 text-blue-800";
+  }
+};
 
-export  const getStatusActive = (deleted_at) => {
-    return deleted_at === null
-      ? "bg-green-100 text-green-800"
-      : "bg-gray-300 text-gray-800";
-  };
+export const getStatusActive = (deleted_at) => {
+  return deleted_at === null
+    ? "bg-green-100 text-green-800"
+    : "bg-gray-300 text-gray-800";
+};
 
 export const getStatusBooking = (status) => {
   const configs = {
@@ -79,14 +79,30 @@ export const formatRoleName = (role) => {
 };
 
 export const getStatusTableBooking = (status) => {
-    switch (status) {
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  switch (status) {
+    case "approved":
+      return "bg-green-100 text-green-800";
+    case "rejected":
+      return "bg-red-100 text-red-800";
+    case "pending":
+      return "bg-yellow-100 text-yellow-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
+export const getTypeColor = (type) => {
+  const colors = {
+    main: {
+      bg: "bg-emerald-50",
+      text: "text-emerald-700",
+      border: "border-emerald-200",
+    },
+    sub: {
+      bg: "bg-purple-50",
+      text: "text-purple-700",
+      border: "border-purple-200",
+    },
   };
+  return colors[type] || colors.sub;
+};

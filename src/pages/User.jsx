@@ -7,7 +7,7 @@ const User = () => {
   const [activeTab, setActiveTab] = useState("user");
 
   const tabs = [
-    { key: "user", label: "Pengguna", icon: Users },
+    { key: "user", label: "List", icon: Users },
   ];
 
   const renderContent = () => {

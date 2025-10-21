@@ -7,18 +7,24 @@ import { useRooms } from "@hooks";
 import { Button } from "@ui";
 
 export const Content = () => {
-  const { rooms, loading, fetchRooms } = useRooms();
+  const { rooms, loading } = useRooms();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType ] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
   const filteredRooms = filterBySearch(rooms, searchTerm, [
     "name",
-    "location",
     "facilities",
-  ]);
+    "capacity"
+  ]).filter((rooms) => {
+    const matchesType = 
+    filterType === "" || rooms.type === filterType;
+
+    return matchesType;
+  });
 
   const { currentData: currentRooms, totalPages } = paginateData(
     filteredRooms,
@@ -38,6 +44,7 @@ export const Content = () => {
       <Filter
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
+        setFilterType={setFilterType}
         resultCount={filteredRooms.length}
         totalCount={rooms.length}
       />

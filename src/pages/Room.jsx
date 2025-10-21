@@ -1,19 +1,22 @@
 import React, { useState } from "react";
 import { TabNavigation } from "@common";
-import { Content } from "@rooms";
-import { Presentation } from "lucide-react";
+import { Content, Create } from "@rooms";
+import { PlusCircleIcon, Presentation } from "lucide-react";
 
 const Room = () => {
   const [activeTab, setActiveTab] = useState("room");
 
   const tabs = [
-    { key: "room", label: "Ruangan", icon: Presentation },
+    { key: "room", label: "List", icon: Presentation },
+    { key: "create", label: "Baru", icon: PlusCircleIcon },
   ];
 
   const renderContent = () => {
     switch (activeTab) {
       case "room":
         return <Content />;
+      case "create":
+        return <Create />;
       default:
         return null;
     }

@@ -7,7 +7,7 @@ const InviteUser = () => {
   const [activeTab, setActiveTab] = useState("invite-user");
 
   const tabs = [
-    { key: "invite-user", label: "Undang Karyawan", icon: UserPlus },
+    { key: "invite-user", label: "Undang", icon: UserPlus },
   ];
 
   const renderContent = () => {

@@ -1,6 +1,6 @@
 import React from "react";
 import BaseTable from "@common/BaseTable";
-import { Eye, Edit, XCircleIcon, ActivityIcon } from "lucide-react";
+import { Eye, Edit, XCircleIcon, ActivityIcon, CalendarCheck } from "lucide-react";
 import { getStatusActive, getRoleColor} from '@utils';
 
 const Table = ({ users, onDetail, onEdit, onToggleStatus, loading }) => {
@@ -52,9 +52,12 @@ const Table = ({ users, onDetail, onEdit, onToggleStatus, loading }) => {
     {
       header: "Tanggal Dibuat",
       render: (row) => (
+        <div className="flex items-center">
+          <CalendarCheck className="w-4 h-4 text-gray-400 mr-2" />
         <span className="text-sm text-gray-500">
           {new Date(row.created_at).toLocaleDateString("id-ID")}
         </span>
+        </div>
       ),
     },
     {

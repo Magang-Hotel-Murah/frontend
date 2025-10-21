@@ -1,6 +1,6 @@
 import React from "react";
 import { BaseTable } from "@common";
-import { Calendar, Users, Clock, Check, X, Trash2, Eye } from "lucide-react";
+import { Calendar, Users, Clock, Check, X, Trash2, Eye, Database } from "lucide-react";
 import { Button } from "@ui";
 import { formatDateTimeHour, getStatusTableBooking } from "@utils";
 
@@ -18,8 +18,8 @@ const Table = ({
       header: "Ruangan",
       render: (row) => (
         <div className="flex items-center">
-          <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-            <Calendar className="h-5 w-5 text-blue-600" />
+          <div className="h-10 w-10 rounded-lg bg-primary-50 flex items-center justify-center">
+            <Database className="h-4 w-4 text-primary-600" />
           </div>
           <div className="ml-3">
             <div className="text-sm font-medium text-gray-900">

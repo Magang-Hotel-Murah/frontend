@@ -8,5 +8,6 @@ export {
     formatRoleName,
     getRoleColor,
     getStatusActive,
-    getStatusTableBooking
+    getStatusTableBooking,
+    getTypeColor,
 } from './color';

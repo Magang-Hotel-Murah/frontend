@@ -4,16 +4,29 @@ import { BaseFilters } from '@common';
 const Filter = ({
     searchTerm, 
     setSearchTerm,
+    filterType,
+    setFilterType,
     resultCount,
     totalCount
 }) => {
     return (
         <BaseFilters
             searchConfig={{
-                placeholder: "Cari nama ruangan...",
+                placeholder: "Cari ruangan atau fasilitas...",
                 value: searchTerm,
                 onChange: (e) => setSearchTerm(e.target.value),
             }}
+            selectFilters= {[
+                {
+                    valueg: filterType,
+                    onChange: (e) => setFilterType(e.target.value),
+                    options: [
+                        { label: "Semua Tipe", value: "" },
+                        { label: "Utama", value: "main" },
+                        { label: "Sub Ruangan", value: "sub"},
+                    ],
+                },
+            ]}
             resultCount={resultCount}
             totalCount={totalCount}
         />
