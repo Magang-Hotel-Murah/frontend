@@ -1,4 +1,3 @@
-import React, { use, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -23,7 +22,6 @@ import {
   ActivateAccount,
   VerifyEmail,
 } from "@auth";
-import { useAuth } from "@hooks";
 import {
   useUser,
   useLogin,

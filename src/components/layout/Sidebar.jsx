@@ -1,5 +1,14 @@
 import React from "react";
-import { Home, Users, Settings, BarChart3, BookIcon, Book, UserPlus, Presentation } from "lucide-react";
+import {
+  Home,
+  Users,
+  Settings,
+  BarChart3,
+  BookIcon,
+  Book,
+  UserPlus,
+  Presentation,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
@@ -88,14 +97,17 @@ const Sidebar = ({
     employee: [
       { id: "home", name: "Home", icon: Home },
       { id: "bookings", name: "Booking", icon: BookIcon },
+      { id: "settings", name: "Pengaturan", icon: Settings },
     ],
     finance_officer: [
       { id: "home", name: "Home", icon: Home },
       { id: "reports", name: "Laporan Keuangan", icon: BarChart3 },
+      { id: "settings", name: "Pengaturan", icon: Settings },
     ],
     support_staff: [
       { id: "home", name: "Home", icon: Home },
       { id: "support", name: "Tiket Bantuan", icon: Book },
+      { id: "settings", name: "Pengaturan", icon: Settings },
     ],
   };
 
