@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import { Lock, Mail, KeyRound, Eye, EyeOff, RefreshCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useForgotPassword } from "@hooks/auth/useForgotPassword";
+import { useResetPassword } from "@hooks/auth/useResetPassword";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
+  // Hooks mutation React Query
+  const { mutateAsync: requestOtp, isPending: isSendingOtp } = useForgotPassword();
+  const { mutateAsync: resetPassword, isPending: isResetting } = useResetPassword();
+
+  // State UI
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -15,51 +21,41 @@ const ForgotPassword = () => {
   const [errors, setError] = useState("");
   const [showPassword1, setShowPassword1] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
+  // Kirim OTP
   const handleRequestOtp = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError("");
     setMessage("");
+
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/forgot-password",
-        { email }
-      );
-      if (response.data.success) {
-        setMessage(response.data.message);
-        setStep(2);
-      }
+      const res = await requestOtp({ email });
+      setMessage(res.message || "Kode OTP telah dikirim ke email Anda.");
+      setStep(2);
     } catch (err) {
-      setError(err.response?.data?.message || "Gagal mengirim OTP");
+      setError(err.message || "Gagal mengirim OTP");
     }
-    setIsLoading(false);
   };
 
+  // Reset Password
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError("");
     setMessage("");
+
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/reset-password",
-        {
-          email,
-          otp,
-          password,
-          password_confirmation: passwordConfirm,
-        }
-      );
-      if (response.data.success) {
-        setMessage("Password berhasil direset, silakan login kembali.");
-        setTimeout(() => navigate("/"), 2000);
-      }
+      const res = await resetPassword({
+        email,
+        otp,
+        password,
+        passwordConfirm,
+      });
+
+      setMessage(res.message || "Password berhasil direset, silakan login kembali.");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || "Gagal reset password");
+      setError(err.message || "Gagal reset password");
     }
-    setIsLoading(false);
   };
 
   return (
@@ -74,6 +70,7 @@ const ForgotPassword = () => {
             : "Masukkan kode OTP dan buat password baru Anda."}
         </p>
 
+        {/* Pesan sukses & error */}
         {message && (
           <div className="mb-4 p-3 text-sm rounded-lg bg-green-50 text-green-700 border border-green-200">
             {message}
@@ -85,6 +82,7 @@ const ForgotPassword = () => {
           </div>
         )}
 
+        {/* STEP 1 - Kirim OTP */}
         {step === 1 && (
           <form onSubmit={handleRequestOtp} className="space-y-4">
             <div className="relative">
@@ -103,14 +101,15 @@ const ForgotPassword = () => {
             </div>
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition"
+              disabled={isSendingOtp}
+              className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
             >
-              {isLoading ? "Mengirim OTP..." : "Kirim OTP"}
+              {isSendingOtp ? "Mengirim OTP..." : "Kirim OTP"}
             </button>
           </form>
         )}
 
+        {/* STEP 2 - Reset Password */}
         {step === 2 && (
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div className="relative">
@@ -128,6 +127,7 @@ const ForgotPassword = () => {
               />
             </div>
 
+            {/* Password Baru */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password Baru
@@ -156,6 +156,7 @@ const ForgotPassword = () => {
               </div>
             </div>
 
+            {/* Konfirmasi Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Konfirmasi Password
@@ -184,17 +185,17 @@ const ForgotPassword = () => {
               </div>
             </div>
 
-            {/* Tombol Submit */}
+            {/* Tombol Reset */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isResetting}
               className={`w-full flex justify-center items-center py-3 px-4 text-sm font-medium rounded-lg text-white transition ${
-                isLoading
+                isResetting
                   ? "bg-primary-400 cursor-not-allowed"
                   : "bg-primary-600 hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               }`}
             >
-              {isLoading ? (
+              {isResetting ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Resetting...
@@ -211,7 +212,7 @@ const ForgotPassword = () => {
 
         <div className="text-center mt-6">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/login")}
             className="text-sm text-primary-600 hover:underline"
           >
             Kembali ke halaman login

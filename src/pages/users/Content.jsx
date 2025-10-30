@@ -1,13 +1,19 @@
 import React, { useState } from "react";
 import { Table, Filter } from "@contentuser";
-import { Update, Detail} from "@users"
+import { Update, Detail } from "@users";
 import { ConfirmationAlert, ToastAlert, AlertStyles } from "@alert";
 import { paginateData, filterBySearch } from "@utils";
 import { Pagination } from "@common";
-import { useUser } from "@hooks";
+import { useGetUsers } from "@hooks/user/useGetUsers";
+import { useToggleStatus } from "@hooks/user/useToggleStatus";
+import { useUpdateUser } from "@hooks/user/useUpdateUser";
 
 const Content = () => {
-  const { users, loading, updateUser, toggleUserStatus } = useUser();
+  const { data: users = [], isLoading: userLoading } = useGetUsers();
+  const { mutateAsync: toggleUserStatus } = useToggleStatus();
+  const { mutate: updatedUser, isPending: isUpdating } = useUpdateUser();
+
+  const loading = updatedUser.isPending || userLoading;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState(null);
@@ -39,7 +45,6 @@ const Content = () => {
 
   const handleSuccess = (updatedUser) => {
     if (modalMode === "edit") {
-      updateUser(updatedUser);
       showToastNotification("success", "User berhasil diperbarui!");
       handleCloseModal();
     }
@@ -93,48 +98,49 @@ const Content = () => {
     <>
       <AlertStyles />
 
-      <Filter
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        filterRole={filterRole}
-        setFilterRole={setFilterRole}
-        filterStatus={filterStatus}
-        setFilterStatus={setFilterStatus}
-        resultCount={filteredUsers?.length || 0}
-        totalCount={users?.length || 0}
-      />
+      <div className="space-y-6">
+        <Filter
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          filterRole={filterRole}
+          setFilterRole={setFilterRole}
+          filterStatus={filterStatus}
+          setFilterStatus={setFilterStatus}
+          resultCount={filteredUsers?.length || 0}
+          totalCount={users?.length || 0}
+        />
 
-      <br />
-      <Table
-        users={currentUsers}
-        onDetail={(user) => handleOpenModal("detail", user)}
-        onEdit={(u) => handleOpenModal("edit", u)}
-        onToggleStatus={handleToggleStatus}
-        loading={loading}
-      />
+        <Table
+          users={currentUsers}
+          onDetail={(user) => handleOpenModal("detail", user)}
+          onEdit={(u) => handleOpenModal("edit", u)}
+          onToggleStatus={handleToggleStatus}
+          loading={loading || isUpdating}
+        />
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        itemsPerPage={itemsPerPage}
-        totalItems={filteredUsers.length}
-      />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          totalItems={filteredUsers.length}
+        />
 
-      {isModalOpen && selectedUser && (
-        <>
-          {modalMode === "detail" && (
-            <Detail user={selectedUser} onClose={handleCloseModal} />
-          )}
-          {modalMode === "edit" && (
-            <Update
-              user={selectedUser}
-              onClose={handleCloseModal}
-              onSuccess={handleSuccess}
-            />
-          )}
-        </>
-      )}
+        {isModalOpen && selectedUser && (
+          <>
+            {modalMode === "detail" && (
+              <Detail user={selectedUser} onClose={handleCloseModal} />
+            )}
+            {modalMode === "edit" && (
+              <Update
+                user={selectedUser}
+                onClose={handleCloseModal}
+                onSuccess={handleSuccess}
+              />
+            )}
+          </>
+        )}
+      </div>
 
       <ConfirmationAlert
         show={showConfirmActive}

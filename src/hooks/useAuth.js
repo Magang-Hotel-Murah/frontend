@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import ApiService from "../services/ApiService";
 
 export const useAuth = () => {
@@ -9,36 +8,27 @@ export const useAuth = () => {
     return token && userData ? JSON.parse(userData) : null;
   });
 
+  // --- LOGIN ---
   const login = async (email, password) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/login`,
-        {
-          email,
-          password,
-        }
-      );
+      const response = await ApiService.login(email, password);
 
-      if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        setUser(response.data.user);
-        return true;
+      if (response?.success) {
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+        setUser(response.user);
+        return { success: true, message: "Login berhasil" };
       }
-      return false;
+
+      return { success: false, message: response?.message || "Login gagal" };
     } catch (error) {
       console.error("Login error:", error);
-      return false;
+      return { success: false, message: "Terjadi kesalahan saat login" };
     }
   };
 
-  const register = async (
-    name,
-    email,
-    password,
-    confirmPassword,
-    company_name
-  ) => {
+  // --- REGISTER ---
+  const register = async (name, email, password, confirmPassword, company_name) => {
     try {
       const response = await ApiService.register(
         name,
@@ -48,25 +38,20 @@ export const useAuth = () => {
         company_name
       );
 
-      return response.success;
+      return {
+        success: response?.success,
+        message: response?.message || "Registrasi berhasil",
+      };
     } catch (error) {
-      console.error("Register Error:", error);
-      return false;
+      console.error("Register error:", error);
+      return { success: false, message: "Terjadi kesalahan saat registrasi" };
     }
   };
 
+  // --- LOGOUT ---
   const logout = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await ApiService.logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -76,11 +61,47 @@ export const useAuth = () => {
     }
   };
 
+  // --- FORGOT PASSWORD ---
+  const forgotPassword = async (email) => {
+    try {
+      const response = await ApiService.forgotPassword(email);
+      return {
+        success: response?.success,
+        message: response?.message || "Email untuk reset password telah dikirim",
+      };
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      return { success: false, message: "Gagal mengirim email reset password" };
+    }
+  };
+
+  // --- RESET PASSWORD ---
+  const resetPassword = async (email, otp, password, passwordConfirm) => {
+    try {
+      const response = await ApiService.resetPassword(
+        email,
+        otp,
+        password,
+        passwordConfirm
+      );
+
+      return {
+        success: response?.success,
+        message: response?.message || "Password berhasil direset",
+      };
+    } catch (error) {
+      console.error("Reset password error:", error);
+      return { success: false, message: "Gagal mereset password" };
+    }
+  };
+
   return {
     user,
+    isAuthenticated: !!user,
     login,
     logout,
     register,
-    isAuthenticated: !!user,
+    forgotPassword,
+    resetPassword,
   };
 };

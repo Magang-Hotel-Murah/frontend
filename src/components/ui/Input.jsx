@@ -10,6 +10,7 @@ const Input = ({
   error,
   required = false,
   disabled = false,
+  readOnly = false,
   icon: Icon,
   helperText,
   className = ''
@@ -34,11 +35,12 @@ const Input = ({
           onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
+          readOnly={readOnly}
           required={required}
           className={`
             w-full px-4 py-2 border rounded-lg transition-all duration-200
             ${Icon ? 'pl-10' : ''}
-            ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}
+            ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'}
             ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
             focus:outline-none focus:ring-2
           `}

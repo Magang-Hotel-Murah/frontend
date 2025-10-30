@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content, Create } from "@rooms";
 import { PlusCircleIcon, Presentation } from "lucide-react";
 
 const Room = () => {
-  const [activeTab, setActiveTab] = useState("room");
+  const [activeTab, setActiveTab] = useState(() => {
+      const saved = localStorage.getItem("activeTab");
+      if(saved === "room" || saved === "create") {
+        return saved;
+      }
+      return "room";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("activeTab", activeTab);
+  }, [activeTab]);
 
   const tabs = [
     { key: "room", label: "List", icon: Presentation },

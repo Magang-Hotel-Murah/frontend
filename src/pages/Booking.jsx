@@ -1,22 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content, Create } from "@bookings";
 import { Book, PlusCircle } from "lucide-react";
 
-const Booking = () => {
-  const [activeTab, setActiveTab] = useState("reservation");
+const Booking = ({ user }) => {
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = localStorage.getItem("activeTab");
+    if (saved === "reservation" || saved === "create") {
+      return saved;
+    }
+    return "reservation";
+  });
 
-  const tabs = [
-    { key: "reservation", label: "List", icon: Book },
-    { key: "create", label: "Baru", icon: PlusCircle}
-  ];
+  useEffect(() => {
+    localStorage.setItem("activeTab", activeTab);
+  }, [activeTab]);
+
+  const tabs =
+    user?.role === "employee"
+      ? [
+          { key: "reservation", label: "List", icon: Book },
+          { key: "create", label: "Baru", icon: PlusCircle },
+        ]
+      : [
+          { key: "reservation", label: "List", icon: Book },
+        ];
 
   const renderContent = () => {
     switch (activeTab) {
       case "reservation":
-        return <Content />;
+        return <Content user={user} />;
       case "create":
-        return <Create />;
+        return user?.role === "employee" ? <Create /> : null;
       default:
         return null;
     }
@@ -32,9 +47,7 @@ const Booking = () => {
           variant="underline"
         />
 
-        <div className="mt-5">
-          {renderContent()}
-        </div>
+        <div className="mt-5">{renderContent()}</div>
       </div>
     </div>
   );

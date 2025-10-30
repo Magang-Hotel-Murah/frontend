@@ -2,7 +2,7 @@ import React, { use, useState } from "react";
 import { Eye, EyeOff, Lock, Mail, LogIn, UserIcon } from "lucide-react";
 import Logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
-
+import { useRegister } from "@hooks/auth";
 import {
   SuccessAlert,
   ErrorAlert,
@@ -13,15 +13,16 @@ import {
 
 const Register = ({ onRegister }) => {
   const navigate = useNavigate();
+  const { mutateAsync: registerUser, isPending } = useRegister();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [company_name, setCompanyName] = useState("");
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
+  const [showEmailVerificationAlert, setShowEmailVerificationAlert] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showLoadingAlert, setShowLoadingAlert] = useState(false);
@@ -33,55 +34,40 @@ const Register = ({ onRegister }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name.trim()) {
-      showToastNotification("error", "Nama tidak boleh kosong");
-      return;
-    }
+    if (!name.trim())
+      return showToastNotification("error", "Nama tidak boleh kosong");
+    if (!email.trim())
+      return showToastNotification("error", "Email tidak boleh kosong");
+    if (!password.trim())
+      return showToastNotification("error", "Password tidak boleh kosong");
+    if (password.length < 6)
+      return showToastNotification("error", "Password minimal 6 karakter");
+    if (password !== confirmPassword)
+      return showToastNotification("error", "Konfirmasi password tidak sama");
 
-    if (!email.trim()) {
-      showToastNotification("error", "Email tidak boleh kosong");
-      return;
-    }
-
-    if (!password.trim()) {
-      showToastNotification("error", "Password tidak boleh kosong");
-      return;
-    }
-
-    if (password.length < 6) {
-      showToastNotification("error", "Password minimal 6 karakter");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      showToastNotification("error", "Konfirmasi password tidak sama");
-      return;
-    }
-
-    setIsLoading(true);
     setShowLoadingAlert(true);
-    setError("");
 
     try {
-      const success = await onRegister(name, email, password, confirmPassword, company_name);
+      const res = await registerUser({
+        name,
+        email,
+        password,
+        confirmPassword,
+        company_name,
+      });
       setShowLoadingAlert(false);
 
-      if (success) {
-        setShowSuccessAlert(true);
+      if (res?.success) {
         showToastNotification("success", "Registrasi berhasil!");
-      } else {
-        setErrorMessage(
-          "Gagal mendaftarkan akun. Email mungkin sudah terdaftar."
-        );
-        setShowErrorAlert(true);
+        setShowSuccessAlert(true);
       }
-    } catch (error) {
-      console.error("Register error:", error);
+    } catch (err) {
+      console.error("Register error:", err);
       setShowLoadingAlert(false);
-      setErrorMessage("Terjadi kesalahan pada server. Silakan coba lagi.");
+      setErrorMessage(
+        err.message || "Gagal mendaftarkan akun. Email mungkin sudah terdaftar."
+      );
       setShowErrorAlert(true);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -93,7 +79,7 @@ const Register = ({ onRegister }) => {
 
   const handleSuccessAlertClose = () => {
     setShowSuccessAlert(false);
-    navigate("/");
+    navigate("/login");
   };
 
   const handleErrorAlertClose = () => {
@@ -267,14 +253,14 @@ const Register = ({ onRegister }) => {
               <div>
                 <button
                   type="submit"
-                  disabled={isLoading || !name || !email || !password}
+                  disabled={isPending}
                   className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white transition-all duration-200 ${
-                    isLoading || !name || !email || !password
+                    isPending
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-primary-500 hover:bg-[#2e406f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#37518C] transform hover:scale-105"
                   }`}
                 >
-                  {isLoading ? (
+                  {isPending ? (
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Mendaftar...
@@ -308,8 +294,10 @@ const Register = ({ onRegister }) => {
         show={showSuccessAlert}
         onClose={handleSuccessAlertClose}
         title="Registrasi Berhasil!"
-        message="Akun Anda berhasil dibuat. Silakan login untuk melanjutkan ke dashboard."
-        buttonText="Lanjut ke Login"
+        message="Akun Anda berhasil dibuat. Kami telah mengirim link verifikasi ke Email anda. 
+        Silakan cek inbox atau folder spam Anda dan klik link tersebut 
+        untuk mengaktifkan akun Anda.."
+        buttonText="Mengerti"
       />
 
       <ErrorAlert

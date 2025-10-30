@@ -16,13 +16,33 @@ import {
   InviteUser,
   Room,
 } from "@pages";
-import { Login, Register, ForgotPassword, ActivateAccount } from "@auth";
+import {
+  Login,
+  Register,
+  ForgotPassword,
+  ActivateAccount,
+  VerifyEmail,
+} from "@auth";
 import { useAuth } from "@hooks";
+import {
+  useUser,
+  useLogin,
+  useLogout,
+  useRegister,
+  useForgotPassword,
+} from "@hooks/auth";
+import { Update } from "@rooms";
 import { ProtectedRoute } from "@components/layout";
 
 const App = () => {
-  const { isAuthenticated, user, login, logout, register, forgotPassword } =
-    useAuth();
+  const { data: user } = useUser();
+
+  const { mutateAsync: login } = useLogin();
+  const { mutateAsync: logout } = useLogout();
+  const { mutateAsync: register } = useRegister();
+  const { mutateAsync: forgotPassword } = useForgotPassword();
+
+  const isAuthenticated = !!user;
 
   return (
     <Router>
@@ -42,6 +62,13 @@ const App = () => {
             ) : (
               <ActivateAccount />
             )
+          }
+        />
+
+        <Route
+          path="/verify-email/:id/:hash"
+          element={
+            isAuthenticated ? <Navigate to="/home" replace /> : <VerifyEmail />
           }
         />
 
@@ -105,6 +132,21 @@ const App = () => {
         />
 
         <Route
+          path="/room/edit/:id"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              user={user}
+              allowedRoles={["company_admin"]}
+            >
+              <MainLayout user={user} onLogout={logout}>
+                <Update />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/booking"
           element={
             <ProtectedRoute
@@ -113,7 +155,7 @@ const App = () => {
               allowedRoles={["super_admin", "company_admin", "employee"]}
             >
               <MainLayout user={user} onLogout={logout}>
-                <Booking />
+                <Booking user={user} />
               </MainLayout>
             </ProtectedRoute>
           }

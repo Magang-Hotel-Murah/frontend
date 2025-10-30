@@ -1,10 +1,18 @@
 import React from "react";
 import { BaseTable } from "@common";
-import { Calendar, Users, Clock, Check, X, Trash2, Eye, Database } from "lucide-react";
-import { Button } from "@ui";
+import {
+  Users,
+  Clock,
+  Check,
+  X,
+  Trash2,
+  Eye,
+  Database,
+} from "lucide-react";
 import { formatDateTimeHour, getStatusTableBooking } from "@utils";
 
 const Table = ({
+  user,
   reservations,
   onDetail,
   onApprove,
@@ -12,6 +20,8 @@ const Table = ({
   onDelete,
   loading,
 }) => {
+  const isAdmin = user?.role === "company_admin";
+  const isEmployee = user?.role === "employee";
 
   const columns = [
     {
@@ -82,38 +92,55 @@ const Table = ({
       headerClassName: "text-right",
       render: (row) => (
         <div className="flex justify-end gap-2">
-          {row.status === "pending" && (
+          {isAdmin && (
             <>
+              {row.status === "pending" && (
+                <>
+                  <button
+                    onClick={() => onApprove(row.id)}
+                    className="text-green-600 hover:text-green-900 p-1"
+                    title="Approve"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onReject(row.id)}
+                    className="text-red-600 hover:text-red-900 p-1"
+                    title="Reject"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+
               <button
-                onClick={() => onApprove(row.id)}
-                className="text-green-600 hover:text-green-900 p-1"
-                title="Approve"
+                onClick={() => onDetail(row)}
+                className="text-gray-600 hover:text-gray-900 p-1"
+                title="Detail"
               >
-                <Check className="w-4 h-4" />
+                <Eye className="w-4 h-4" />
               </button>
+
               <button
-                onClick={() => onReject(row.id)}
+                onClick={() => onDelete(row.id)}
                 className="text-red-600 hover:text-red-900 p-1"
-                title="Reject"
+                title="Delete"
               >
-                <X className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" />
               </button>
             </>
           )}
-          <button
-            onClick={() => onDetail(row)}
-            className="text-gray-600 hover:text-gray-900 p-1"
-            title="Detail"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => onDelete(row.id)}
-            className="text-red-600 hover:text-red-900 p-1"
-            title="Delete"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+
+          {/* EMPLOYEE: hanya tombol detail */}
+          {isEmployee && (
+            <button
+              onClick={() => onDetail(row)}
+              className="text-gray-600 hover:text-gray-900 p-1"
+              title="Detail"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+          )}
         </div>
       ),
     },

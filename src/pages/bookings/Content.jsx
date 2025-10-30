@@ -1,28 +1,27 @@
-import React, { use, useState } from "react";
-import { Plus } from "lucide-react";
-import { useReservations } from "@hooks";
-import { CreateReservationModal } from "@ui";
+import React, { useState } from "react";
 import { Pagination } from "@common";
 import { Table, Filter } from "@contentbooking";
 import { AlertStyles } from "@alert";
 import { paginateData, filterBySearch } from "@utils";
 import { Detail } from "@bookings";
+import { useGetReservations } from "@hooks/reservation-meeting-room/useGetReservations";
+import { useGetRooms } from "@hooks/meeting-room/useGetRooms";
+import { useDeleteReservation } from "@hooks/reservation-meeting-room/useDeleteReservation";
+import { useUpdateReservationStatus } from "@hooks/reservation-meeting-room/useUpdateReservationStatus";
 
-export const Content = () => {
-  const {
-    reservations,
-    rooms,
-    loading,
-    createReservation,
-    updateReservationStatus,
-    deleteReservation,
-  } = useReservations();
+export const Content = ({ user }) => {
+  const { data: reservations = [], isLoading: reservationLoading } =
+    useGetReservations();
+  const { data: rooms = [], isLoading: roomLoading } = useGetRooms();
+  const { mutateAsync: deleteReservation } = useDeleteReservation();
+  const { mutate: updateStatus, isPending: isUpdating } =
+    useUpdateReservationStatus();
+
+  const loading = updateStatus.isPending || reservationLoading || roomLoading;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState(null);
   const [selectedReservation, setSelectedReservation] = useState(null);
-
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -43,13 +42,8 @@ export const Content = () => {
     setIsModalOpen(false);
   };
 
-  const handleCreateReservation = async (newReservation) => {
-    try {
-      await createReservation(newReservation);
-      setShowCreateModal(false);
-    } catch (error) {
-      console.error("Error creating reservation:", error);
-    }
+  const handleUpdateStatus = (id, status) => {
+    updateStatus({ id, status });
   };
 
   const filteredReservations = filterBySearch(reservations, searchTerm, [
@@ -77,19 +71,7 @@ export const Content = () => {
     <>
       <AlertStyles />
 
-      <div>
-        <div className="flex justify-end items-center">
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Booking Ruangan Meeting
-          </button>
-        </div>
-
-        <br />
-
+      <div className="space-y-6">
         <Filter
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -101,15 +83,14 @@ export const Content = () => {
           rooms={rooms}
         />
 
-        <br />
-
         <Table
+          user={user}
           reservations={currentReservations}
           onDetail={(reservations) => handleOpenModal("detail", reservations)}
-          onApprove={(id) => updateReservationStatus(id, "approved")}
-          onReject={(id) => updateReservationStatus(id, "rejected")}
+          onApprove={(id) => handleUpdateStatus(id, "approved")}
+          onReject={(id) => handleUpdateStatus(id, "rejected")}
           onDelete={deleteReservation}
-          loading={loading}
+          loading={loading || isUpdating}
         />
 
         <Pagination
@@ -130,12 +111,6 @@ export const Content = () => {
             )}
           </>
         )}
-        <CreateReservationModal
-          showModal={showCreateModal}
-          setShowModal={setShowCreateModal}
-          rooms={rooms}
-          onCreateReservation={handleCreateReservation}
-        />
       </div>
     </>
   );

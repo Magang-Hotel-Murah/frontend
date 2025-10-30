@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content } from "@users";
 import { Users } from "lucide-react";
 
 const User = () => {
-  const [activeTab, setActiveTab] = useState("user");
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = localStorage.getItem("activeTab");
+    if(saved === "user") {
+      return saved
+    }
+    return "user";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("activeTab", activeTab);
+  }, [activeTab])
 
   const tabs = [
     { key: "user", label: "List", icon: Users },

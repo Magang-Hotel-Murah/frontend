@@ -1,45 +1,72 @@
-import React, { useState } from 'react';
-import { 
-  User, 
-  Lock, 
-  Bell, 
-  Palette, 
-  Shield, 
+import React, { useEffect, useState } from "react";
+import {
+  User,
+  Lock,
+  Bell,
+  Palette,
+  Shield,
   Download,
-  Check
-} from 'lucide-react';
+  Check,
+} from "lucide-react";
+import {
+  Profile,
+  Security,
+  Notifications,
+  Appearance,
+  Privacy,
+  Data,
+} from "@settings";
 
-import { Profile, Security, Notifications, Appearance, Privacy, Data } from '@settings';
 const Setting = () => {
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = localStorage.getItem("activeTab");
+    if (
+      saved === "profile" ||
+      saved === "security" ||
+      saved === "notifications" ||
+      saved === "appearance" ||
+      saved === "data"
+    ) {
+      return saved;
+    }
+    return "profile";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("activeTab", activeTab);
+  }, [activeTab]);
+
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
   });
+
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
     sms: false,
-    newsletter: true
+    newsletter: true,
   });
-  const [theme, setTheme] = useState('light');
-  const [language, setLanguage] = useState('id');
+
+  const [theme, setTheme] = useState("light");
+  const [language, setLanguage] = useState("id");
   const [profileData, setProfileData] = useState({});
   const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
+
   const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState("");
 
   const tabs = [
-    { id: 'profile', label: 'Profil', icon: User },
-    { id: 'security', label: 'Keamanan', icon: Lock },
-    { id: 'notifications', label: 'Notifikasi', icon: Bell },
-    { id: 'appearance', label: 'Tampilan', icon: Palette },
-    { id: 'data', label: 'Data', icon: Download }
+    { id: "profile", label: "Profil", icon: User },
+    { id: "security", label: "Keamanan", icon: Lock },
+    { id: "notifications", label: "Notifikasi", icon: Bell },
+    { id: "appearance", label: "Tampilan", icon: Palette },
+    { id: "data", label: "Data", icon: Download },
   ];
 
   const handleSave = async (section) => {
@@ -47,35 +74,35 @@ const Setting = () => {
     setTimeout(() => {
       setIsSaving(false);
       setSaveSuccess(section);
-      setTimeout(() => setSaveSuccess(''), 3000);
+      setTimeout(() => setSaveSuccess(""), 3000);
     }, 1000);
   };
 
   const handleProfileChange = (field, value) => {
-    setProfileData(prev => ({
+    setProfileData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handlePasswordChange = (field, value) => {
-    setPasswordData(prev => ({
+    setPasswordData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleNotificationChange = (type) => {
-    setNotifications(prev => ({
+    setNotifications((prev) => ({
       ...prev,
-      [type]: !prev[type]
+      [type]: !prev[type],
     }));
   };
 
   const togglePasswordVisibility = (field) => {
-    setShowPassword(prev => ({
+    setShowPassword((prev) => ({
       ...prev,
-      [field]: !prev[field]
+      [field]: !prev[field],
     }));
   };
 
@@ -84,9 +111,9 @@ const Setting = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setProfileData(prev => ({
+        setProfileData((prev) => ({
           ...prev,
-          avatar: e.target.result
+          avatar: e.target.result,
         }));
       };
       reader.readAsDataURL(file);
@@ -109,19 +136,19 @@ const Setting = () => {
       handleAvatarChange,
       handleSave,
       setTheme,
-      setLanguage
+      setLanguage,
     };
 
     switch (activeTab) {
-      case 'profile':
+      case "profile":
         return <Profile {...props} />;
-      case 'security':
+      case "security":
         return <Security {...props} />;
-      case 'notifications':
+      case "notifications":
         return <Notifications {...props} />;
-      case 'appearance':
+      case "appearance":
         return <Appearance {...props} />;
-      case 'data':
+      case "data":
         return <Data {...props} />;
       default:
         return null;
@@ -130,7 +157,6 @@ const Setting = () => {
 
   return (
     <div className="mx-auto">
-
       {saveSuccess && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center space-x-2 text-green-700">
           <Check className="w-5 h-5" />
@@ -149,8 +175,8 @@ const Setting = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-primary-50 text-primary-600 border-r-2 border-primary-600'
-                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                      ? "bg-primary-50 text-primary-600 border-r-2 border-primary-600"
+                      : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                   }`}
                 >
                   <Icon className="w-5 h-5 mr-3" />

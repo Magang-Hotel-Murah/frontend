@@ -2,33 +2,50 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
 class ApiService {
   async request(endpoint, options = {}) {
-    const token = localStorage.getItem("token");
-    const url = `${API_BASE_URL}${endpoint}`;
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      ...options,
-    };
+  const token = localStorage.getItem("token");
 
-    if (config.body && typeof config.body !== "string") {
-      config.body = JSON.stringify(config.body);
-    }
+  const url = `${API_BASE_URL}${endpoint}`;
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    ...options,
+  };
 
-    const response = await fetch(url, config);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    if (response.status === 204) {
-      return null;
-    }
-
-    return response.json();
+  if (config.body && typeof config.body !== "string") {
+    config.body = JSON.stringify(config.body);
   }
+
+  const response = await fetch(url, config);
+
+  // Tangani error HTTP
+  if (!response.ok) {
+    let errorMessage = `HTTP error! status: ${response.status}`;
+    try {
+      const errData = await response.json();
+      errorMessage = errData.message || errorMessage;
+    } catch {
+      // Jika response bukan JSON
+    }
+    throw new Error(errorMessage);
+  }
+
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return null;
+  }
+
+  // Tangani response non-JSON (misal HTML redirect)
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    return { success: true, message: "Email berhasil diverifikasi!" };
+  }
+
+  // Jika JSON, parse normal
+  return response.json();
+}
 
   //Auth
   async login(email, password) {
@@ -49,6 +66,15 @@ class ApiService {
         company_name,
       },
     });
+  }
+
+  async verifyEmail(id, hash, expires, signature) {
+    return this.request(
+      `/verify-email/${id}/${hash}?expires=${expires}&signature=${signature}`,
+      {
+        method: "GET",
+      }
+    );
   }
 
   async logout() {
@@ -127,8 +153,8 @@ class ApiService {
     return this.request("/invite-users", {
       method: "POST",
       body: {
-        employees: employees
-      }
+        employees: employees,
+      },
     });
   }
 
@@ -160,7 +186,7 @@ class ApiService {
     return this.request("/meeting-room");
   }
 
-  async getRoom(id) {
+  async getRoomById(id) {
     return this.request(`/meeting-room/${id}`);
   }
 
@@ -194,7 +220,7 @@ class ApiService {
   }
 
   async getReservationsById(id) {
-    return this.request(`/meeting-room-reservations/${id}`)
+    return this.request(`/meeting-room-reservations/${id}`);
   }
 
   async createReservation(data) {

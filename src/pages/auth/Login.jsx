@@ -2,90 +2,75 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, LogIn } from "lucide-react";
 import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import { useLogin } from "@hooks/auth";
 
-import { 
-  SuccessAlert, 
-  ErrorAlert, 
-  LoadingAlert, 
+import {
+  SuccessAlert,
+  ErrorAlert,
+  LoadingAlert,
   ToastAlert,
-  AlertStyles 
+  AlertStyles,
 } from "@alert";
 
-const Login = ({ onLogin }) => {
+const Login = () => {
   const navigate = useNavigate();
+  const { mutate: login, isPending } = useLogin();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  
+
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showLoadingAlert, setShowLoadingAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState('info');
-  const [toastMessage, setToastMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [toastType, setToastType] = useState("info");
+  const [toastMessage, setToastMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (!email.trim() && !password.trim()) {
-      showToastNotification('error', 'Email dan password harus diisi');
-      return;
-    }
 
-    if (!email.trim()) {
-      showToastNotification('error', 'Email harus diisi');
-      return;
-    }
-
-    if (!password.trim()) {
-      showToastNotification('error', 'Password harus diisi');
-      return;
-    }
+    if (!email.trim() && !password.trim())
+      return showToastNotification("error", "Email dan password harus diisi");
+    if (!email.trim())
+      return showToastNotification("error", "Email harus diisi");
+    if (!password.trim())
+      return showToastNotification("error", "Password harus diisi");
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      showToastNotification('error', 'Format email tidak valid');
-      return;
-    }
+    if (!emailRegex.test(email))
+      return showToastNotification("error", "Format email tidak valid");
 
-    setIsLoading(true);
     setShowLoadingAlert(true);
 
-    try {
-      const success = await onLogin(email, password);
-      setShowLoadingAlert(false);
-      
-      if (!success) {
-        setErrorMessage("Email atau password yang Anda masukkan salah. Silakan periksa kembali dan coba lagi.");
-        setShowErrorAlert(true);
-      } else {
-        setShowSuccessAlert(true);
-        showToastNotification('success', 'Login berhasil! Mengarahkan ke dashboard...');
-        setTimeout(() => {
-          navigate("/home");
-        }, 1500);
-      }
-    } catch (error) {
-      setShowLoadingAlert(false);
-      console.error("Login error:", error);
-      
-      if (error.message === 'Network Error') {
-        setErrorMessage("Tidak dapat terhubung ke server. Periksa koneksi internet Anda.");
-      } else if (error.response?.status === 429) {
-        setErrorMessage("Terlalu banyak percobaan login. Silakan coba lagi setelah beberapa menit.");
-      } else if (error.response?.status === 500) {
-        setErrorMessage("Terjadi kesalahan pada server. Silakan coba lagi nanti.");
-      } else {
-        setErrorMessage("Terjadi kesalahan yang tidak terduga. Silakan coba lagi.");
-      }
-      
-      setShowErrorAlert(true);
-    }
+    login(
+      { email, password },
+      {
+        onSuccess: () => {
+          setShowLoadingAlert(false);
+          setShowSuccessAlert(true);
+          showToastNotification(
+            "success",
+            "Login berhasil! Mengarahkan ke dashboard..."
+          );
 
-    setIsLoading(false);
+          setTimeout(() => {
+            navigate("/home");
+          }, 1500);
+        },
+        onError: (error) => {
+          console.error("Login error:", error);
+          setShowLoadingAlert(false);
+
+          const msg =
+            error.message ||
+            "Email atau password salah. Silakan periksa kembali.";
+          setErrorMessage(msg);
+          setShowErrorAlert(true);
+        },
+      }
+    );
   };
 
   const showToastNotification = (type, message) => {
@@ -96,7 +81,7 @@ const Login = ({ onLogin }) => {
 
   const handleErrorAlertClose = () => {
     setShowErrorAlert(false);
-    setErrorMessage('');
+    setErrorMessage("");
   };
 
   const handleSuccessAlertClose = () => {
@@ -105,21 +90,23 @@ const Login = ({ onLogin }) => {
   };
 
   const handleForgotPassword = () => {
-    setShowSuccessAlert(false);
-    navigate("/forgot-password"); 
+    navigate("/forgot-password");
   };
 
   return (
     <>
       <AlertStyles />
-      
+
       <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-indigo-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-4">
               <img src={logo} alt="hotelmurah" />
             </div>
-            <h2 className="text-3xl font-bold" style={{ color: "var(--primary-500)" }}>
+            <h2
+              className="text-3xl font-bold"
+              style={{ color: "var(--primary-500)" }}
+            >
               MeetWise
             </h2>
             <p className="mt-2 text-sm text-gray-600">
@@ -214,18 +201,18 @@ const Login = ({ onLogin }) => {
                   </button>
                 </div>
               </div>
-              
+
               <div>
                 <button
                   type="submit"
-                  disabled={isLoading || !email || !password}
+                  disabled={isPending || !email || !password}
                   className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white transition-all duration-200 ${
-                    isLoading || !email || !password
+                    isPending || !email || !password
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:bg-primary-700 transform hover:scale-105"
                   }`}
                 >
-                  {isLoading ? (
+                  {isPending ? (
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Masuk...

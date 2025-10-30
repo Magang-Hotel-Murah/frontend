@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Mail, Plus, X, Send, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "@ui";
-import { useInvite } from "@hooks";
+import { useInviteUser } from "@hooks/invite-user";
 
 const Content = () => {
+  const { mutateAsync: inviteUser, isPending, isError, error } = useInviteUser();
   const [emails, setEmails] = useState([""]);
   const [selectedRole, setSelectedRole] = useState("select_role");
   const [message, setMessage] = useState({ type: "", text: "" });
   const [roleError, setRoleError] = useState("");
   
-  const { invite_user, loading, error } = useInvite();
 
   const roles = [
     {
@@ -88,7 +88,7 @@ const Content = () => {
         },
       ];
 
-      const response = await invite_user(employeesData);
+      const response = await inviteUser(employeesData);
 
       setMessage({
         type: "success",
@@ -123,9 +123,6 @@ const Content = () => {
                 <Mail className="w-8 h-8 text-gray-500" />
               </div>
               <div>
-                {/* <h1 className="text-xl font-medium text-gray-500 uppercase tracking-wider">
-                  Kirim undangan ke email karyawan perusahaan anda
-                </h1> */}
                 <p className="text-gray-500 text-small uppercase tracking-wider">
                   Kirim undangan ke email karyawan perusahaan anda
                 </p>
@@ -248,7 +245,7 @@ const Content = () => {
                 size="medium"
                 type="button"
                 onClick={handleReset}
-                disabled={loading}
+                disabled={isPending}
               >
                 Reset
               </Button>
@@ -258,10 +255,10 @@ const Content = () => {
                 size="medium"
                 type="button"
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={isPending}
                 className="flex items-center space-x-2"
               >
-                {loading ? (
+                {isPending ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Mengirim...</span>

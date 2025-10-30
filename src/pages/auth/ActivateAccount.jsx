@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Spinner, Input, Button } from "@ui";
 import { CheckCircle, AlertCircle } from "lucide-react";
-import { useInvite } from "@hooks";
+import { useActivateAccount } from "@hooks/auth";
 
 const ActivateAccount = () => {
   const navigate = useNavigate("");
-  const { activate_account, loading, error } = useInvite();
-
+  const {
+    mutateAsync: activateAccount,
+    isPending: loading,
+    error,
+  } = useActivateAccount();
   const [formData, setFormData] = useState({
     name: "",
     password: "",
@@ -67,13 +70,12 @@ const ActivateAccount = () => {
     }
 
     try {
-
-      const response = await activate_account(
+      const response = await activateAccount({
         token,
-        formData.name,
-        formData.password,
-        formData.passwordConfirm,
-      );
+        name: formData.name,
+        password: formData.password,
+        passwordConfirm: formData.passwordConfirm,
+      });
 
       console.log("Activation response:", response);
 
