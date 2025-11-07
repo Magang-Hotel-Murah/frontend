@@ -5,3 +5,4 @@ export { default as Booking } from './Booking';
 export { default as LandingPage } from './LandingPage';
 export { default as InviteUser } from './InviteUser';
 export { default as Room } from './Room';
+export { default as Organization } from './Organization';

@@ -14,6 +14,7 @@ import {
   LandingPage,
   InviteUser,
   Room,
+  Organization,
 } from "@pages";
 import {
   Login,
@@ -33,15 +34,26 @@ import { Update } from "@rooms";
 import { ProtectedRoute } from "@components/layout";
 
 const App = () => {
-  const { data: user } = useUser();
+  const { data: user, isLoading, isError } = useUser();
 
   const { mutateAsync: login } = useLogin();
   const { mutateAsync: logout } = useLogout();
   const { mutateAsync: register } = useRegister();
   const { mutateAsync: forgotPassword } = useForgotPassword();
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user && !isError;
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <Router>
       <Routes>
@@ -109,6 +121,21 @@ const App = () => {
             <ProtectedRoute isAuthenticated={isAuthenticated} user={user}>
               <MainLayout user={user} onLogout={logout}>
                 <Home />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/organization"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              user={user}
+              allowedRoles={["company_admin"]}
+            >
+              <MainLayout user={user} onLogout={logout}>
+                <Organization />
               </MainLayout>
             </ProtectedRoute>
           }

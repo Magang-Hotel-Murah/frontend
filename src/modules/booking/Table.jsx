@@ -88,7 +88,7 @@ const Table = ({
       ),
     },
     {
-      header: "Aksi",
+      header: isEmployee ? "Detail" : "Aksi",
       headerClassName: "text-right",
       render: (row) => (
         <div className="flex justify-end gap-2">
@@ -131,7 +131,6 @@ const Table = ({
             </>
           )}
 
-          {/* EMPLOYEE: hanya tombol detail */}
           {isEmployee && (
             <button
               onClick={() => onDetail(row)}

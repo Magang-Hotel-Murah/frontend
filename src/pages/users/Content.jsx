@@ -4,9 +4,7 @@ import { Update, Detail } from "@users";
 import { ConfirmationAlert, ToastAlert, AlertStyles } from "@alert";
 import { paginateData, filterBySearch } from "@utils";
 import { Pagination } from "@common";
-import { useGetUsers } from "@hooks/user/useGetUsers";
-import { useToggleStatus } from "@hooks/user/useToggleStatus";
-import { useUpdateUser } from "@hooks/user/useUpdateUser";
+import { useGetUsers, useUpdateUser, useToggleStatus } from "@hooks/user";
 
 const Content = () => {
   const { data: users = [], isLoading: userLoading } = useGetUsers();

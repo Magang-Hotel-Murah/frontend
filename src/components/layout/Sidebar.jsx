@@ -4,14 +4,14 @@ import {
   Users,
   Settings,
   BarChart3,
-  BookIcon,
   Book,
   UserPlus,
   Presentation,
+  Cast,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useUser } from "@hooks/auth";
 
 const Sidebar = ({
   isOpen,
@@ -22,12 +22,15 @@ const Sidebar = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { data: user = null, isLoading } = useUser();
 
   useEffect(() => {
     switch (location.pathname) {
       case "/home":
         setActiveMenu("home");
+        break;
+      case "/organization":
+        setActiveMenu("organizations");
         break;
       case "/room":
         setActiveMenu("room");
@@ -53,6 +56,9 @@ const Sidebar = ({
     switch (itemId) {
       case "home":
         navigate("/home");
+        break;
+      case "organizations":
+        navigate("/organization");
         break;
       case "room":
         navigate("/room");
@@ -83,21 +89,18 @@ const Sidebar = ({
   const menuItemsByRole = {
     super_admin: [
       { id: "home", name: "Home", icon: Home },
-      { id: "bookings", name: "Booking", icon: BookIcon },
+      { id: "bookings", name: "Booking", icon: Book },
       { id: "users", name: "Pengguna", icon: Users },
       { id: "settings", name: "Pengaturan", icon: Settings },
     ],
     company_admin: [
       { id: "home", name: "Home", icon: Home },
+      { id: "organizations", name: "Organisasi", icon: Cast },
       { id: "room", name: "Ruangan", icon: Presentation },
-      { id: "bookings", name: "Booking", icon: BookIcon },
+      { id: "bookings", name: "Reservasi", icon: Book },
       { id: "invite-user", name: "Undang Karyawan", icon: UserPlus },
       { id: "users", name: "Pengguna", icon: Users },
-    ],
-    employee: [
-      { id: "home", name: "Home", icon: Home },
-      { id: "bookings", name: "Booking", icon: BookIcon },
-      { id: "settings", name: "Pengaturan", icon: Settings },
+      { id: "settings", name: "Pengaturan", icon: Settings}
     ],
     finance_officer: [
       { id: "home", name: "Home", icon: Home },
@@ -111,15 +114,25 @@ const Sidebar = ({
     ],
   };
 
-  const role = user?.role;
+  if (isLoading) {
+    return null; // atau tampilkan skeleton sidebar
+  }
 
-  const menuItems = menuItemsByRole[role] || [];
+  if (!user) {
+    return null; // hindari render sebelum user tersedia
+  }
+
+  if (user.role === "employee") {
+    return null;
+  }
+
+  const menuItems = menuItemsByRole[user.role] || [];
 
   return (
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 z-20 bg-white bg-opacity-50 lh:hidden"
+          className="fixed inset-0 z-20 bg-white bg-opacity-50 lg:hidden"
           onClick={onClose}
         />
       )}

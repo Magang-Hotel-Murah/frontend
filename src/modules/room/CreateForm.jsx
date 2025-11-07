@@ -17,6 +17,9 @@ const CreateForm = ({
   onSubmit,
   onReset,
 }) => {
+  const isDisabled =
+    loading || (formData.type === "sub" && filteredMainRooms.length === 0);
+
   return (
     <div className="mx-auto">
       <div className="bg-white rounded-lg shadow-md p-6">
@@ -131,10 +134,7 @@ const CreateForm = ({
               size="medium"
               variant="submit"
               type="submit"
-              disabled={
-                loading ||
-                (formData.type === "sub" && filteredMainRooms.length === 0)
-              }
+              disabled={isDisabled}
             >
               {loading ? "Menyimpan..." : "Simpan Ruangan"}
             </Button>
