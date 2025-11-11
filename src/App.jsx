@@ -14,6 +14,7 @@ import {
   LandingPage,
   InviteUser,
   Room,
+  Display,
 } from "@pages";
 import {
   Login,
@@ -31,6 +32,7 @@ import {
 } from "@hooks/auth";
 import { Update } from "@rooms";
 import { ProtectedRoute } from "@components/layout";
+
 
 const App = () => {
   const { data: user } = useUser();
@@ -51,6 +53,9 @@ const App = () => {
             isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />
           }
         />
+
+        <Route path="/meeting-display/:companyCode" element={<Display/>} />
+
 
         <Route
           path="/activate-account"

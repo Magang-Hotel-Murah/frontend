@@ -2,50 +2,50 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
 class ApiService {
   async request(endpoint, options = {}) {
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  const url = `${API_BASE_URL}${endpoint}`;
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    ...options,
-  };
+    const url = `${API_BASE_URL}${endpoint}`;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      ...options,
+    };
 
-  if (config.body && typeof config.body !== "string") {
-    config.body = JSON.stringify(config.body);
-  }
-
-  const response = await fetch(url, config);
-
-  // Tangani error HTTP
-  if (!response.ok) {
-    let errorMessage = `HTTP error! status: ${response.status}`;
-    try {
-      const errData = await response.json();
-      errorMessage = errData.message || errorMessage;
-    } catch {
-      // Jika response bukan JSON
+    if (config.body && typeof config.body !== "string") {
+      config.body = JSON.stringify(config.body);
     }
-    throw new Error(errorMessage);
-  }
 
-  // Handle 204 No Content
-  if (response.status === 204) {
-    return null;
-  }
+    const response = await fetch(url, config);
 
-  // Tangani response non-JSON (misal HTML redirect)
-  const contentType = response.headers.get("content-type");
-  if (!contentType || !contentType.includes("application/json")) {
-    return { success: true, message: "Email berhasil diverifikasi!" };
-  }
+    // Tangani error HTTP
+    if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errData = await response.json();
+        errorMessage = errData.message || errorMessage;
+      } catch {
+        // Jika response bukan JSON
+      }
+      throw new Error(errorMessage);
+    }
 
-  // Jika JSON, parse normal
-  return response.json();
-}
+    // Handle 204 No Content
+    if (response.status === 204) {
+      return null;
+    }
+
+    // Tangani response non-JSON (misal HTML redirect)
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return { success: true, message: "Email berhasil diverifikasi!" };
+    }
+
+    // Jika JSON, parse normal
+    return response.json();
+  }
 
   //Auth
   async login(email, password) {
@@ -234,6 +234,13 @@ class ApiService {
     return this.request(`/meeting-room-reservations/${id}/status`, {
       method: "PUT",
       body: { status },
+    });
+  }
+
+  async displayReservation(companyCode, filter = "?filter=year") {
+    const url = `/meeting-display/${companyCode}${filter}`;
+    return this.request(url, {
+      method: "GET",
     });
   }
 }
