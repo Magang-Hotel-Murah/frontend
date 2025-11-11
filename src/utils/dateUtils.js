@@ -46,15 +46,22 @@ export const dateUtils = {
             date1.getFullYear() === date2.getFullYear();
     },
 
-    getWeekDays: (baseDate) => {
-        const dayOfWeek = baseDate.getDay();
-        const monday = new Date(baseDate);
-        monday.setDate(baseDate.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    getWeekDays: (baseDate, startFromMonday = true) => {
+        const dayOfWeek = baseDate.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
+        let weekStart = new Date(baseDate);
+
+        if (startFromMonday) {
+            // Geser ke Senin
+            weekStart.setDate(baseDate.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+        } else {
+            // Geser ke Minggu
+            weekStart.setDate(baseDate.getDate() - dayOfWeek);
+        }
 
         const days = [];
         for (let i = 0; i < 7; i++) {
-            const date = new Date(monday);
-            date.setDate(monday.getDate() + i);
+            const date = new Date(weekStart);
+            date.setDate(weekStart.getDate() + i);
             days.push({
                 day: dateUtils.getDayName(date),
                 fullDay: dateUtils.getFullDayName(date),

@@ -9,9 +9,12 @@ import YearView from '../components/MeetingDisplay/YearView';
 import { dateUtils } from '../utils/dateUtils';
 import { useDisplayMeetings, useTodayTomorrowMeetings, useSyncFilterToUrl } from '../hooks/useDisplayData';
 
+// Responsive Display Component dengan Mobile Support
+
 const Display = () => {
   const { companyCode } = useParams();
   const [searchParams] = useSearchParams();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const initialFilterType = searchParams.get('filter') || 'week';
   const initialRoom = searchParams.get('room_id') || '';
@@ -62,7 +65,6 @@ const Display = () => {
     return new Date(selectedYear, selectedMonth, today.getDate());
   }, [selectedYear, selectedMonth, filterType]);
 
-
   useSyncFilterToUrl({
     filterType,
     selectedRoom,
@@ -94,14 +96,12 @@ const Display = () => {
   const loading = meetingsLoading || todayTomorrowLoading;
   const error = meetingsError?.message;
 
-  // Update current time setiap menit
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Navigasi prev/next
   const handleNavigate = (direction) => {
     if (filterType === 'week') {
       const newDate = new Date(currentWeekStart);
@@ -118,7 +118,6 @@ const Display = () => {
     }
   };
 
-  // Filter change
   const handleFilterChange = (key, value) => {
     if (key === 'filterType') {
       setFilterType(value);
@@ -147,6 +146,26 @@ const Display = () => {
     else if (key === 'selectedStatus') {
       setSelectedStatus(value);
     }
+  };
+
+    const goToCurrentPeriod = () => {
+    const now = new Date();
+    if (filterType === 'week') {
+      const day = now.getDay(); 
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      setCurrentWeekStart(new Date(now.setDate(diff)));
+    } else if (filterType === 'month') {
+      setSelectedMonth(now.getMonth());
+      setSelectedYear(now.getFullYear());
+    } else if (filterType === 'year') {
+      setSelectedYear(now.getFullYear());
+    }
+  };
+
+  const goToMonth = (monthIndex, year) => {
+    setSelectedMonth(monthIndex);
+    setSelectedYear(year);
+    setFilterType('month');
   };
 
   const handleResetFilters = () => {
@@ -184,31 +203,49 @@ const Display = () => {
     }
   };
 
-  const weekDays = dateUtils.getWeekDays(currentWeekStart);
+  const weekDays = dateUtils.getWeekDays(currentWeekStart, false);
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorDisplay error={error} />;
 
   return (
     <div className="h-screen bg-white flex overflow-hidden">
-      <Sidebar 
-        companyName={companyName}
-        selectedDate={selectedDate}
-        onMonthChange={handleMonthChange}
-        todayMeetings={todayMeetings}
-        tomorrowMeetings={tomorrowMeetings}
-      />
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        fixed lg:relative inset-y-0 left-0 z-50 lg:z-0
+        transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <Sidebar 
+          companyName={companyName}
+          selectedDate={selectedDate}
+          onMonthChange={handleMonthChange}
+          todayMeetings={todayMeetings}
+          tomorrowMeetings={tomorrowMeetings}
+          onClose={() => setIsSidebarOpen(false)}
+        />
+      </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header 
           displayTitle={getDisplayTitle()}
           filterType={filterType}
           onNavigate={handleNavigate}
+          onGoToCurrentPeriod={goToCurrentPeriod}
           selectedRoom={selectedRoom}
           selectedStatus={selectedStatus}
           rooms={rooms}
           onFilterChange={handleFilterChange}
           onReset={handleResetFilters}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
 
         <div className="flex-1 overflow-hidden">
@@ -220,8 +257,25 @@ const Display = () => {
               currentTime={currentTime}
             />
           )}
-          {filterType === 'month' && <MonthView selectedDate={selectedDate} meetings={meetings} />}
-          {filterType === 'year' && <YearView selectedDate={selectedDate} meetings={meetings} />}
+          {filterType === 'month' &&
+            <MonthView 
+              selectedDate={selectedDate} 
+              meetings={meetings} 
+              goToWeekPeriod={(date) => {
+                setFilterType('week');
+                const day = date.getDay();
+                const monday = new Date(date);
+                monday.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
+                setCurrentWeekStart(monday);
+              }}
+            />}
+          {filterType === 'year' && (
+            <YearView
+              selectedDate={selectedDate}
+              meetings={meetings}
+              onGoToMonth={goToMonth}
+            />
+          )}        
         </div>
       </div>
     </div>

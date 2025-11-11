@@ -6,14 +6,22 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const getRoomColor = (roomId) => {
     const colors = [
-        '#93C5FD',
-        '#FBCFE8',
-        '#BFDBFE',
-        '#FCA5A5',
-        '#FED7AA',
-        '#F9A8D4',
-        '#C7D2FE',
-        '#FCD34D',
+        // Blues
+        '#DBEAFE', '#BFDBFE', '#93C5FD', '#60A5FA',
+        // Greens
+        '#DCFCE7', '#BBF7D0', '#86EFAC', '#4ADE80',
+        // Purples
+        '#F3E8FF', '#E9D5FF', '#D8B4FE', '#C084FC',
+        // Reds/Pinks
+        '#FEE2E2', '#FECACA', '#FCA5A5', '#F87171',
+        // Oranges
+        '#FFEDD5', '#FED7AA', '#FDBA74', '#FB923C',
+        // Yellows
+        '#FEF3C7', '#FEF08A', '#FDE047', '#FACC15',
+        // Teals
+        '#CCFBF1', '#99F6E4', '#5EEAD4', '#2DD4BF',
+        // Indigos
+        '#E0E7FF', '#C7D2FE', '#A5B4FC', '#818CF8',
     ];
 
     return Number.isFinite(roomId) ? colors[roomId % colors.length] : '#E5E7EB';

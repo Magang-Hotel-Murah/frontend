@@ -8,13 +8,34 @@ const Sidebar = ({
   selectedDate, 
   onMonthChange, 
   todayMeetings = [], 
-  tomorrowMeetings = []
+  tomorrowMeetings = [],
+  onClose
 }) => {
   return (
-    <div className="w-56 md:w-64 lg:w-72 flex-shrink-0 border-r border-primary-200 p-3 md:p-4 overflow-hidden bg-gradient-to-b from-white to-primary-50/30">
-      <div className="flex items-center gap-3 group cursor-pointer mb-4">
-        <img alt="meetwise" height="50" width="50" src="/src/assets/logo.png" />
-        <h1 className="text-2xl font-bold text-primary-900">{companyName}</h1>
+    <div className="w-64 sm:w-72 lg:w-80 h-full flex-shrink-0 border-r border-slate-200 p-3 sm:p-4 overflow-y-auto bg-gradient-to-b from-white to-slate-50">
+      {/* Header with Close Button (Mobile Only) */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer">
+          <img 
+            alt="meetwise" 
+            className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12" 
+            src="/src/assets/logo.png" 
+          />
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 truncate">
+            {companyName}
+          </h1>
+        </div>
+        
+        {/* Close Button - Mobile Only */}
+        <button
+          onClick={onClose}
+          className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+          aria-label="Close sidebar"
+        >
+          <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       {/* Mini Calendar */}
@@ -23,21 +44,21 @@ const Sidebar = ({
         onMonthChange={onMonthChange} 
       />
 
-      {/* Today's meetings summary */}
-      <div className="border-t border-primary-200 pt-2">
+      {/* Today's and Tomorrow's meetings summary */}
+      <div className="border-t border-slate-200 pt-3 sm:pt-4 space-y-4">
         <MeetingSummary 
           meetings={todayMeetings}
           title="HARI INI"
-          bgColor="bg-primary-200"
+          bgColor="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500"
           date={dateUtils.formatDate(new Date()).split(',')[0]}
         />
 
         {tomorrowMeetings && tomorrowMeetings.length > 0 && (
-          <div className="border-t border-primary-200 pt-2 mt-2">
+          <div className="pt-2">
             <MeetingSummary 
               meetings={tomorrowMeetings}
               title="BESOK"
-              bgColor="bg-primary-100"
+              bgColor="bg-slate-100 border-l-4 border-slate-400"
               date={dateUtils.formatDate(new Date(new Date().setDate(new Date().getDate() + 1))).split(',')[0]}
             />
           </div>
