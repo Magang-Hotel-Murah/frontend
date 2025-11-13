@@ -56,12 +56,12 @@ const FilterSection = ({
       <div className="mt-2 flex gap-2 flex-wrap">
         {selectedRoom && (
           <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px] sm:text-xs border border-blue-200">
-            Room: {rooms.find(r => r.id === parseInt(selectedRoom))?.name}
+            Ruangan: {rooms.find(r => r.id === parseInt(selectedRoom))?.name}
           </span>
         )}
         {selectedStatus && (
           <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px] sm:text-xs border border-blue-200">
-            Status: {selectedStatus}
+            Status: {selectedStatus === 'ongoing' ? 'Sedang Berlangsung' : selectedStatus === 'upcoming' ? 'Akan Datang' : 'Selesai'}
           </span>
         )}
       </div>
