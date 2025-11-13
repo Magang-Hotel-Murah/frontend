@@ -16,9 +16,9 @@ const FilterSection = ({
         onChange={(e) => onFilterChange('filterType', e.target.value)}
         className="px-2 py-1.5 border border-slate-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
       >
-        <option value="week">Week</option>
-        <option value="month">Month</option>
-        <option value="year">Year</option>
+        <option value="week">Minggu</option>
+        <option value="month">Bulan</option>
+        <option value="year">Tahun</option>
       </select>
 
       <select 
@@ -26,7 +26,7 @@ const FilterSection = ({
         onChange={(e) => onFilterChange('selectedRoom', e.target.value)}
         className="px-2 py-1.5 border border-slate-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 col-span-1"
       >
-        <option value="">All Rooms</option>
+        <option value="">Semua Ruangan</option>
         {rooms.map(room => (
           <option key={room.id} value={room.id}>{room.name}</option>
         ))}
@@ -37,10 +37,10 @@ const FilterSection = ({
         onChange={(e) => onFilterChange('selectedStatus', e.target.value)}
         className="px-2 py-1.5 border border-slate-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 col-span-1"
       >
-        <option value="">All Status</option>
-        <option value="ongoing">Ongoing</option>
-        <option value="upcoming">Upcoming</option>
-        <option value="finished">Finished</option>
+        <option value="">Semua Status</option>
+        <option value="ongoing">Sedang Berlangsung</option>
+        <option value="upcoming">Akan Datang</option>
+        <option value="finished">Selesai</option>
       </select>
 
       <button
