@@ -13,6 +13,7 @@ const MainLayout = ({ children, user, onLogout }) => {
 
   const routeToMenuMap = {
     "/home": "home",
+    "/organization": "organizations",
     "/booking": "bookings",
     "/room": "room",
     "/invite-user": "invite-user",
@@ -54,10 +55,8 @@ const MainLayout = ({ children, user, onLogout }) => {
     }
   };
 
-  // Check if user is employee
   const isEmployee = user?.role === "employee";
 
-  // Layout for Employee (No Sidebar)
   if (isEmployee) {
     return (
       <div className="bg-gray-50 min-h-screen">
@@ -72,7 +71,6 @@ const MainLayout = ({ children, user, onLogout }) => {
     );
   }
 
-  // Layout for Other Roles (With Sidebar)
   return (
     <div className="bg-gray-50 min-h-screen">
       <Navbar

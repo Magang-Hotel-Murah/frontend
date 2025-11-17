@@ -19,6 +19,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showLoadingAlert, setShowLoadingAlert] = useState(false);
@@ -47,16 +48,22 @@ const Login = () => {
     login(
       { email, password },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
           setShowLoadingAlert(false);
           setShowSuccessAlert(true);
+          setUserRole(response?.user?.role || response?.data?.user?.role);
           showToastNotification(
             "success",
             "Login berhasil! Mengarahkan ke dashboard..."
           );
 
           setTimeout(() => {
-            navigate("/home");
+            const role = response?.user?.role || response?.data?.user?.role;
+            if (role === "employee") {
+              navigate("/booking");
+            } else {
+              navigate("/home");
+            }
           }, 1500);
         },
         onError: (error) => {
@@ -86,7 +93,11 @@ const Login = () => {
 
   const handleSuccessAlertClose = () => {
     setShowSuccessAlert(false);
-    navigate("/home");
+    if (userRole === "employee") {
+      navigate("/booking");
+    } else {
+      navigate("/home");
+    }
   };
 
   const handleForgotPassword = () => {

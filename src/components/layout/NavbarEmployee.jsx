@@ -30,10 +30,9 @@ const NavbarEmployee = ({ user }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastConfig, setToastConfig] = useState({ type: "info", message: "" });
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState("booking");
 
   const menuItems = [
-    { id: "home", name: "Home", icon: Home, path: "/home" },
     { id: "bookings", name: "Booking", icon: BookIcon, path: "/booking" },
     { id: "request", name: "Permintaan", icon: GitPullRequest, path: "/request" },
     { id: "settings", name: "Pengaturan", icon: Settings, path: "/setting" },

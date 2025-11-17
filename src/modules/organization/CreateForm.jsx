@@ -43,11 +43,11 @@ const CreateForm = ({
 
           <div className="mx-auto">
             <div className="mb-2">
-              <h3 className="block text-sm font-medium text-gray-700 mb-2">
+              <h3 className="block text-sm font-medium text-gray-700 mb-3">
                 Plih Posisi
               </h3>
             </div>
-            <div className="p-6 space-y-2 max-h-96 overflow-y-auto">
+            <div className="p-6 space-y-2 max-h-96 overflow-y-auto mb-3">
               {positions.map((pos) => (
                 <label
                   key={pos.id}

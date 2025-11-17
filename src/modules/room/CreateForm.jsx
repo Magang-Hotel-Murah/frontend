@@ -30,15 +30,6 @@ const CreateForm = ({
           </div>
         )}
 
-        <div className="mb-12 text-center">
-          <div className="inline-block">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-700 mb-2 tracking-tight">
-              {companyName}
-            </h2>
-            <div className="h-1 bg-gradient-to-r from-transparent via-primary-600 to-transparent rounded-full"></div>
-          </div>
-        </div>
-
         <form onSubmit={onSubmit}>
           <BaseFormInput
             type="select"
