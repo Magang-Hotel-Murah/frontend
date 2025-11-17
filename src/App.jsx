@@ -15,6 +15,7 @@ import {
   InviteUser,
   Room,
   Organization,
+  Display,
 } from "@pages";
 import {
   Login,
@@ -32,6 +33,7 @@ import {
 } from "@hooks/auth";
 import { Update } from "@rooms";
 import { ProtectedRoute } from "@components/layout";
+
 
 const App = () => {
   const { data: user, isLoading, isError } = useUser();
@@ -74,6 +76,9 @@ const App = () => {
             )
           }
         />
+
+        <Route path="/meeting-display/:companyCode" element={<Display/>} />
+
 
         <Route
           path="/activate-account"

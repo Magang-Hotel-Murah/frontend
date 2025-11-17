@@ -279,6 +279,13 @@ class ApiService {
       body: { status },
     });
   }
+
+  async displayReservation(companyCode, filter = "?filter=year") {
+    const url = `/meeting-display/${companyCode}${filter}`;
+    return this.request(url, {
+      method: "GET",
+    });
+  }
 }
 
 export default new ApiService();

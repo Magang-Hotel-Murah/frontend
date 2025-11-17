@@ -6,3 +6,4 @@ export { default as LandingPage } from './LandingPage';
 export { default as InviteUser } from './InviteUser';
 export { default as Room } from './Room';
 export { default as Organization } from './Organization';
+export { default as Display } from './Display';
