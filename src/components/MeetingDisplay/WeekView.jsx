@@ -31,7 +31,7 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
         {/* Sidebar jam - Hide on very small screens */}
         <div className="w-12 sm:w-16 lg:w-20 flex-shrink-0 border-r border-slate-200 flex flex-col bg-white/95 backdrop-blur-sm shadow-sm">
           <div className="h-12 sm:h-14 lg:h-16 border-b border-slate-200 flex-shrink-0"></div>
-          <div className="flex-1 flex flex-col overflow-y-auto">
+          <div className="flex-1 flex flex-col overflow-hidden">
             {timeSlots.map(slot => (
               <div
                 key={slot}

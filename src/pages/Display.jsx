@@ -74,7 +74,7 @@ const Display = () => {
     selectedMonth
   });
 
-  const timeSlots = Array.from({ length: 10 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`);
+  const timeSlots = Array.from({ length: 24 }, (_, i) => `${(i + 0).toString().padStart(2, '0')}:00`);
 
   const { data: meetingsData, isLoading: meetingsLoading, error: meetingsError } = useDisplayMeetings(companyCode, {
     filterType,

@@ -64,7 +64,7 @@ export const meetingLayout = {
         const endHour = meeting.endTime.getHours();
         const endMinute = meeting.endTime.getMinutes();
 
-        const top = ((startHour - 8) * 60 + startMinute);
+        const top = ((startHour - 0) * 60 + startMinute);
         const duration = ((endHour * 60 + endMinute) - (startHour * 60 + startMinute));
 
         return { top, height: duration };
