@@ -23,7 +23,7 @@ class ApiService {
     if (response.status === 401) {
       const publicEndpoints = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/activate-account'];
       const isPublicEndpoint = publicEndpoints.some(ep => endpoint.includes(ep));
-      
+
       if (isPublicEndpoint) {
         let errorMessage = "Invalid credentials";
         try {
@@ -36,7 +36,7 @@ class ApiService {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("token_expiry");
-        
+
         window.location.href = "/login";
         throw new Error("Session expired. Please login again.");
       }

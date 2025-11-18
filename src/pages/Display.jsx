@@ -9,7 +9,51 @@ import YearView from '../components/MeetingDisplay/YearView';
 import { dateUtils } from '../utils/dateUtils';
 import { useDisplayMeetings, useTodayTomorrowMeetings, useSyncFilterToUrl } from '../hooks/useDisplayData';
 
-// Responsive Display Component dengan Mobile Support
+const getSundayOfWeek = (date) => {
+  const dayOfWeek = date.getDay(); 
+  const sunday = new Date(date);
+  sunday.setDate(date.getDate() - dayOfWeek); 
+  return sunday;
+};
+
+const getDynamicTimeSlots = (meetings) => {
+  if (!meetings || meetings.length === 0) {
+    return Array.from({ length: 10 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`);
+  }
+
+  const hours = new Set();
+  
+  meetings.forEach(meeting => {
+    const startDate = new Date(meeting.startTime);
+    const endDate = new Date(meeting.endTime);
+    
+    hours.add(startDate.getHours());
+    
+    const endHour = endDate.getHours();
+    if (endDate.getMinutes() > 0) {
+      hours.add(endHour + 1);
+    } else {
+      hours.add(endHour);
+    }
+  });
+
+  const sortedHours = Array.from(hours).sort((a, b) => a - b);
+  
+  if (sortedHours.length === 0) {
+    return Array.from({ length: 10 }, (_, i) => `${(i + 8).toString().padStart(2, '0')}:00`);
+  }
+
+  // Tambahkan buffer 1 jam sebelum dan sesudah
+  const minHour = Math.max(0, sortedHours[0] - 1);
+  const maxHour = Math.min(23, sortedHours[sortedHours.length - 1] + 1);
+
+  const timeSlots = [];
+  for (let i = minHour; i <= maxHour; i++) {
+    timeSlots.push(`${i.toString().padStart(2, '0')}:00`);
+  }
+
+  return timeSlots;
+};
 
 const Display = () => {
   const { companyCode } = useParams();
@@ -25,12 +69,7 @@ const Display = () => {
 
   let defaultYear = today.getFullYear();
   let defaultMonth = today.getMonth();
-  let defaultWeekStart = (() => {
-    const dayOfWeek = today.getDay();
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-    return monday;
-  })();
+  let defaultWeekStart = getSundayOfWeek(today);
 
   if (startDateParam) {
     const parsedStart = new Date(startDateParam);
@@ -42,12 +81,9 @@ const Display = () => {
       defaultYear = parsedStart.getFullYear();
       defaultMonth = 0;
     } else if (initialFilterType === 'week') {
-      const day = parsedStart.getDay();
-      const monday = new Date(parsedStart);
-      monday.setDate(parsedStart.getDate() - (day === 0 ? 6 : day - 1));
-      defaultWeekStart = monday;
-      defaultYear = monday.getFullYear();
-      defaultMonth = monday.getMonth();
+      defaultWeekStart = getSundayOfWeek(parsedStart);
+      defaultYear = defaultWeekStart.getFullYear();
+      defaultMonth = defaultWeekStart.getMonth();
     }
   }
 
@@ -57,7 +93,9 @@ const Display = () => {
   const [selectedYear, setSelectedYear] = useState(defaultYear);
   const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
   const [currentWeekStart, setCurrentWeekStart] = useState(defaultWeekStart);
-
+  
+  console.log('currentWeekStart', currentWeekStart, 'selectedYear', selectedYear, 'selectedMonth', selectedMonth);
+  
   const selectedDate = useMemo(() => {
     const today = new Date();
     if (filterType === 'month') return new Date(selectedYear, selectedMonth, 1);
@@ -74,8 +112,6 @@ const Display = () => {
     selectedMonth
   });
 
-  const timeSlots = Array.from({ length: 24 }, (_, i) => `${(i + 0).toString().padStart(2, '0')}:00`);
-
   const { data: meetingsData, isLoading: meetingsLoading, error: meetingsError } = useDisplayMeetings(companyCode, {
     filterType,
     selectedRoom,
@@ -87,11 +123,16 @@ const Display = () => {
 
   const { data: todayTomorrowData, isLoading: todayTomorrowLoading } = useTodayTomorrowMeetings(companyCode);
 
-  const meetings = meetingsData?.meetings || [];
+  const meetings = useMemo(() => meetingsData?.meetings || [], [meetingsData?.meetings]);
   const companyName = meetingsData?.companyName || '';
   const rooms = meetingsData?.rooms || [];
   const todayMeetings = todayTomorrowData?.todayMeetings || [];
   const tomorrowMeetings = todayTomorrowData?.tomorrowMeetings || [];
+
+  // Generate dynamic time slots berdasarkan meeting yang ada
+  const timeSlots = useMemo(() => {
+    return getDynamicTimeSlots(meetings);
+  }, [meetings]);
 
   const loading = meetingsLoading || todayTomorrowLoading;
   const error = meetingsError?.message;
@@ -124,10 +165,7 @@ const Display = () => {
 
       const now = new Date();
       if (value === 'week') {
-        const dayOfWeek = now.getDay();
-        const monday = new Date(now);
-        monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-        setCurrentWeekStart(monday);
+        setCurrentWeekStart(getSundayOfWeek(now)); 
         setSelectedYear(now.getFullYear());
         setSelectedMonth(now.getMonth());
       } 
@@ -148,12 +186,10 @@ const Display = () => {
     }
   };
 
-    const goToCurrentPeriod = () => {
+  const goToCurrentPeriod = () => {
     const now = new Date();
     if (filterType === 'week') {
-      const day = now.getDay(); 
-      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      setCurrentWeekStart(new Date(now.setDate(diff)));
+      setCurrentWeekStart(getSundayOfWeek(now)); 
     } else if (filterType === 'month') {
       setSelectedMonth(now.getMonth());
       setSelectedYear(now.getFullYear());
@@ -173,10 +209,7 @@ const Display = () => {
     setSelectedStatus('');
     setFilterType('week');
     const now = new Date();
-    const dayOfWeek = now.getDay();
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-    setCurrentWeekStart(monday);
+    setCurrentWeekStart(getSundayOfWeek(now));
     setSelectedYear(now.getFullYear());
     setSelectedMonth(now.getMonth());
   };
@@ -191,10 +224,21 @@ const Display = () => {
 
   const getDisplayTitle = () => {
     if (filterType === 'week') {
-      const weekStart = currentWeekStart;
+      const weekStart = new Date(currentWeekStart);
       const weekEnd = new Date(currentWeekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
-      return `${weekStart.getDate()} - ${weekEnd.getDate()} ${dateUtils.getMonthName(weekStart)} ${weekStart.getFullYear()}`;
+      
+      const startDate = weekStart.getDate();
+      const endDate = weekEnd.getDate();
+      const startMonth = dateUtils.getMonthName(weekStart);
+      const endMonth = dateUtils.getMonthName(weekEnd);
+      const year = weekStart.getFullYear();
+      
+      if (startMonth !== endMonth) {
+        return `${startDate} ${startMonth} - ${endDate} ${endMonth} ${year}`;
+      }
+      
+      return `${startDate} - ${endDate} ${startMonth} ${year}`;
     } else if (filterType === 'month') {
       const displayDate = new Date(selectedYear, selectedMonth, 1);
       return `${dateUtils.getMonthName(displayDate)} ${selectedYear}`;
@@ -203,7 +247,7 @@ const Display = () => {
     }
   };
 
-  const weekDays = dateUtils.getWeekDays(currentWeekStart, false);
+  const weekDays = dateUtils.getWeekDays(currentWeekStart, false); // false = mulai dari Minggu
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorDisplay error={error} />;
@@ -263,10 +307,7 @@ const Display = () => {
               meetings={meetings} 
               goToWeekPeriod={(date) => {
                 setFilterType('week');
-                const day = date.getDay();
-                const monday = new Date(date);
-                monday.setDate(date.getDate() - (day === 0 ? 6 : day - 1));
-                setCurrentWeekStart(monday);
+                setCurrentWeekStart(getSundayOfWeek(date));
               }}
             />}
           {filterType === 'year' && (

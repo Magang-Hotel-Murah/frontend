@@ -24,11 +24,13 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
     setShowModal(true);
   };
 
+  const startHour = timeSlots.length > 0 ? parseInt(timeSlots[0].split(':')[0]) : 0;
+  const endHour = timeSlots.length > 0 ? parseInt(timeSlots[timeSlots.length - 1].split(':')[0]) + 1 : 24;
+  const totalMinutesInView = (endHour - startHour) * 60;
+
   return (
     <>
-      {/* Week Grid - Responsive Layout */}
       <div className="p-2 sm:p-3 flex h-full bg-gradient-to-br from-slate-50 to-blue-50/20 overflow-hidden">
-        {/* Sidebar jam - Hide on very small screens */}
         <div className="w-12 sm:w-16 lg:w-20 flex-shrink-0 border-r border-slate-200 flex flex-col bg-white/95 backdrop-blur-sm shadow-sm">
           <div className="h-12 sm:h-14 lg:h-16 border-b border-slate-200 flex-shrink-0"></div>
           <div className="flex-1 flex flex-col overflow-hidden">
@@ -45,22 +47,19 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
           </div>
         </div>
 
-        {/* Kolom hari - Horizontal scroll on mobile */}
         <div className="flex-1 flex overflow-x-auto">
           {weekDays.map((day, dayIndex) => {
             const dayMeetings = getMeetingsForDay(day.fullDate);
             const processedMeetings = meetingLayout.calculateMeetingColumns(dayMeetings);
 
             const columnHeight = columnHeights[dayIndex] || 0;
-            const totalMinutes = timeSlots.length * 60;
-            const pixelPerMinute = columnHeight > 0 ? columnHeight / totalMinutes : 0;
+            const pixelPerMinute = columnHeight > 0 ? columnHeight / totalMinutesInView : 0;
 
             return (
               <div
                 key={dayIndex}
                 className="flex-1 border-r border-slate-200 min-w-[80px] sm:min-w-[100px] lg:min-w-[120px] flex flex-col bg-white/95 backdrop-blur-sm"
               >
-                {/* Header hari - Responsive sizing */}
                 <div
                   className={`h-12 sm:h-14 lg:h-16 border-b border-slate-200 text-center py-1 sm:py-2 flex-shrink-0 transition-all duration-300 ${
                     day.isToday
@@ -84,12 +83,10 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
                   </div>
                 </div>
 
-                {/* Isi kalender */}
                 <div
                   ref={(el) => (columnRefs.current[dayIndex] = el)}
                   className="relative flex-1 overflow-hidden"
                 >
-                  {/* Grid jam */}
                   <div className="absolute inset-0 flex flex-col">
                     {timeSlots.map((slot, idx) => (
                       <div
@@ -101,9 +98,23 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
                     ))}
                   </div>
 
-                  {/* Blok meeting - Adjusted for mobile */}
                   {processedMeetings.map(meeting => {
-                    const { top, height } = meetingLayout.calculateMeetingPosition(meeting);
+                    const startDate = new Date(meeting.startTime);
+                    const endDate = new Date(meeting.endTime);
+                    
+                    const meetingStartHour = startDate.getHours();
+                    const meetingStartMinute = startDate.getMinutes();
+                    const meetingEndHour = endDate.getHours();
+                    const meetingEndMinute = endDate.getMinutes();
+                    
+                    const startOffsetMinutes = (meetingStartHour - startHour) * 60 + meetingStartMinute;
+                    const endOffsetMinutes = (meetingEndHour - startHour) * 60 + meetingEndMinute;
+                    
+                    const durationMinutes = endOffsetMinutes - startOffsetMinutes;
+                    
+                    const topPixels = startOffsetMinutes * pixelPerMinute;
+                    const heightPixels = durationMinutes * pixelPerMinute;
+
                     const columnWidth = 100 / meeting.totalColumns;
                     const leftPosition = meeting.column * columnWidth;
 
@@ -113,8 +124,8 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
                         onClick={() => handleMeetingClick(meeting)}
                         className="absolute rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-2 text-xs overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:z-10 hover:scale-105 border-l-2 sm:border-l-3"
                         style={{
-                          top: `${top * pixelPerMinute}px`,
-                          height: `${height * pixelPerMinute}px`,
+                          top: `${topPixels}px`,
+                          height: `${heightPixels}px`,
                           left: `${leftPosition}%`,
                           width: `${columnWidth - 1}%`,
                           backgroundColor: meeting.color + '90',
@@ -127,7 +138,7 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
                         <div className="font-semibold text-slate-900 text-[10px] sm:text-xs line-clamp-2">
                           {meeting.title}
                         </div>
-                        {height * pixelPerMinute > 40 && (
+                        {heightPixels > 40 && (
                           <div className="text-[9px] sm:text-xs text-slate-700 truncate mt-0.5 sm:mt-1 flex items-center gap-0.5 sm:gap-1">
                             <span className="hidden sm:inline">📍</span> 
                             <span className="truncate">{meeting.room}</span>
@@ -143,7 +154,6 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
         </div>
       </div>
 
-      {/* Modal Detail - Responsive */}
       {showModal && selectedMeeting && (
         <div
           className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm p-4"
