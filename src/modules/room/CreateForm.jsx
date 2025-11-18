@@ -17,6 +17,9 @@ const CreateForm = ({
   onSubmit,
   onReset,
 }) => {
+  const isDisabled =
+    loading || (formData.type === "sub" && filteredMainRooms.length === 0);
+
   return (
     <div className="mx-auto">
       <div className="bg-white rounded-lg shadow-md p-6">
@@ -26,15 +29,6 @@ const CreateForm = ({
             <span className="text-red-700 text-sm">{errors.submit}</span>
           </div>
         )}
-
-        <div className="mb-12 text-center">
-          <div className="inline-block">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-700 mb-2 tracking-tight">
-              {companyName}
-            </h2>
-            <div className="h-1 bg-gradient-to-r from-transparent via-primary-600 to-transparent rounded-full"></div>
-          </div>
-        </div>
 
         <form onSubmit={onSubmit}>
           <BaseFormInput
@@ -131,10 +125,7 @@ const CreateForm = ({
               size="medium"
               variant="submit"
               type="submit"
-              disabled={
-                loading ||
-                (formData.type === "sub" && filteredMainRooms.length === 0)
-              }
+              disabled={isDisabled}
             >
               {loading ? "Menyimpan..." : "Simpan Ruangan"}
             </Button>

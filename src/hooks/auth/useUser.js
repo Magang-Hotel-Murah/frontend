@@ -1,14 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
+import ApiService from "../../services/ApiService"; // sesuaikan path
 
 export const useUser = () => {
+  const token = localStorage.getItem("token");
+  
   return useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const user = localStorage.getItem("user");
-      return user ? JSON.parse(user) : null;
+      if (!token) {
+        localStorage.removeItem("user");
+        return null;
+      }
+      
+      try {
+        const response = await ApiService.getCurrentUser();
+        const userData = response.data;
+        
+        localStorage.setItem("user", JSON.stringify(userData));
+        return userData;
+      } catch (error) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return null;
+      }
     },
-    staleTime: Infinity,
-    initialData: () => {
+    enabled: !!token,
+    retry: false,
+    staleTime: 2 * 60 * 1000,
+    cacheTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+
+    placeholderData: () => {
       const user = localStorage.getItem("user");
       return user ? JSON.parse(user) : null;
     },

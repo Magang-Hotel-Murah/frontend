@@ -14,6 +14,7 @@ import {
   LandingPage,
   InviteUser,
   Room,
+  Organization,
   Display,
 } from "@pages";
 import {
@@ -35,22 +36,44 @@ import { ProtectedRoute } from "@components/layout";
 
 
 const App = () => {
-  const { data: user } = useUser();
+  const { data: user, isLoading, isError } = useUser();
 
   const { mutateAsync: login } = useLogin();
   const { mutateAsync: logout } = useLogout();
   const { mutateAsync: register } = useRegister();
   const { mutateAsync: forgotPassword } = useForgotPassword();
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user && !isError;
 
+  // Helper function untuk mendapatkan default route berdasarkan role
+  const getDefaultRoute = (user) => {
+    if (!user) return "/";
+    if (user.role === "employee") return "/booking";
+    return "/home";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <Router>
       <Routes>
         <Route
           path="/"
           element={
-            isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />
+            isAuthenticated ? (
+              <Navigate to={getDefaultRoute(user)} replace />
+            ) : (
+              <LandingPage />
+            )
           }
         />
 
@@ -61,7 +84,7 @@ const App = () => {
           path="/activate-account"
           element={
             isAuthenticated ? (
-              <Navigate to="/home" replace />
+              <Navigate to={getDefaultRoute(user)} replace />
             ) : (
               <ActivateAccount />
             )
@@ -71,7 +94,11 @@ const App = () => {
         <Route
           path="/verify-email/:id/:hash"
           element={
-            isAuthenticated ? <Navigate to="/home" replace /> : <VerifyEmail />
+            isAuthenticated ? (
+              <Navigate to={getDefaultRoute(user)} replace />
+            ) : (
+              <VerifyEmail />
+            )
           }
         />
 
@@ -79,7 +106,7 @@ const App = () => {
           path="/login"
           element={
             isAuthenticated ? (
-              <Navigate to="/home" replace />
+              <Navigate to={getDefaultRoute(user)} replace />
             ) : (
               <Login onLogin={login} />
             )
@@ -90,7 +117,7 @@ const App = () => {
           path="/register"
           element={
             isAuthenticated ? (
-              <Navigate to="/home" replace />
+              <Navigate to={getDefaultRoute(user)} replace />
             ) : (
               <Register onRegister={register} />
             )
@@ -101,7 +128,7 @@ const App = () => {
           path="/forgot-password"
           element={
             isAuthenticated ? (
-              <Navigate to="/home" replace />
+              <Navigate to={getDefaultRoute(user)} replace />
             ) : (
               <ForgotPassword onForgotPassword={forgotPassword} />
             )
@@ -111,9 +138,28 @@ const App = () => {
         <Route
           path="/home"
           element={
-            <ProtectedRoute isAuthenticated={isAuthenticated} user={user}>
+            <ProtectedRoute 
+              isAuthenticated={isAuthenticated} 
+              user={user}
+              allowedRoles={["super_admin", "company_admin", "finance_officer", "support_staff"]}
+            >
               <MainLayout user={user} onLogout={logout}>
                 <Home />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/organization"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              user={user}
+              allowedRoles={["company_admin"]}
+            >
+              <MainLayout user={user} onLogout={logout}>
+                <Organization />
               </MainLayout>
             </ProtectedRoute>
           }

@@ -81,7 +81,7 @@ const BaseFormInput = ({
                 type="button"
                 onClick={onAddTag}
                 disabled={!tagInputValue?.trim() || disabled}
-                className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 transition"
+                className="px-4 py-2.5 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 transition"
               >
                 <Plus className="w-4 h-4" /> Tambah
               </button>

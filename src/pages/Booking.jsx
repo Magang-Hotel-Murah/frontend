@@ -6,9 +6,10 @@ import { Book, PlusCircle } from "lucide-react";
 const Booking = ({ user }) => {
   const [activeTab, setActiveTab] = useState(() => {
     const saved = localStorage.getItem("activeTab");
-    if (saved === "reservation" || saved === "create") {
-      return saved;
-    }
+
+    if (saved === "reservation") return "reservation";
+    if (saved === "create" && user?.role === "employee") return "create";
+
     return "reservation";
   });
 
@@ -22,9 +23,7 @@ const Booking = ({ user }) => {
           { key: "reservation", label: "List", icon: Book },
           { key: "create", label: "Baru", icon: PlusCircle },
         ]
-      : [
-          { key: "reservation", label: "List", icon: Book },
-        ];
+      : [{ key: "reservation", label: "List", icon: Book }];
 
   const renderContent = () => {
     switch (activeTab) {

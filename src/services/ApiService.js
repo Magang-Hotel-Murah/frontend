@@ -20,31 +20,52 @@ class ApiService {
 
     const response = await fetch(url, config);
 
-    // Tangani error HTTP
+    if (response.status === 401) {
+      const publicEndpoints = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/activate-account'];
+      const isPublicEndpoint = publicEndpoints.some(ep => endpoint.includes(ep));
+      
+      if (isPublicEndpoint) {
+        let errorMessage = "Invalid credentials";
+        try {
+          const errData = await response.json();
+          errorMessage = errData.message || errorMessage;
+        } catch {
+        }
+        throw new Error(errorMessage);
+      } else {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("token_expiry");
+        
+        window.location.href = "/login";
+        throw new Error("Session expired. Please login again.");
+      }
+    }
+
     if (!response.ok) {
       let errorMessage = `HTTP error! status: ${response.status}`;
       try {
         const errData = await response.json();
         errorMessage = errData.message || errorMessage;
       } catch {
-        // Jika response bukan JSON
       }
       throw new Error(errorMessage);
     }
 
-    // Handle 204 No Content
     if (response.status === 204) {
       return null;
     }
 
-    // Tangani response non-JSON (misal HTML redirect)
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      return { success: true, message: "Email berhasil diverifikasi!" };
+      return { success: true, message: "Request berhasil!" };
     }
 
-    // Jika JSON, parse normal
     return response.json();
+  }
+
+  async getCurrentUser() {
+    return this.request("/auth/me");
   }
 
   //Auth
@@ -124,6 +145,11 @@ class ApiService {
     });
   }
 
+  async listUser(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/users/list?${query}`);
+  }
+
   //USER PROFILE
   async getUserProfiles() {
     return this.request("/user-profiles");
@@ -176,6 +202,23 @@ class ApiService {
     return this.request("/divisions");
   }
 
+  async getDivisionById(id) {
+    return this.request(`/divisions/${id}`);
+  }
+
+  async createDivision(data) {
+    return this.request("/divisions", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  async deleteDivision(id) {
+    return this.request(`/divisions/${id}`, {
+      method: "DELETE",
+    })
+  }
+
   //POSITION
   async getPositions() {
     return this.request("/positions");
@@ -224,7 +267,7 @@ class ApiService {
   }
 
   async createReservation(data) {
-    return this.request("/meeting-room/reserv", {
+    return this.request("/meeting-room-reservations", {
       method: "POST",
       body: data,
     });

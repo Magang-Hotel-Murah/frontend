@@ -1,9 +1,8 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar, Sidebar, Footer } from "@layout";
+import { NavbarEmployee } from "@layout";
 import { useToggle } from "@hooks";
 import { useLocation } from "react-router-dom";
-import { set } from "react-hook-form";
-import { object } from "yup";
 
 const MainLayout = ({ children, user, onLogout }) => {
   const [sidebarOpen, toggleSidebar, openSidebar, closeSidebar] =
@@ -14,11 +13,13 @@ const MainLayout = ({ children, user, onLogout }) => {
 
   const routeToMenuMap = {
     "/home": "home",
+    "/organization": "organizations",
     "/booking": "bookings",
-    "/room" : "room",
+    "/room": "room",
     "/invite-user": "invite-user",
     "/user": "users",
     "/setting": "settings",
+    "/request": "request",
   };
 
   useEffect(() => {
@@ -53,6 +54,22 @@ const MainLayout = ({ children, user, onLogout }) => {
       setIsCollapsed(!isCollapsed);
     }
   };
+
+  const isEmployee = user?.role === "employee";
+
+  if (isEmployee) {
+    return (
+      <div className="bg-gray-50 min-h-screen">
+        <NavbarEmployee user={user} />
+
+        <div className="p-3 mt-20">
+          <div className="p-3 border-2 border-dashed border-gray-200 rounded-lg min-h-screen bg-white">
+            {children}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen">
