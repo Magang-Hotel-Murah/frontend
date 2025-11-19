@@ -93,9 +93,7 @@ const Display = () => {
   const [selectedYear, setSelectedYear] = useState(defaultYear);
   const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
   const [currentWeekStart, setCurrentWeekStart] = useState(defaultWeekStart);
-  
-  console.log('currentWeekStart', currentWeekStart, 'selectedYear', selectedYear, 'selectedMonth', selectedMonth);
-  
+    
   const selectedDate = useMemo(() => {
     const today = new Date();
     if (filterType === 'month') return new Date(selectedYear, selectedMonth, 1);
