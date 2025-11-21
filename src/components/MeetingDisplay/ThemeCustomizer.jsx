@@ -61,9 +61,10 @@ const ThemeCustomizer = ({ onThemeChange }) => {
       setCustomColor(theme.primary);
       applyTheme(theme);
     }
-  }, []);
+  }, [applyTheme]);
 
-  const applyTheme = (colors) => {
+
+  const applyTheme = React.useCallback((colors) => {
     document.documentElement.style.setProperty('--color-primary', colors.primary);
     document.documentElement.style.setProperty('--color-primary-light', colors.primaryLight);
     document.documentElement.style.setProperty('--color-primary-medium', colors.primaryMedium);
@@ -75,7 +76,7 @@ const ThemeCustomizer = ({ onThemeChange }) => {
     if (onThemeChange) {
       onThemeChange(colors);
     }
-  };
+  }, [onThemeChange]);
 
   const handlePresetClick = (theme) => {
     const colors = generateThemeColors(theme.color);
