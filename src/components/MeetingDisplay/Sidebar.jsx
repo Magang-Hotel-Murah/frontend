@@ -13,7 +13,6 @@ const Sidebar = ({
 }) => {
   return (
     <div className="w-64 sm:w-72 lg:w-80 h-full flex-shrink-0 border-r border-slate-200 p-3 sm:p-4 overflow-y-auto bg-gradient-to-b from-white to-slate-50">
-      {/* Header with Close Button (Mobile Only) */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 sm:gap-3 group cursor-pointer">
           <img 
@@ -26,31 +25,31 @@ const Sidebar = ({
           </h1>
         </div>
         
-        {/* Close Button - Mobile Only */}
         <button
           onClick={onClose}
-          className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+          className="lg:hidden p-2 rounded-lg transition-all hover:opacity-80"
+          style={{ 
+            color: 'var(--color-primary, #ff751a)'
+          }}
           aria-label="Close sidebar"
         >
-          <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
-      {/* Mini Calendar */}
       <MiniCalendar 
         selectedDate={selectedDate} 
         onMonthChange={onMonthChange} 
       />
 
-      {/* Today's and Tomorrow's meetings summary */}
       <div className="border-t border-slate-200 pt-3 sm:pt-4 space-y-4">
         <MeetingSummary 
           meetings={todayMeetings}
           title="HARI INI"
-          bgColor="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500"
           date={dateUtils.formatDate(new Date()).split(',')[0]}
+          isTomorrow={false}
         />
 
         {tomorrowMeetings && tomorrowMeetings.length > 0 && (
@@ -58,8 +57,8 @@ const Sidebar = ({
             <MeetingSummary 
               meetings={tomorrowMeetings}
               title="BESOK"
-              bgColor="bg-slate-100 border-l-4 border-slate-400"
               date={dateUtils.formatDate(new Date(new Date().setDate(new Date().getDate() + 1))).split(',')[0]}
+              isTomorrow={true}
             />
           </div>
         )}

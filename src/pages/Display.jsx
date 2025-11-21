@@ -6,7 +6,9 @@ import Header from '../components/MeetingDisplay/Header';
 import WeekView from '../components/MeetingDisplay/WeekView';
 import MonthView from '../components/MeetingDisplay/MonthView';
 import YearView from '../components/MeetingDisplay/YearView';
+import ThemeCustomizer from '../components/MeetingDisplay/ThemeCustomizer';
 import { dateUtils } from '../utils/dateUtils';
+import { themeUtils } from '../utils/themeUtils';
 import { useDisplayMeetings, useTodayTomorrowMeetings, useSyncFilterToUrl } from '../hooks/useDisplayData';
 
 const getSundayOfWeek = (date) => {
@@ -134,6 +136,10 @@ const Display = () => {
 
   const loading = meetingsLoading || todayTomorrowLoading;
   const error = meetingsError?.message;
+
+  useEffect(() => {
+    themeUtils.initializeTheme();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -317,6 +323,7 @@ const Display = () => {
           )}        
         </div>
       </div>
+      <ThemeCustomizer />
     </div>
   );
 };

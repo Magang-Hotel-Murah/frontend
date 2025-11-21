@@ -14,7 +14,10 @@ const MiniCalendar = ({ selectedDate, onMonthChange }) => {
         <div className="flex gap-1 sm:gap-2">
           <button 
             onClick={() => onMonthChange(-1)}
-            className="p-1 sm:p-1.5 hover:bg-slate-100 rounded text-slate-600 hover:text-slate-900 transition-colors"
+            className="p-1 sm:p-1.5 rounded transition-all hover:opacity-80"
+            style={{ 
+              color: 'var(--color-primary, #ff751a)'
+            }}
             aria-label="Previous month"
           >
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -23,7 +26,10 @@ const MiniCalendar = ({ selectedDate, onMonthChange }) => {
           </button>
           <button 
             onClick={() => onMonthChange(1)}
-            className="p-1 sm:p-1.5 hover:bg-slate-100 rounded text-slate-600 hover:text-slate-900 transition-colors"
+            className="p-1 sm:p-1.5 rounded transition-all hover:opacity-80"
+            style={{ 
+              color: 'var(--color-primary, #ff751a)'
+            }}
             aria-label="Next month"
           >
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -48,11 +54,31 @@ const MiniCalendar = ({ selectedDate, onMonthChange }) => {
           <div key={index} className="aspect-square">
             {day && (
               <button
-                className={`w-full h-full flex items-center justify-center text-[10px] sm:text-xs lg:text-sm rounded-full hover:bg-slate-100 transition-colors ${
-                  dateUtils.isToday(day) 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                    : 'text-slate-800'
-                }`}
+                className="w-full h-full flex items-center justify-center text-[10px] sm:text-xs lg:text-sm rounded-full transition-all"
+                style={
+                  dateUtils.isToday(day)
+                    ? {
+                        backgroundColor: 'var(--color-primary, #ff751a)',
+                        color: 'white'
+                      }
+                    : {
+                        color: 'rgb(30, 41, 59)'
+                      }
+                }
+                onMouseEnter={(e) => {
+                  if (!dateUtils.isToday(day)) {
+                    e.currentTarget.style.backgroundColor = 'var(--color-primary-light, rgba(59, 130, 246, 0.1))';
+                  } else {
+                    e.currentTarget.style.opacity = '0.9';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!dateUtils.isToday(day)) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  } else {
+                    e.currentTarget.style.opacity = '1';
+                  }
+                }}
                 aria-label={`Select ${day.getDate()}`}
               >
                 {day.getDate()}

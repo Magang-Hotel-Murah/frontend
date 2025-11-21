@@ -108,7 +108,7 @@ export const useDisplayMeetings = (companyCode, filterParams) => {
                 throw new Error("Kode perusahaan tidak ditemukan atau tidak memiliki data reservasi.");
             }
 
-            const companyName = response.data.reservations[0]?.company?.name || 'Company';
+            const companyName = response.data.company_name || 'Company';
             const meetings = formatMeetings(response.data.reservations);
             const rooms = response.data.all_rooms;
 

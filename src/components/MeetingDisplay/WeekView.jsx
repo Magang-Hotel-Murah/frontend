@@ -30,7 +30,12 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
 
   return (
     <>
-      <div className="p-2 sm:p-3 flex h-full bg-gradient-to-br from-slate-50 to-blue-50/20 overflow-hidden">
+      <div 
+        className="p-2 sm:p-3 flex h-full overflow-hidden"
+        style={{
+          background: 'linear-gradient(to bottom right, rgb(248, 250, 252), rgba(var(--color-primary-rgb, 59, 130, 246), 0.05))'
+        }}
+      >
         <div className="w-12 sm:w-16 lg:w-20 flex-shrink-0 border-r border-slate-200 flex flex-col bg-white/95 backdrop-blur-sm shadow-sm">
           <div className="h-12 sm:h-14 lg:h-16 border-b border-slate-200 flex-shrink-0"></div>
           <div className="flex-1 flex flex-col overflow-hidden">
@@ -60,12 +65,13 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
                 key={dayIndex}
                 className="flex-1 border-r border-slate-200 min-w-[80px] sm:min-w-[100px] lg:min-w-[120px] flex flex-col bg-white/95 backdrop-blur-sm"
               >
+                {/* Header Hari - Menggunakan Theme Color untuk Today */}
                 <div
-                  className={`h-12 sm:h-14 lg:h-16 border-b border-slate-200 text-center py-1 sm:py-2 flex-shrink-0 transition-all duration-300 ${
-                    day.isToday
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm'
-                      : 'bg-white'
-                  }`}
+                  className="h-12 sm:h-14 lg:h-16 border-b border-slate-200 text-center py-1 sm:py-2 flex-shrink-0 transition-all duration-300"
+                  style={day.isToday ? {
+                    background: 'linear-gradient(to bottom right, var(--color-primary, #ff751a), var(--color-primary-dark, #2563EB))',
+                    boxShadow: '0 1px 3px 0 rgba(var(--color-primary-rgb, 59, 130, 246), 0.1)'
+                  } : {}}
                 >
                   <div
                     className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
@@ -154,6 +160,7 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
         </div>
       </div>
 
+      {/* Modal - Menggunakan Theme Color untuk Button */}
       {showModal && selectedMeeting && (
         <div
           className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm p-4"
@@ -174,7 +181,10 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
               <div>👤 {selectedMeeting.organizer || 'Tidak diketahui'}</div>
             </div>
             <button
-              className="mt-4 sm:mt-5 w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
+              className="mt-4 sm:mt-5 w-full text-white font-semibold py-2 rounded-lg transition-all hover:opacity-90 text-sm sm:text-base"
+              style={{ 
+                backgroundColor: 'var(--color-primary, #ff751a)',
+              }}
               onClick={() => setShowModal(false)}
             >
               Tutup
