@@ -53,17 +53,7 @@ const ThemeCustomizer = ({ onThemeChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [customColor, setCustomColor] = useState('#ff751a');
   const [selectedTheme, setSelectedTheme] = useState(null);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('appTheme');
-    if (savedTheme) {
-      const theme = JSON.parse(savedTheme);
-      setCustomColor(theme.primary);
-      applyTheme(theme);
-    }
-  }, [applyTheme]);
-
-
+  
   const applyTheme = React.useCallback((colors) => {
     document.documentElement.style.setProperty('--color-primary', colors.primary);
     document.documentElement.style.setProperty('--color-primary-light', colors.primaryLight);
@@ -77,6 +67,15 @@ const ThemeCustomizer = ({ onThemeChange }) => {
       onThemeChange(colors);
     }
   }, [onThemeChange]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('appTheme');
+    if (savedTheme) {
+      const theme = JSON.parse(savedTheme);
+      setCustomColor(theme.primary);
+      applyTheme(theme);
+    }
+  }, [applyTheme]);
 
   const handlePresetClick = (theme) => {
     const colors = generateThemeColors(theme.color);
