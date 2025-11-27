@@ -1,4 +1,47 @@
 export const meetingLayout = {
+    splitMultiDayMeetings: (meetings) => {
+        const result = [];
+
+        meetings.forEach(meeting => {
+            const start = new Date(meeting.startTime);
+            const end = new Date(meeting.endTime);
+
+            if (start.getDate() !== end.getDate() ||
+                start.getMonth() !== end.getMonth() ||
+                start.getFullYear() !== end.getFullYear()) {
+
+                const endOfDay = new Date(start);
+                endOfDay.setHours(23, 59, 59, 999);
+
+                result.push({
+                    ...meeting,
+                    id: `${meeting.id}_part1`,
+                    endTime: endOfDay,
+                    isMultiDay: true,
+                    multiDayPart: 'start',
+                    originalEndTime: end
+                });
+
+                const startOfNextDay = new Date(end);
+                startOfNextDay.setHours(0, 0, 0, 0);
+
+                result.push({
+                    ...meeting,
+                    id: `${meeting.id}_part2`,
+                    startTime: startOfNextDay,
+                    fullDate: startOfNextDay,
+                    isMultiDay: true,
+                    multiDayPart: 'end',
+                    originalStartTime: start
+                });
+            } else {
+                result.push(meeting);
+            }
+        });
+
+        return result;
+    },
+
     calculateMeetingColumns: (dayMeetings) => {
         if (dayMeetings.length === 0) return [];
 
