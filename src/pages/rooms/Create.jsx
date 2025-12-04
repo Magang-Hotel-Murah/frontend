@@ -2,8 +2,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useGetRooms } from "@hooks/meeting-room/useGetRooms";
 import { useCreateRoom } from "@hooks/meeting-room/useCreateRoom";
 import { CreateForm } from "@contentroom";
+import { useNavigate } from "react-router-dom";
 
-const Create = () => {
+const Create = ({ onSuccess }) => {
+  const navigate = useNavigate();
+  
   const { data: rooms = [], refetch, isLoading: roomsLoading } = useGetRooms();
   const createRoom = useCreateRoom();
 
@@ -16,6 +19,7 @@ const Create = () => {
     parent_id: "",
     capacity: "",
     facilities: [],
+    images: [],
   });
   const [facilityInput, setFacilityInput] = useState("");
   const [errors, setErrors] = useState({});
@@ -40,13 +44,23 @@ const Create = () => {
     return rooms.filter((r) => r?.type?.toLowerCase() === "main");
   }, [rooms]);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, isFile = false) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      ...(name === "type" && value === "main" ? { parent_id: "" } : {}),
-    }));
+
+    if (isFile) {
+      const filesArray = Array.from(e.target.files);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: filesArray,
+      }));
+    } else {
+      const value = e.target.value;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        ...(name === "type" && value === "main" ? { parent_id: "" } : {}),
+      }));
+    }
 
     if (errors[name]) {
       setErrors((prev) => {
@@ -94,8 +108,7 @@ const Create = () => {
       newErrors.parent_id = "Ruangan utama tidak boleh memiliki parent";
 
     if (!formData.capacity) newErrors.capacity = "Kapasitas wajib diisi";
-    else if (formData.capacity < 1)
-      newErrors.capacity = "Kapasitas minimal 1";
+    else if (formData.capacity < 1) newErrors.capacity = "Kapasitas minimal 1";
 
     if (formData.location && formData.location.length > 255)
       newErrors.location = "Lokasi maksimal 255 karakter";
@@ -108,11 +121,22 @@ const Create = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const submitData = {
-      ...formData,
-      capacity: parseInt(formData.capacity),
-      parent_id: formData.parent_id ? parseInt(formData.parent_id) : null,
-    };
+    const submitData = new FormData();
+    submitData.append("name", formData.name);
+    submitData.append("type", formData.type);
+    submitData.append("location", formData.location || "");
+    if (formData.parent_id) {
+      submitData.append("parent_id", formData.parent_id);
+    }
+    submitData.append("capacity", formData.capacity);
+    formData.facilities.forEach((f, i) => {
+      submitData.append(`facilities[${i}]`, f);
+    });
+    if (formData.images.length > 0) {
+      formData.images.forEach((file) => {
+        submitData.append("images[]", file);
+      });
+    }
 
     try {
       await createRoom.mutateAsync(submitData);
@@ -125,10 +149,16 @@ const Create = () => {
         parent_id: "",
         capacity: "",
         facilities: [],
+        images: [],
       });
       setFacilityInput("");
       setErrors({});
+
+      if (onSuccess) onSuccess();
     } catch (error) {
+      console.error("❌ Submit error:", error);
+      console.error("❌ Error message:", error.message);
+
       setErrors({
         submit: error.message || "Terjadi kesalahan saat menyimpan data",
       });

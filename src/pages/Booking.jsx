@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content, Create } from "@bookings";
-import { Book, PlusCircle } from "lucide-react";
+import { Book, GitPullRequest, PlusCircle } from "lucide-react";
 
 const Booking = ({ user }) => {
   const [activeTab, setActiveTab] = useState(() => {
@@ -9,6 +9,7 @@ const Booking = ({ user }) => {
 
     if (saved === "reservation") return "reservation";
     if (saved === "create" && user?.role === "employee") return "create";
+    if (saved === "request" && user?.role === "employee") return "request";
 
     return "reservation";
   });
@@ -22,6 +23,7 @@ const Booking = ({ user }) => {
       ? [
           { key: "reservation", label: "List", icon: Book },
           { key: "create", label: "Baru", icon: PlusCircle },
+          { key: "request", label: "Permintaan", icon: GitPullRequest },
         ]
       : [{ key: "reservation", label: "List", icon: Book }];
 

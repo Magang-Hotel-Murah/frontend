@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   CheckCircle,
   AlertTriangle,
@@ -12,44 +12,50 @@ import {
   Mail,
   Bell,
   Settings,
-} from 'lucide-react';
+} from "lucide-react";
 
-const BaseAlert = ({ 
-  show, 
-  onClose, 
-  children, 
-  showCloseButton = true, 
+const BaseAlert = ({
+  show,
+  onClose,
+  children,
+  showCloseButton = true,
   backdropBlur = true,
-  size = 'md',
-  animation = 'scale',
-  position = 'center'
+  size = "md",
+  animation = "scale",
+  position = "center",
 }) => {
   if (!show) return null;
 
   const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md', 
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-    full: 'max-w-2xl'
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-xl",
+    full: "max-w-2xl",
   };
 
   const animationClasses = {
-    scale: 'animate-scale-in',
-    slide: 'animate-slide-in',
-    fade: 'animate-fade-in',
-    bounce: 'animate-bounce-in'
+    scale: "animate-scale-in",
+    slide: "animate-slide-in",
+    fade: "animate-fade-in",
+    bounce: "animate-bounce-in",
   };
 
   const positionClasses = {
-    center: 'items-center justify-center',
-    top: 'items-start justify-center pt-16',
-    bottom: 'items-end justify-center pb-16'
+    center: "items-center justify-center",
+    top: "items-start justify-center pt-16",
+    bottom: "items-end justify-center pb-16",
   };
 
   return (
-    <div className={`fixed inset-0 ${backdropBlur ? 'backdrop-blur-xl bg-white/10' : 'bg-black/50'} flex ${positionClasses[position]} p-4 z-50`}>
-      <div className={`bg-white rounded-2xl shadow-2xl ${sizeClasses[size]} w-full mx-4 transform transition-all duration-300 ${animationClasses[animation]}`}>
+    <div
+      className={`fixed inset-0 ${
+        backdropBlur ? "backdrop-blur-xl bg-white/10" : "bg-black/50"
+      } flex ${positionClasses[position]} p-4 z-50`}
+    >
+      <div
+        className={`bg-white rounded-2xl shadow-2xl ${sizeClasses[size]} w-full mx-4 transform transition-all duration-300 ${animationClasses[animation]}`}
+      >
         {showCloseButton && (
           <button
             onClick={onClose}
@@ -64,14 +70,14 @@ const BaseAlert = ({
   );
 };
 
-export const SuccessAlert = ({ 
-  show, 
-  onClose, 
-  title = "Berhasil!", 
-  message, 
+export const SuccessAlert = ({
+  show,
+  onClose,
+  title = "Berhasil!",
+  message,
   buttonText = "OK",
   showIcon = true,
-  customIcon = null
+  customIcon = null,
 }) => (
   <BaseAlert show={show} onClose={onClose}>
     <div className="p-6 text-center">
@@ -92,13 +98,13 @@ export const SuccessAlert = ({
   </BaseAlert>
 );
 
-export const ErrorAlert = ({ 
-  show, 
-  onClose, 
-  title = "Error!", 
-  message, 
+export const ErrorAlert = ({
+  show,
+  onClose,
+  title = "Error!",
+  message,
   buttonText = "Coba Lagi",
-  showIcon = true 
+  showIcon = true,
 }) => (
   <BaseAlert show={show} onClose={onClose}>
     <div className="p-6 text-center">
@@ -119,13 +125,13 @@ export const ErrorAlert = ({
   </BaseAlert>
 );
 
-export const WarningAlert = ({ 
-  show, 
-  onClose, 
-  title = "Peringatan!", 
-  message, 
+export const WarningAlert = ({
+  show,
+  onClose,
+  title = "Peringatan!",
+  message,
   buttonText = "Mengerti",
-  showIcon = true 
+  showIcon = true,
 }) => (
   <BaseAlert show={show} onClose={onClose}>
     <div className="p-6 text-center">
@@ -146,13 +152,13 @@ export const WarningAlert = ({
   </BaseAlert>
 );
 
-export const InfoAlert = ({ 
-  show, 
-  onClose, 
-  title = "Informasi", 
-  message, 
+export const InfoAlert = ({
+  show,
+  onClose,
+  title = "Informasi",
+  message,
   buttonText = "OK",
-  showIcon = true 
+  showIcon = true,
 }) => (
   <BaseAlert show={show} onClose={onClose}>
     <div className="p-6 text-center">
@@ -173,23 +179,23 @@ export const InfoAlert = ({
   </BaseAlert>
 );
 
-export const ConfirmationAlert = ({ 
-  show, 
-  onClose, 
+export const ConfirmationAlert = ({
+  show,
+  onClose,
   onConfirm,
-  title = "Konfirmasi", 
-  message, 
+  title = "Konfirmasi",
+  message,
   confirmText = "Ya",
   cancelText = "Batal",
   confirmColor = "red",
   showIcon = true,
-  isLoading = false
+  isLoading = false,
 }) => {
   const colorClasses = {
-    red: 'bg-red-600 hover:bg-red-700',
-    blue: 'bg-primary-600 hover:bg-primary-700',
-    green: 'bg-green-600 hover:bg-green-700',
-    yellow: 'bg-yellow-600 hover:bg-yellow-700'
+    red: "bg-red-600 hover:bg-red-700",
+    blue: "bg-primary-600 hover:bg-primary-700",
+    green: "bg-green-600 hover:bg-green-700",
+    yellow: "bg-yellow-600 hover:bg-yellow-700",
   };
 
   const bgIconClasses = {
@@ -255,13 +261,17 @@ export const ConfirmationAlert = ({
   );
 };
 
-
-export const LoadingAlert = ({ 
-  show, 
-  title = "Memproses...", 
-  message = "Mohon tunggu sebentar" 
+export const LoadingAlert = ({
+  show,
+  title = "Memproses...",
+  message = "Mohon tunggu sebentar",
 }) => (
-  <BaseAlert show={show} onClose={() => {}} showCloseButton={false} backdropBlur={true}>
+  <BaseAlert
+    show={show}
+    onClose={() => {}}
+    showCloseButton={false}
+    backdropBlur={true}
+  >
     <div className="p-6 text-center">
       <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-primary-100 mb-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
@@ -272,31 +282,47 @@ export const LoadingAlert = ({
   </BaseAlert>
 );
 
-export const ActionAlert = ({ 
-  show, 
-  onClose, 
-  title, 
-  message, 
+export const ActionAlert = ({
+  show,
+  onClose,
+  title,
+  message,
   actions = [],
   icon = null,
-  iconBgColor = 'bg-primary-100',
-  size = 'md'
+  iconBgColor = "bg-primary-100",
+  size = "md",
+  customImage = null,
 }) => (
   <BaseAlert show={show} onClose={onClose} size={size}>
     <div className="p-6 text-center">
-      {icon && (
-        <div className={`mx-auto flex items-center justify-center h-16 w-16 rounded-full ${iconBgColor} mb-4`}>
+      {customImage && (
+        <img
+          src={customImage}
+          alt="Alert"
+          className="mx-auto w-20 h-20 rounded-full object-cover mb-4"
+        />
+      )}
+
+      {!customImage && icon && (
+        <div
+          className={`mx-auto flex items-center justify-center h-16 w-16 rounded-full ${iconBgColor} mb-4`}
+        >
           {icon}
         </div>
       )}
+
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
       <p className="text-sm text-gray-600 mb-6">{message}</p>
+
       <div className="space-y-3">
         {actions.map((action, index) => (
           <button
             key={index}
             onClick={action.onClick}
-            className={`w-full py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center ${action.className || 'bg-primary-600 text-white hover:bg-primary-700'}`}
+            className={`w-full py-3 px-4 rounded-lg transition-colors duration-200 font-medium flex items-center justify-center ${
+              action.className ||
+              "bg-primary-600 text-white hover:bg-primary-700"
+            }`}
           >
             {action.icon && <span className="mr-2">{action.icon}</span>}
             {action.label}
@@ -307,13 +333,13 @@ export const ActionAlert = ({
   </BaseAlert>
 );
 
-export const ToastAlert = ({ 
-  show, 
-  onClose, 
-  message, 
-  type = 'info',
-  position = 'top-right',
-  duration = 3000
+export const ToastAlert = ({
+  show,
+  onClose,
+  message,
+  type = "info",
+  position = "top-right",
+  duration = 3000,
 }) => {
   React.useEffect(() => {
     if (show && duration > 0) {
@@ -327,34 +353,41 @@ export const ToastAlert = ({
   if (!show) return null;
 
   const typeClasses = {
-    success: 'bg-green-500 text-white',
-    error: 'bg-red-500 text-white',
-    warning: 'bg-yellow-500 text-white',
-    info: 'bg-primary-500 text-white'
+    success: "bg-green-500 text-white",
+    error: "bg-red-500 text-white",
+    warning: "bg-yellow-500 text-white",
+    info: "bg-primary-500 text-white",
   };
 
   const positionClasses = {
-    'top-right': 'top-4 right-4',
-    'top-left': 'top-4 left-4',
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
-    'top-center': 'top-4 left-1/2 transform -translate-x-1/2',
-    'bottom-center': 'bottom-4 left-1/2 transform -translate-x-1/2'
+    "top-right": "top-4 right-4",
+    "top-left": "top-4 left-4",
+    "bottom-right": "bottom-4 right-4",
+    "bottom-left": "bottom-4 left-4",
+    "top-center": "top-4 left-1/2 transform -translate-x-1/2",
+    "bottom-center": "bottom-4 left-1/2 transform -translate-x-1/2",
   };
 
   const icons = {
     success: <CheckCircle className="h-5 w-5" />,
     error: <AlertCircle className="h-5 w-5" />,
     warning: <AlertTriangle className="h-5 w-5" />,
-    info: <Info className="h-5 w-5" />
+    info: <Info className="h-5 w-5" />,
   };
 
   return (
-    <div className={`fixed ${positionClasses[position]} z-50 animate-slide-in-right`}>
-      <div className={`${typeClasses[type]} px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 min-w-64 max-w-sm`}>
+    <div
+      className={`fixed ${positionClasses[position]} z-50 animate-slide-in-right`}
+    >
+      <div
+        className={`${typeClasses[type]} px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 min-w-64 max-w-sm`}
+      >
         {icons[type]}
         <span className="text-sm font-medium flex-1">{message}</span>
-        <button onClick={onClose} className="ml-2 hover:bg-white/20 rounded p-1">
+        <button
+          onClick={onClose}
+          className="ml-2 hover:bg-white/20 rounded p-1"
+        >
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -453,12 +486,12 @@ export const useAlert = () => {
 
   const showAlert = (alertConfig) => {
     const id = Date.now();
-    setAlerts(prev => [...prev, { ...alertConfig, id, show: true }]);
+    setAlerts((prev) => [...prev, { ...alertConfig, id, show: true }]);
     return id;
   };
 
   const closeAlert = (id) => {
-    setAlerts(prev => prev.filter(alert => alert.id !== id));
+    setAlerts((prev) => prev.filter((alert) => alert.id !== id));
   };
 
   const closeAllAlerts = () => {
@@ -470,10 +503,14 @@ export const useAlert = () => {
     showAlert,
     closeAlert,
     closeAllAlerts,
-    showSuccess: (message, options = {}) => showAlert({ type: 'success', message, ...options }),
-    showError: (message, options = {}) => showAlert({ type: 'error', message, ...options }),
-    showWarning: (message, options = {}) => showAlert({ type: 'warning', message, ...options }),
-    showInfo: (message, options = {}) => showAlert({ type: 'info', message, ...options }),
+    showSuccess: (message, options = {}) =>
+      showAlert({ type: "success", message, ...options }),
+    showError: (message, options = {}) =>
+      showAlert({ type: "error", message, ...options }),
+    showWarning: (message, options = {}) =>
+      showAlert({ type: "warning", message, ...options }),
+    showInfo: (message, options = {}) =>
+      showAlert({ type: "info", message, ...options }),
   };
 };
 
@@ -487,5 +524,5 @@ export default {
   ActionAlert,
   ToastAlert,
   AlertStyles,
-  useAlert
+  useAlert,
 };

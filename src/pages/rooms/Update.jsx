@@ -22,6 +22,7 @@ const Update = () => {
     parent_id: "",
     capacity: "",
     facilities: [],
+    
   });
   const [facilityInput, setFacilityInput] = useState("");
   const [errors, setErrors] = useState({});

@@ -27,7 +27,7 @@ const Organization = () => {
       case "organization":
         return <Content />;
       case "create":
-        return <Create />;
+        return <Create onSuccess={() => setActiveTab("organization")}/>;
       default:
         return null;
     }

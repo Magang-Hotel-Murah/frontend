@@ -3,6 +3,7 @@ import { Navbar, Sidebar, Footer } from "@layout";
 import { NavbarEmployee } from "@layout";
 import { useToggle } from "@hooks";
 import { useLocation } from "react-router-dom";
+import { BotFAB } from "@pages"
 
 const MainLayout = ({ children, user, onLogout }) => {
   const [sidebarOpen, toggleSidebar, openSidebar, closeSidebar] =
@@ -67,6 +68,8 @@ const MainLayout = ({ children, user, onLogout }) => {
             {children}
           </div>
         </div>
+
+        <BotFAB />
       </div>
     );
   }
@@ -98,6 +101,8 @@ const MainLayout = ({ children, user, onLogout }) => {
           {children}
         </div>
       </div>
+      
+      <BotFAB />
     </div>
   );
 };

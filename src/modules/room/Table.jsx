@@ -1,18 +1,39 @@
 import React from "react";
-import { Edit, Trash2, Database, MapPin, UsersRoundIcon } from "lucide-react";
+import {
+  Edit,
+  Trash2,
+  MapPin,
+  UsersRoundIcon,
+  ImageOff,
+} from "lucide-react";
 import { BaseTable } from "@common";
-import { getTypeColor } from '@utils';
+import { getTypeColor } from "@utils";
 
 const Table = ({ rooms, onDelete, onEdit, loading }) => {
-
   const columns = [
+    {
+      header: "Foto",
+
+      render: (row) => (
+        <div className="flex-items-center justify-center">
+          {row.images && row.images.length > 0 ? (
+            <img
+              src={row.images[0]}
+              alt={row.name}
+              className="h-14 w-14 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="h-14 w-14 rounded-lg bg-gray-100 flex items-center justify-center">
+              <ImageOff className="h-6 w-6 text-gray-400" />
+            </div>
+          )}
+        </div>
+      ),
+    },
     {
       header: "Ruangan",
       render: (row) => (
         <div className="flex items-center">
-          <div className="h-10 w-10 rounded-lg bg-primary-50 flex items-center justify-center mr-2">
-            <Database className="h-4 w-4 text-primary-600" />
-          </div>
           <div className="text-sm font-semibold text-gray-900">{row.name}</div>
         </div>
       ),

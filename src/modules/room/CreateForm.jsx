@@ -1,6 +1,6 @@
 import React from "react";
 import { AlertCircle } from "lucide-react";
-import { Button } from "@ui";
+import { Button, ImageUploadInput } from "@ui";
 import { BaseFormInput } from "@common";
 
 const CreateForm = ({
@@ -118,6 +118,13 @@ const CreateForm = ({
             onRemoveTag={onRemoveFacility}
             placeholder="Contoh: Proyektor, Whiteboard"
             inputProps={{ maxLength: 100 }}
+          />
+
+          <ImageUploadInput
+            label="Foto Ruangan"
+            onChange={(e, isFile) => onInputChange(e, isFile)}
+            maxFiles={5}
+            maxSizeMB={2}
           />
 
           <div className="flex gap-3 pt-4 border-t">

@@ -6,3 +6,5 @@ export { default as ReservationCard } from './ReservationCard';
 export { default as TextArea } from './TextArea';
 export { default as Spinner } from './Spinner';
 export { default as Loading } from './Loading';
+export { default as StatCard } from './StatCard';
+export { default as ImageUploadInput } from './ImageUploadInput'; 

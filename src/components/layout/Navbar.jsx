@@ -1,16 +1,9 @@
 import React, { useState } from "react";
 import Logo from "../../assets/logo.png";
-import {
-  Menu,
-  X,
-  Bell,
-  User,
-  LogOut,
-  ChevronLeft,
-  Settings,
-} from "lucide-react";
+import { Menu, Bell, User, LogOut, ChevronLeft, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "@hooks/auth";
+import { useGetUserProfile } from "@hooks/user-profile";
 
 import {
   ConfirmationAlert,
@@ -23,13 +16,15 @@ import {
 const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
   const navigate = useNavigate();
   const { mutateAsync: logout } = useLogout();
+  const { data: userProfile, isLoading: isLoadingProfile } =
+    useGetUserProfile();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [showNotificationInfo, setShowNotificationInfo] = useState(false);
   const [showProfileActions, setShowProfileActions] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastConfig, setToastConfig] = useState({ type: "info", message: "" });
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleLogoutClick = () => {
     setShowLogoutConfirm(true);
@@ -46,17 +41,13 @@ const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
         showToastNotification("success", "Logout berhasil! Sampai jumpa lagi.");
 
         setTimeout(() => {
-          window.location.href = "/login"; // paksa reload halaman login
+          window.location.href = "/login";
         }, 700);
       } catch (error) {
         setIsLoggingOut(false);
         showToastNotification("error", "Gagal logout. Silakan coba lagi.");
       }
     }, 1500);
-  };
-
-  const handleNotificationClick = () => {
-    setShowNotificationInfo(true);
   };
 
   const handleProfileClick = () => {
@@ -74,25 +65,16 @@ const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
     showToastNotification("info", "Mengarahkan ke halaman pengaturan...");
   };
 
-  const navigateToProfile = () => {
-    setShowProfileActions(false);
-    showToastNotification("info", "Halaman profil akan segera tersedia");
-  };
-
-  const markAllNotificationsRead = () => {
-    setShowNotificationInfo(false);
-    showToastNotification(
-      "success",
-      "Semua notifikasi telah ditandai sebagai dibaca"
-    );
+  const handleImageError = () => {
+    setImageError(true);
   };
 
   return (
     <>
       <AlertStyles />
 
-      <nav className="bg-white border-b border-primary-500 fixed w-full z-50 top-0">
-        <div className="px-3 py-3 lg:px-5 lg:pl-3">
+      <nav className="bg-white border-b border-gray-200 shadow-sm fixed w-full z-50 top-0">
+        <div className="px-4 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-start">
               <button
@@ -115,37 +97,37 @@ const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <button
-                onClick={handleNotificationClick}
-                className="p-2 text-gray-500 hover:bg-primary-50 rounded-lg relative transition-colors"
-                title="Notifikasi"
-              >
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-              </button>
-
               <div className="flex items-center space-x-3">
                 <button
                   onClick={handleProfileClick}
-                  className="flex items-center space-x-3 hover:bg-primary-50 rounded-lg p-2 transition-colors"
+                  className="flex items-center gap-3 hover:bg-gray-50 rounded-lg px-3 py-2 transition-colors"
                   title="Menu Profil"
                 >
-                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-gray-500" />
+                  <div className="relative w-9 h-9 bg-primary-100 rounded-full overflow-hidden flex items-center justify-center">
+                    {isLoadingProfile ? (
+                      <div className="w-full h-full animate-pulse bg-primary-50" />
+                    ) : userProfile?.photo && !imageError ? (
+                      <img
+                        src={userProfile.photo}
+                        alt={userProfile.name || user?.name || "User"}
+                        className="w-full h-full object-cover"
+                        onError={handleImageError}
+                      />
+                    ) : (
+                      <User className="w-4 h-4 text-gray-500" />
+                    )}
                   </div>
-                  <div className="hidden md:block text-left">
-                    <p className="text-sm font-medium text-gray-500">
-                      {user?.name || "PT. Hotel Murah Travelindo"}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {user?.role || "Admin"}
+
+                  <div className="hidden sm:block text-left">
+                    <p className="text-sm font-semibold text-gray-700">
+                      {userProfile?.name || user?.name}
                     </p>
                   </div>
                 </button>
 
                 <button
                   onClick={handleLogoutClick}
-                  className="p-2 text-gray-500 hover:bg-red-500 hover:bg-opacity-80 rounded-lg transition-colors"
+                  className="p-2.5 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
                   title="Logout"
                 >
                   <LogOut className="w-4 h-4" />
@@ -168,14 +150,6 @@ const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
         isLoading={isLoggingOut}
       />
 
-      <InfoAlert
-        show={showNotificationInfo}
-        onClose={() => setShowNotificationInfo(false)}
-        title="Notifikasi"
-        message="Anda memiliki 3 notifikasi baru tentang transaksi dan aktivitas sistem."
-        buttonText="Tandai Semua Dibaca"
-      />
-
       <ActionAlert
         show={showProfileActions}
         onClose={() => setShowProfileActions(false)}
@@ -187,12 +161,6 @@ const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
         iconBgColor="bg-blue-100"
         size="md"
         actions={[
-          {
-            label: "Lihat Profil",
-            icon: <User className="h-4 w-4" />,
-            onClick: navigateToProfile,
-            className: "bg-blue-500 text-white hover:bg-blue-600",
-          },
           {
             label: "Pengaturan",
             icon: <Settings className="h-4 w-4" />,
@@ -211,63 +179,6 @@ const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
           {
             label: "Batal",
             onClick: () => setShowProfileActions(false),
-            className: "bg-gray-300 text-gray-700 hover:bg-gray-400",
-          },
-        ]}
-      />
-
-      <ActionAlert
-        show={showNotificationInfo}
-        onClose={() => setShowNotificationInfo(false)}
-        title="Pusat Notifikasi"
-        message="Anda memiliki beberapa notifikasi penting yang perlu ditinjau."
-        icon={<Bell className="h-8 w-8 text-yellow-600" />}
-        iconBgColor="bg-yellow-100"
-        size="lg"
-        actions={[
-          {
-            label: "3 Transaksi Baru",
-            icon: <div className="h-2 w-2 bg-green-500 rounded-full" />,
-            onClick: () => {
-              setShowNotificationInfo(false);
-              navigate("/transaction");
-              showToastNotification(
-                "info",
-                "Mengarahkan ke halaman transaksi..."
-              );
-            },
-            className:
-              "bg-green-500 text-white hover:bg-green-600 text-left justify-start",
-          },
-          {
-            label: "2 User Baru Terdaftar",
-            icon: <div className="h-2 w-2 bg-blue-500 rounded-full" />,
-            onClick: () => {
-              setShowNotificationInfo(false);
-              navigate("/user");
-              showToastNotification("info", "Mengarahkan ke halaman user...");
-            },
-            className:
-              "bg-blue-500 text-white hover:bg-blue-600 text-left justify-start",
-          },
-          {
-            label: "1 Pesan Sistem",
-            icon: <div className="h-2 w-2 bg-red-500 rounded-full" />,
-            onClick: () => {
-              setShowNotificationInfo(false);
-              showToastNotification("info", "Update sistem telah tersedia");
-            },
-            className:
-              "bg-red-500 text-white hover:bg-red-600 text-left justify-start",
-          },
-          {
-            label: "Tandai Semua Dibaca",
-            onClick: markAllNotificationsRead,
-            className: "bg-gray-500 text-white hover:bg-gray-600",
-          },
-          {
-            label: "Tutup",
-            onClick: () => setShowNotificationInfo(false),
             className: "bg-gray-300 text-gray-700 hover:bg-gray-400",
           },
         ]}

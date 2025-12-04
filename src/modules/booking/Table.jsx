@@ -7,7 +7,7 @@ import {
   X,
   Trash2,
   Eye,
-  Database,
+  ImageOff,
 } from "lucide-react";
 import { formatDateTimeHour, getStatusTableBooking } from "@utils";
 
@@ -25,12 +25,27 @@ const Table = ({
 
   const columns = [
     {
+      header: "Foto",
+      render: (row) => (
+        <div className="flex items-center justify-center">
+          {row.room?.images ? (
+            <img
+              src={row.room.images}
+              alt={row.room?.name}
+              className="h-14 w-14 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="h-14 w-14 rounded-lg bg-gray-100 flex items-center justify-center">
+              <ImageOff className="h-6 w-6 text-gray-400" />
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
       header: "Ruangan",
       render: (row) => (
         <div className="flex items-center">
-          <div className="h-10 w-10 rounded-lg bg-primary-50 flex items-center justify-center">
-            <Database className="h-4 w-4 text-primary-600" />
-          </div>
           <div className="ml-3">
             <div className="text-sm font-medium text-gray-900">
               {row.room?.name}

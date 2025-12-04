@@ -7,3 +7,4 @@ export { default as BaseModal } from './BaseModal';
 export { default as BaseFormInput } from './BaseFormInput';
 export { default as DateTimePicker } from './DateTimePicker';
 export { default as SearchableDropdown} from './SearchableDropdown';
+export { default as SearchableRoomDropdown } from './SearchableRoomDropdown';

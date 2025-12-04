@@ -26,7 +26,7 @@ const Room = () => {
       case "room":
         return <Content />;
       case "create":
-        return <Create />;
+        return <Create onSuccess={() => setActiveTab("room")} />;
       default:
         return null;
     }

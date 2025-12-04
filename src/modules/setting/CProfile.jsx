@@ -1,106 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { User, Camera, AlertCircle } from "lucide-react";
-import { useGetDivisions } from "@hooks/division";
-import { useGetPosition } from "@hooks/position";
-import { useGetUserProfile, useSaveUserProfile } from "@hooks/user-profile";
+import { AlertCircle } from "lucide-react";
+import { Button } from "@ui";
+import { BaseFormInput } from "@common";
 
-
-const Profile = () => {
-  const { data: divisions = [], isLoading: divisionLoading } =
-    useGetDivisions();
-  const { data: positions = [], isLoading: positionLoading } = useGetPosition();
-
-  const [profileData, setProfileData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
-    division_id: "",
-    position_id: "",
-    photo: null,
-  });
-
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const { data: profileResponse, isLoading: isLoadingProfile } = useGetUserProfile();
-  const { saveProfile, isLoading: isSaving} = useSaveUserProfile();
-
-  useEffect(() => {
-    if (profileResponse) {
-      setProfileData({
-        fullName: profileResponse.user?.name || "",
-        email: profileResponse.user?.email || "",
-        phone: profileResponse.phone || "",
-        address: profileResponse.address || "",
-        division_id: profileResponse.division_id || "",
-        position_id: profileResponse.position_id || "",
-        photo: profileResponse.photo || null, 
-      });
-    } else if (profileResponse === null) {
-      const user = JSON.parse(localStorage.getItem("user"));
-      setProfileData((prev) => ({
-        ...prev,
-        fullName: user?.name || "",
-        email: user?.email || "",
-      }));
-    }
-  }, [profileResponse]);
-
-  const handleProfileChange = (field, value) => {
-    setProfileData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-    setError("");
-    setSuccess("");
-  };
-
-  const handleAvatarChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileData((prev) => ({
-          ...prev,
-          photo: e.target.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSave = async () => {
-    try {
-      setError("");
-      setSuccess("");
-
-      const updateData = {
-        division_id: profileData.division_id,
-        position_id: profileData.position_id,
-        phone: profileData.phone,
-        address: profileData.address,
-        photo: profileData.photo,
-      };
-      
-      const result = await saveProfile(updateData);
-      setSuccess(result.message);
-    } catch (error) {
-      setError("Gagal menyimpan profil. Silakan coba lagi.");
-      console.error("Error saving profile:", error);
-    }
-  };
-
-  const loading = divisionLoading || positionLoading || isLoadingProfile;
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    );
-  }
-
+const CProfile = ({}) => {
   return (
     <div className="space-y-6 mt-4 mb-4 mr-4 ml-4">
       {error && (
@@ -132,7 +34,7 @@ const Profile = () => {
           </div>
           <label
             htmlFor="avatar-upload"
-            className="absolute bottom-0 right-0 bg-gray-400 text-gray-50 rounded-full p-2 cursor-pointer hover:bg-primary-400 transition-colors"
+            className="absolute bottom-0 right-0 bg-gray-500 text-white rounded-full p-2 cursor-pointer hover:bg-primary-400 transition-colors"
           >
             <Camera className="w-4 h-4" />
           </label>
@@ -151,6 +53,10 @@ const Profile = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <BaseFormInput
+        type="text"
+
+        />
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Nama Lengkap
@@ -159,7 +65,7 @@ const Profile = () => {
             type="text"
             value={profileData.fullName}
             onChange={(e) => handleProfileChange("fullName", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled
           />
         </div>
@@ -172,8 +78,8 @@ const Profile = () => {
             type="email"
             value={profileData.email}
             onChange={(e) => handleProfileChange("email", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-            disabled
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled // This should be updated in user table, not profile
           />
         </div>
 
@@ -185,7 +91,7 @@ const Profile = () => {
             type="tel"
             value={profileData.phone}
             onChange={(e) => handleProfileChange("phone", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -196,7 +102,7 @@ const Profile = () => {
           <select
             value={profileData.division_id}
             onChange={(e) => handleProfileChange("division_id", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Pilih Divisi</option>
             {divisions.map((division) => (
@@ -214,7 +120,7 @@ const Profile = () => {
           <select
             value={profileData.position_id}
             onChange={(e) => handleProfileChange("position_id", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Pilih Posisi</option>
             {positions.map((position) => (
@@ -233,7 +139,7 @@ const Profile = () => {
             value={profileData.address}
             onChange={(e) => handleProfileChange("address", e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
@@ -242,7 +148,7 @@ const Profile = () => {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 disabled:opacity-50 flex items-center space-x-2"
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-primary-600 disabled:opacity-50 flex items-center space-x-2"
         >
           <span>{isSaving ? "Menyimpan..." : "Simpan Profil"}</span>
         </button>
@@ -250,5 +156,3 @@ const Profile = () => {
     </div>
   );
 };
-
-export default Profile;

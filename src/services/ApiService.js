@@ -2,67 +2,73 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
 class ApiService {
   async request(endpoint, options = {}) {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
+  const url = `${API_BASE_URL}${endpoint}`;
+  
+  const isFormData = options.body instanceof FormData;
+  
+  const config = {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(!isFormData && { "Content-Type": "application/json" }),
+    },
+    ...options,
+  };
 
-    const url = `${API_BASE_URL}${endpoint}`;
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      ...options,
-    };
+  if (config.body && !isFormData && typeof config.body !== "string") {
+    config.body = JSON.stringify(config.body);
+  }
 
-    if (config.body && typeof config.body !== "string") {
-      config.body = JSON.stringify(config.body);
-    }
+  const response = await fetch(url, config);
 
-    const response = await fetch(url, config);
-
-    if (response.status === 401) {
-      const publicEndpoints = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/activate-account'];
-      const isPublicEndpoint = publicEndpoints.some(ep => endpoint.includes(ep));
-      
-      if (isPublicEndpoint) {
-        let errorMessage = "Invalid credentials";
-        try {
-          const errData = await response.json();
-          errorMessage = errData.message || errorMessage;
-        } catch {
-        }
-        throw new Error(errorMessage);
-      } else {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("token_expiry");
-        
-        window.location.href = "/login";
-        throw new Error("Session expired. Please login again.");
-      }
-    }
-
-    if (!response.ok) {
-      let errorMessage = `HTTP error! status: ${response.status}`;
+  if (response.status === 401) {
+    const publicEndpoints = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/activate-account'];
+    const isPublicEndpoint = publicEndpoints.some(ep => endpoint.includes(ep));
+    
+    if (isPublicEndpoint) {
+      let errorMessage = "Invalid credentials";
       try {
         const errData = await response.json();
         errorMessage = errData.message || errorMessage;
-      } catch {
-      }
+      } catch {}
       throw new Error(errorMessage);
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("token_expiry");
+      
+      window.location.href = "/login";
+      throw new Error("Session expired. Please login again.");
     }
-
-    if (response.status === 204) {
-      return null;
-    }
-
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      return { success: true, message: "Request berhasil!" };
-    }
-
-    return response.json();
   }
+
+  if (!response.ok) {
+    let errorMessage = `HTTP error! status: ${response.status}`;
+    let errorDetails = null;
+    
+    try {
+      const errData = await response.json();
+      errorDetails = errData;
+      errorMessage = errData.message || errorMessage;
+  
+    } catch {}
+    
+    
+    throw new Error(errorMessage);
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    return { success: true, message: "Request berhasil!" };
+  }
+
+  return response.json();
+}
 
   async getCurrentUser() {
     return this.request("/auth/me");

@@ -3,7 +3,7 @@ import { useGetPosition } from "@hooks/position";
 import { useCreateDivision } from "@hooks/division";
 import { CreateForm } from "@contentorganization";
 
-const Create = () => {
+const Create = ({ onSuccess }) => {
   const {
     data: position = [],
     refetch,
@@ -87,6 +87,8 @@ const Create = () => {
       });
       setNewPositionInput("");
       setErrors({});
+
+      if (onSuccess) onSuccess();
     } catch (error) {
       setErrors({
         submit: error.message || "Terjadi kesalahan saat menyimpan data",
