@@ -22,7 +22,12 @@ const MonthView = ({ selectedDate, meetings, goToWeekPeriod }) => {
   return (
     <>
       {/* Grid Bulan - Responsive */}
-      <div className="overflow-y-auto h-full bg-gradient-to-br from-slate-50 to-blue-50/20 p-2 sm:p-3">
+      <div 
+        className="overflow-y-auto h-full p-2 sm:p-3"
+        style={{
+          background: 'linear-gradient(to bottom right, rgb(248, 250, 252), rgba(var(--color-primary-rgb, 59, 130, 246), 0.05))'
+        }}
+      >
         <div className="bg-white/95 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-lg p-2 sm:p-4 overflow-hidden border border-slate-200">
           {/* Header Hari - Responsive text */}
           <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs sm:text-sm mb-2 sm:mb-3">
@@ -49,26 +54,47 @@ const MonthView = ({ selectedDate, meetings, goToWeekPeriod }) => {
                 <div
                   key={idx}
                   onClick={() => day && handleDayClick(day)}
-                  className={`h-16 sm:h-24 lg:h-28 border rounded-lg sm:rounded-xl p-1 sm:p-2 relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer ${
+                  className="h-16 sm:h-24 lg:h-28 border rounded-lg sm:rounded-xl p-1 sm:p-2 relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+                  style={
                     dateUtils.isToday(day)
-                      ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-sm'
+                      ? {
+                          borderColor: 'var(--color-primary)',
+                          background: 'linear-gradient(to bottom right, var(--color-primary-light), var(--color-primary-medium))',
+                          boxShadow: '0 1px 2px 0 rgba(var(--color-primary-rgb, 59, 130, 246), 0.1)'
+                        }
                       : day
-                      ? 'border-slate-200 bg-white hover:border-blue-300'
-                      : 'border-transparent bg-slate-50/50 cursor-default'
-                  }`}
+                      ? {
+                          borderColor: 'rgb(226, 232, 240)',
+                          backgroundColor: 'white'
+                        }
+                      : {
+                          borderColor: 'transparent',
+                          backgroundColor: 'rgb(248, 250, 252, 0.5)',
+                          cursor: 'default'
+                        }
+                  }
+                  onMouseEnter={(e) => {
+                    if (day && !dateUtils.isToday(day)) {
+                      e.currentTarget.style.borderColor = 'var(--color-primary-light)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (day && !dateUtils.isToday(day)) {
+                      e.currentTarget.style.borderColor = 'rgb(226, 232, 240)';
+                    }
+                  }}
                 >
                   {day && (
                     <>
                       <div
-                        className={`text-xs sm:text-sm font-bold text-right ${
-                          dateUtils.isToday(day)
-                            ? 'text-blue-700'
-                            : 'text-slate-800'
-                        }`}
+                        className="text-xs sm:text-sm font-bold text-right"
+                        style={{
+                          color: dateUtils.isToday(day) ? 'var(--color-primary-dark, #2563EB)' : 'rgb(30, 41, 59)'
+                        }}
                       >
                         {day.getDate()}
                       </div>
-                      <div className=" space-y-0.5 sm:space-y-1 overflow-y-auto max-h-[40px] sm:max-h-[60px] lg:max-h-[75px]">
+                      <div className="space-y-0.5 sm:space-y-1 overflow-y-auto max-h-[40px] sm:max-h-[60px] lg:max-h-[75px]">
                         {dayMeetings.slice(0, window.innerWidth < 640 ? 1 : 3).map((meeting) => (
                           <div
                             key={meeting.id}
@@ -142,7 +168,8 @@ const MonthView = ({ selectedDate, meetings, goToWeekPeriod }) => {
             )}
 
             <button
-              className="mt-4 w-full bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition text-sm sm:text-base"
+              className="mt-4 w-full text-white font-semibold py-2 rounded-lg transition-all hover:opacity-90 text-sm sm:text-base"
+              style={{ backgroundColor: 'var(--color-primary, #10B981)' }}
               onClick={() => {
                 if (selectedDay && goToWeekPeriod) {
                   goToWeekPeriod(selectedDay);
@@ -154,7 +181,8 @@ const MonthView = ({ selectedDate, meetings, goToWeekPeriod }) => {
             </button>
 
             <button
-              className="mt-4 sm:mt-5 w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
+              className="mt-2 sm:mt-3 w-full text-white font-semibold py-2 rounded-lg transition-all hover:opacity-90 text-sm sm:text-base"
+              style={{ backgroundColor: 'var(--color-primary, #ff751a)' }}
               onClick={() => setShowModal(false)}
             >
               Tutup

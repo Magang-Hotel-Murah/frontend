@@ -16,18 +16,60 @@ class ApiService {
     ...options,
   };
 
+<<<<<<< HEAD
   if (config.body && !isFormData && typeof config.body !== "string") {
     config.body = JSON.stringify(config.body);
   }
+=======
+    const url = `${API_BASE_URL}${endpoint}`;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "true"
+      },
+      ...options,
+    };
+>>>>>>> 65b88578d9db9fb003a4d16fe0d3049032924560
 
   const response = await fetch(url, config);
 
+<<<<<<< HEAD
   if (response.status === 401) {
     const publicEndpoints = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/activate-account'];
     const isPublicEndpoint = publicEndpoints.some(ep => endpoint.includes(ep));
     
     if (isPublicEndpoint) {
       let errorMessage = "Invalid credentials";
+=======
+    const response = await fetch(url, config);
+
+    if (response.status === 401) {
+      const publicEndpoints = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/activate-account'];
+      const isPublicEndpoint = publicEndpoints.some(ep => endpoint.includes(ep));
+
+      if (isPublicEndpoint) {
+        let errorMessage = "Invalid credentials";
+        try {
+          const errData = await response.json();
+          errorMessage = errData.message || errorMessage;
+        } catch {
+        }
+        throw new Error(errorMessage);
+      } else {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("token_expiry");
+
+        window.location.href = "/login";
+        throw new Error("Session expired. Please login again.");
+      }
+    }
+
+    if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
+>>>>>>> 65b88578d9db9fb003a4d16fe0d3049032924560
       try {
         const errData = await response.json();
         errorMessage = errData.message || errorMessage;

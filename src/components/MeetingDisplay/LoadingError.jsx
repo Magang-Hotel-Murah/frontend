@@ -3,7 +3,10 @@ import React from 'react';
 export const LoadingSpinner = () => (
   <div className="h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
     <div className="text-center">
-      <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+      <div 
+        className="animate-spin rounded-full h-16 w-16 border-b-4 mx-auto mb-4"
+        style={{ borderBottomColor: 'var(--color-primary, #ff751a)' }}
+      ></div>
       <p className="text-xl text-slate-800 font-medium">Memuat data rapat...</p>
     </div>
   </div>

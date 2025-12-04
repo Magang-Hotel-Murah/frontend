@@ -1,9 +1,21 @@
 import React from 'react';
 
-const MeetingSummary = ({ meetings, title, bgColor, date }) => (
+const MeetingSummary = ({ meetings, title, date, isTomorrow = false }) => (
   <>
-    {/* Header - Responsive spacing and text */}
-    <div className={`${bgColor} py-1 sm:py-1.5 px-2 sm:px-3 flex items-center justify-between mb-2 sm:mb-3 rounded-md`}>
+    <div 
+      className="py-1 sm:py-1.5 px-2 sm:px-3 flex items-center justify-between mb-2 sm:mb-3 rounded-md border-l-4"
+      style={
+        isTomorrow
+          ? {
+              backgroundColor: 'rgb(241, 245, 249)',
+              borderLeftColor: 'rgb(148, 163, 184)'
+            }
+          : {
+              background: 'linear-gradient(to right, var(--color-primary-light, rgba(59, 130, 246, 0.1)), var(--color-primary-medium, rgba(59, 130, 246, 0.2)))',
+              borderLeftColor: 'var(--color-primary, #ff751a)'
+            }
+      }
+    >
       <h3 className="font-semibold text-slate-800 text-xs sm:text-sm">{title}</h3>
       <span className="text-[10px] sm:text-xs text-slate-600">{date}</span>
     </div>

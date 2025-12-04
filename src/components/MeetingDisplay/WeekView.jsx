@@ -8,6 +8,13 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
   const columnRefs = useRef([]);
   const [columnHeights, setColumnHeights] = useState([]);
 
+  const [processedMeetings, setProcessedMeetings] = useState([]);
+
+  useEffect(() => {
+    const splitMeetings = meetingLayout.splitMultiDayMeetings(meetings);
+    setProcessedMeetings(splitMeetings);
+  }, [meetings]);
+
   useEffect(() => {
     if (columnRefs.current.length > 0) {
       const heights = columnRefs.current.map(ref => ref?.clientHeight || 0);
@@ -16,7 +23,7 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
   }, [timeSlots, weekDays]);
 
   const getMeetingsForDay = (dayDate) => {
-    return meetings.filter(meeting => dateUtils.isSameDay(meeting.fullDate, dayDate));
+    return processedMeetings.filter(meeting => dateUtils.isSameDay(meeting.fullDate, dayDate));
   };
 
   const handleMeetingClick = (meeting) => {
@@ -24,14 +31,21 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
     setShowModal(true);
   };
 
+  const startHour = timeSlots.length > 0 ? parseInt(timeSlots[0].split(':')[0]) : 0;
+  const endHour = timeSlots.length > 0 ? parseInt(timeSlots[timeSlots.length - 1].split(':')[0]) + 1 : 24;
+  const totalMinutesInView = (endHour - startHour) * 60;
+
   return (
     <>
-      {/* Week Grid - Responsive Layout */}
-      <div className="p-2 sm:p-3 flex h-full bg-gradient-to-br from-slate-50 to-blue-50/20 overflow-hidden">
-        {/* Sidebar jam - Hide on very small screens */}
+      <div 
+        className="p-2 sm:p-3 flex h-full overflow-hidden"
+        style={{
+          background: 'linear-gradient(to bottom right, rgb(248, 250, 252), rgba(var(--color-primary-rgb, 59, 130, 246), 0.05))'
+        }}
+      >
         <div className="w-12 sm:w-16 lg:w-20 flex-shrink-0 border-r border-slate-200 flex flex-col bg-white/95 backdrop-blur-sm shadow-sm">
           <div className="h-12 sm:h-14 lg:h-16 border-b border-slate-200 flex-shrink-0"></div>
-          <div className="flex-1 flex flex-col overflow-y-auto">
+          <div className="flex-1 flex flex-col overflow-hidden">
             {timeSlots.map(slot => (
               <div
                 key={slot}
@@ -45,28 +59,25 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
           </div>
         </div>
 
-        {/* Kolom hari - Horizontal scroll on mobile */}
         <div className="flex-1 flex overflow-x-auto">
           {weekDays.map((day, dayIndex) => {
             const dayMeetings = getMeetingsForDay(day.fullDate);
-            const processedMeetings = meetingLayout.calculateMeetingColumns(dayMeetings);
+            const layoutMeetings = meetingLayout.calculateMeetingColumns(dayMeetings);
 
             const columnHeight = columnHeights[dayIndex] || 0;
-            const totalMinutes = timeSlots.length * 60;
-            const pixelPerMinute = columnHeight > 0 ? columnHeight / totalMinutes : 0;
+            const pixelPerMinute = columnHeight > 0 ? columnHeight / totalMinutesInView : 0;
 
             return (
               <div
                 key={dayIndex}
                 className="flex-1 border-r border-slate-200 min-w-[80px] sm:min-w-[100px] lg:min-w-[120px] flex flex-col bg-white/95 backdrop-blur-sm"
               >
-                {/* Header hari - Responsive sizing */}
                 <div
-                  className={`h-12 sm:h-14 lg:h-16 border-b border-slate-200 text-center py-1 sm:py-2 flex-shrink-0 transition-all duration-300 ${
-                    day.isToday
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm'
-                      : 'bg-white'
-                  }`}
+                  className="h-12 sm:h-14 lg:h-16 border-b border-slate-200 text-center py-1 sm:py-2 flex-shrink-0 transition-all duration-300"
+                  style={day.isToday ? {
+                    background: 'linear-gradient(to bottom right, var(--color-primary, #ff751a), var(--color-primary-dark, #2563EB))',
+                    boxShadow: '0 1px 3px 0 rgba(var(--color-primary-rgb, 59, 130, 246), 0.1)'
+                  } : {}}
                 >
                   <div
                     className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
@@ -84,12 +95,10 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
                   </div>
                 </div>
 
-                {/* Isi kalender */}
                 <div
                   ref={(el) => (columnRefs.current[dayIndex] = el)}
                   className="relative flex-1 overflow-hidden"
                 >
-                  {/* Grid jam */}
                   <div className="absolute inset-0 flex flex-col">
                     {timeSlots.map((slot, idx) => (
                       <div
@@ -101,20 +110,42 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
                     ))}
                   </div>
 
-                  {/* Blok meeting - Adjusted for mobile */}
-                  {processedMeetings.map(meeting => {
-                    const { top, height } = meetingLayout.calculateMeetingPosition(meeting);
+                  {layoutMeetings.map(meeting => {
+                    const startDate = new Date(meeting.startTime);
+                    const endDate = new Date(meeting.endTime);
+                    
+                    const meetingStartHour = startDate.getHours();
+                    const meetingStartMinute = startDate.getMinutes();
+                    const meetingEndHour = endDate.getHours();
+                    const meetingEndMinute = endDate.getMinutes();
+                    
+                    const startOffsetMinutes = (meetingStartHour - startHour) * 60 + meetingStartMinute;
+                    const endOffsetMinutes = (meetingEndHour - startHour) * 60 + meetingEndMinute;
+                    
+                    const durationMinutes = endOffsetMinutes - startOffsetMinutes;
+                    
+                    const topPixels = startOffsetMinutes * pixelPerMinute;
+                    const heightPixels = durationMinutes * pixelPerMinute;
+
                     const columnWidth = 100 / meeting.totalColumns;
                     const leftPosition = meeting.column * columnWidth;
+
+                    const isMultiDayStart = meeting.multiDayPart === 'start';
+                    const isMultiDayEnd = meeting.multiDayPart === 'end';
+                    const borderRadius = isMultiDayStart 
+                      ? 'rounded-t-lg sm:rounded-t-xl rounded-b-none' 
+                      : isMultiDayEnd 
+                      ? 'rounded-b-lg sm:rounded-b-xl rounded-t-none' 
+                      : 'rounded-lg sm:rounded-xl';
 
                     return (
                       <div
                         key={meeting.id}
                         onClick={() => handleMeetingClick(meeting)}
-                        className="absolute rounded-lg sm:rounded-xl px-1 sm:px-2 py-1 sm:py-2 text-xs overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:z-10 hover:scale-105 border-l-2 sm:border-l-3"
+                        className={`absolute ${borderRadius} px-1 sm:px-2 py-1 sm:py-2 text-xs overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:z-10 hover:scale-105 border-l-2 sm:border-l-3`}
                         style={{
-                          top: `${top * pixelPerMinute}px`,
-                          height: `${height * pixelPerMinute}px`,
+                          top: `${topPixels}px`,
+                          height: `${heightPixels}px`,
                           left: `${leftPosition}%`,
                           width: `${columnWidth - 1}%`,
                           backgroundColor: meeting.color + '90',
@@ -122,12 +153,18 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
                           borderLeftWidth: '3px',
                           minHeight: '30px',
                         }}
-                        title={`${meeting.title}\n${meeting.room}\n${meeting.organizer}`}
+                        title={`${meeting.title}\n${meeting.room}\n${meeting.organizer}${meeting.isMultiDay ? '\n(Berlanjut ke hari lain)' : ''}`}
                       >
+                        {meeting.isMultiDay && (
+                          <div className="absolute top-1 right-1 bg-white/90 rounded px-1 py-0.5 text-[8px] sm:text-[9px] font-bold text-slate-700 shadow-sm">
+                            {isMultiDayStart ? '→' : '←'}
+                          </div>
+                        )}
+                        
                         <div className="font-semibold text-slate-900 text-[10px] sm:text-xs line-clamp-2">
                           {meeting.title}
                         </div>
-                        {height * pixelPerMinute > 40 && (
+                        {heightPixels > 40 && (
                           <div className="text-[9px] sm:text-xs text-slate-700 truncate mt-0.5 sm:mt-1 flex items-center gap-0.5 sm:gap-1">
                             <span className="hidden sm:inline">📍</span> 
                             <span className="truncate">{meeting.room}</span>
@@ -143,7 +180,6 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
         </div>
       </div>
 
-      {/* Modal Detail - Responsive */}
       {showModal && selectedMeeting && (
         <div
           className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm p-4"
@@ -158,13 +194,31 @@ const WeekView = ({ weekDays, meetings, timeSlots }) => {
             </h3>
             <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
               <div>📋 <strong>{selectedMeeting.title}</strong></div>
+              {selectedMeeting.isMultiDay && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-2 text-amber-800">
+                  ⚠️ Meeting ini berlanjut ke hari lain
+                  {selectedMeeting.originalStartTime && (
+                    <div className="text-[10px] mt-1">
+                      Mulai: {dateUtils.formatDate(selectedMeeting.originalStartTime)}
+                    </div>
+                  )}
+                  {selectedMeeting.originalEndTime && (
+                    <div className="text-[10px]">
+                      Selesai: {dateUtils.formatDate(selectedMeeting.originalEndTime)}
+                    </div>
+                  )}
+                </div>
+              )}
               <div>📅 {dateUtils.formatDate(selectedMeeting.startTime)}</div>
               <div>🕐 {selectedMeeting.time}</div>
               <div>📍 {selectedMeeting.room || 'Tidak diketahui'}</div>
               <div>👤 {selectedMeeting.organizer || 'Tidak diketahui'}</div>
             </div>
             <button
-              className="mt-4 sm:mt-5 w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
+              className="mt-4 sm:mt-5 w-full text-white font-semibold py-2 rounded-lg transition-all hover:opacity-90 text-sm sm:text-base"
+              style={{ 
+                backgroundColor: 'var(--color-primary, #ff751a)',
+              }}
               onClick={() => setShowModal(false)}
             >
               Tutup

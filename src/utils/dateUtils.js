@@ -47,14 +47,12 @@ export const dateUtils = {
     },
 
     getWeekDays: (baseDate, startFromMonday = true) => {
-        const dayOfWeek = baseDate.getDay(); // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
+        const dayOfWeek = baseDate.getDay();
         let weekStart = new Date(baseDate);
 
         if (startFromMonday) {
-            // Geser ke Senin
             weekStart.setDate(baseDate.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
         } else {
-            // Geser ke Minggu
             weekStart.setDate(baseDate.getDate() - dayOfWeek);
         }
 
@@ -92,5 +90,11 @@ export const dateUtils = {
         }
 
         return days;
-    }
+    },
+    toLocalDateString: (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    },
 };

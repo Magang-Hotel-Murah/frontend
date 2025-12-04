@@ -16,28 +16,41 @@ const Header = ({
   return (
     <div className="border-b border-slate-200 p-3 sm:p-4 flex-shrink-0 bg-gradient-to-r from-white to-slate-50">
       {/* Top Row - Title and Navigation */}
-      <div className="flex items-center justify-between mb-3 gap-2">
+      <div className="relative flex items-center justify-between mb-3 gap-2">
         {/* Mobile Menu Button */}
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
+          className="lg:hidden p-2 rounded-lg transition-all hover:opacity-80 flex-shrink-0"
+          style={{ 
+            backgroundColor: 'var(--color-primary-light, rgba(59, 130, 246, 0.1))',
+            color: 'var(--color-primary, #ff751a)'
+          }}
           aria-label="Open menu"
         >
-          <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
 
-        {/* Title - Responsive sizing */}
-        <h2 className="absolute left-1/2 transform -translate-x-1/2 text-base sm:text-lg lg:text-xl font-semibold text-slate-900 truncate">
+        {/* Title - Centered with proper spacing */}
+        <h2 className="
+          absolute left-1/2 -translate-x-1/2 
+          text-center text-base sm:text-lg lg:text-xl font-semibold 
+          text-slate-900 truncate px-2 lg:px-4
+        ">
           {displayTitle}
         </h2>
+
 
         {/* Navigation Controls */}
         <div className="flex gap-1 sm:gap-2 flex-shrink-0">
           <button 
             onClick={() => onNavigate(-1)}
-            className="p-1.5 sm:p-2 hover:bg-slate-100 rounded text-slate-600 hover:text-slate-900 transition-colors"
+            className="p-1.5 sm:p-2 rounded transition-all hover:opacity-80"
+            style={{ 
+              backgroundColor: 'var(--color-primary-light, rgba(59, 130, 246, 0.1))',
+              color: 'var(--color-primary, #ff751a)'
+            }}
             aria-label="Previous"
           >
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -47,7 +60,8 @@ const Header = ({
           
           <button 
             onClick={onGoToCurrentPeriod}
-            className="hidden sm:block px-3 lg:px-4 py-1.5 lg:py-2 bg-slate-100 rounded text-xs lg:text-sm font-medium text-slate-900 hover:bg-slate-200 transition-colors whitespace-nowrap"
+            className="hidden sm:block px-3 lg:px-4 py-1.5 lg:py-2 rounded text-xs lg:text-sm font-medium text-white transition-all hover:opacity-90 whitespace-nowrap"
+            style={{ backgroundColor: 'var(--color-primary, #ff751a)' }}
           >
             {filterType === 'week' ? 'This Week' : filterType === 'month' ? 'This Month' : 'This Year'}
           </button>
@@ -55,7 +69,11 @@ const Header = ({
           
           <button 
             onClick={() => onNavigate(1)}
-            className="p-1.5 sm:p-2 hover:bg-slate-100 rounded text-slate-600 hover:text-slate-900 transition-colors"
+            className="p-1.5 sm:p-2 rounded transition-all hover:opacity-80"
+            style={{ 
+              backgroundColor: 'var(--color-primary-light, rgba(59, 130, 246, 0.1))',
+              color: 'var(--color-primary, #ff751a)'
+            }}
             aria-label="Next"
           >
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

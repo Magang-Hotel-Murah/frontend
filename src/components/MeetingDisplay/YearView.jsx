@@ -17,7 +17,12 @@ const YearView = ({ selectedDate, meetings, onGoToMonth }) => {
   return (
     <>
       {/* Grid Tahun */}
-      <div className="p-2 sm:p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 overflow-y-auto h-full bg-gradient-to-br from-slate-50 to-blue-50/20">
+      <div 
+        className="p-2 sm:p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 overflow-y-auto h-full"
+        style={{
+          background: 'linear-gradient(to bottom right, rgb(248, 250, 252), rgba(var(--color-primary-rgb, 59, 130, 246), 0.05))'
+        }}
+      >
         {Array.from({ length: 12 }).map((_, i) => {
           const monthDate = new Date(selectedDate.getFullYear(), i, 1);
           const monthMeetings = meetings.filter(
@@ -31,15 +36,42 @@ const YearView = ({ selectedDate, meetings, onGoToMonth }) => {
               key={i}
               onClick={() => handleMonthClick(monthDate, monthMeetings, i)}
               className="group relative border border-slate-200 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:shadow-xl transition-all duration-300 bg-white/95 backdrop-blur-sm hover:-translate-y-1 overflow-hidden cursor-pointer"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-primary-light)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgb(226, 232, 240)';
+              }}
             >
               {/* Card month content */}
-              <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-bl-full"></div>
+              <div 
+                className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 rounded-bl-full"
+                style={{
+                  background: 'linear-gradient(to bottom right, var(--color-primary-light, rgba(59, 130, 246, 0.1)), var(--color-primary-medium, rgba(59, 130, 246, 0.2)))'
+                }}
+              ></div>
               <div className="relative">
                 <div className="flex items-center justify-between mb-2 sm:mb-3">
-                  <h4 className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-blue-600 transition-colors">
+                  <h4 
+                    className="font-bold text-sm sm:text-base transition-colors"
+                    style={{ 
+                      color: 'rgb(15, 23, 42)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'var(--color-primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'rgb(15, 23, 42)';
+                    }}
+                  >
                     {dateUtils.getMonthName(monthDate)}
                   </h4>
-                  <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
+                  <span 
+                    className="px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg text-white shadow-sm"
+                    style={{ 
+                      background: 'linear-gradient(to right, var(--color-primary, #ff751a), var(--color-primary-dark, #2563EB))' 
+                    }}
+                  >
                     {monthMeetings.length}
                   </span>
                 </div>
@@ -56,7 +88,8 @@ const YearView = ({ selectedDate, meetings, onGoToMonth }) => {
                   {monthMeetings.length > (window.innerWidth < 640 ? 2 : 4) && (
                     <button
                       type="button"
-                      className="text-[10px] sm:text-xs text-blue-600 text-right font-semibold pt-1 underline hover:text-blue-800 w-full"
+                      className="text-[10px] sm:text-xs text-right font-semibold pt-1 underline hover:opacity-70 w-full transition-all"
+                      style={{ color: 'var(--color-primary, #ff751a)' }}
                       onClick={() => console.log('Tampilkan semua meeting')}
                     >
                       +{monthMeetings.length - (window.innerWidth < 640 ? 2 : 4)} lainnya
@@ -112,7 +145,8 @@ const YearView = ({ selectedDate, meetings, onGoToMonth }) => {
             {/* Tombol pergi ke bulan */}
             {onGoToMonth && selectedMonthIndex !== null && (
               <button
-                className="mt-4 sm:mt-5 w-full bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition text-sm sm:text-base"
+                className="mt-4 sm:mt-5 w-full text-white font-semibold py-2 rounded-lg transition-all hover:opacity-90 text-sm sm:text-base"
+                style={{ backgroundColor: 'var(--color-primary, #10B981)' }}
                 onClick={() => {
                   onGoToMonth(selectedMonthIndex, selectedDate.getFullYear());
                   setShowModal(false);
@@ -123,7 +157,8 @@ const YearView = ({ selectedDate, meetings, onGoToMonth }) => {
             )}
 
             <button
-              className="mt-2 sm:mt-3 w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
+              className="mt-2 sm:mt-3 w-full text-white font-semibold py-2 rounded-lg transition-all hover:opacity-90 text-sm sm:text-base"
+              style={{ backgroundColor: 'var(--color-primary, #ff751a)' }}
               onClick={() => setShowModal(false)}
             >
               Tutup

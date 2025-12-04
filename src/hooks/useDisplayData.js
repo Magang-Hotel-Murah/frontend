@@ -66,8 +66,8 @@ const buildQueryString = (filterParams) => {
         const start = new Date(currentWeekStart);
         const end = new Date(start);
         end.setDate(start.getDate() + 6);
-        startStr = start.toISOString().split("T")[0];
-        endStr = end.toISOString().split("T")[0];
+        startStr = dateUtils.toLocalDateString(start);
+        endStr = dateUtils.toLocalDateString(end);
     } else if (filterType === "month" && selectedYear !== undefined && selectedMonth !== undefined) {
         const end = new Date(selectedYear, selectedMonth + 1, 0);
         startStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`;
@@ -88,7 +88,6 @@ const buildQueryString = (filterParams) => {
     return `?${params.toString()}`;
 };
 
-// Hook untuk fetch meetings berdasarkan filter
 export const useDisplayMeetings = (companyCode, filterParams) => {
     const queryString = buildQueryString(filterParams);
 
@@ -109,7 +108,7 @@ export const useDisplayMeetings = (companyCode, filterParams) => {
                 throw new Error("Kode perusahaan tidak ditemukan atau tidak memiliki data reservasi.");
             }
 
-            const companyName = response.data.reservations[0]?.company?.name || 'Company';
+            const companyName = response.data.company_name || 'Company';
             const meetings = formatMeetings(response.data.reservations);
             const rooms = response.data.all_rooms;
 
@@ -122,7 +121,6 @@ export const useDisplayMeetings = (companyCode, filterParams) => {
     });
 };
 
-// Hook untuk fetch meetings hari ini dan besok
 export const useTodayTomorrowMeetings = (companyCode) => {
     return useQuery({
         queryKey: ['todayTomorrowMeetings', companyCode],
@@ -132,8 +130,8 @@ export const useTodayTomorrowMeetings = (companyCode) => {
             tomorrow.setDate(tomorrow.getDate() + 1);
 
             const params = new URLSearchParams();
-            params.append("start_date", today.toISOString().split("T")[0]);
-            params.append("end_date", tomorrow.toISOString().split("T")[0]);
+            params.append("start_date", dateUtils.toLocalDateString(today));
+            params.append("end_date", dateUtils.toLocalDateString(tomorrow));
 
             const response = await ApiService.displayReservation(companyCode, `?${params.toString()}`);
 
@@ -172,10 +170,9 @@ export const useSyncFilterToUrl = (filterParams) => {
             const start = new Date(filterParams.currentWeekStart);
             const end = new Date(start);
             end.setDate(start.getDate() + 6);
-            startStr = start.toISOString().split('T')[0];
-            endStr = end.toISOString().split('T')[0];
+            startStr = dateUtils.toLocalDateString(start);
+            endStr = dateUtils.toLocalDateString(end);
         } else if (filterParams.filterType === 'month' && filterParams.selectedYear !== undefined && filterParams.selectedMonth !== undefined) {
-            // Format manual untuk menghindari timezone issue
             const lastDay = new Date(filterParams.selectedYear, filterParams.selectedMonth + 1, 0).getDate();
             startStr = `${filterParams.selectedYear}-${String(filterParams.selectedMonth + 1).padStart(2, '0')}-01`;
             endStr = `${filterParams.selectedYear}-${String(filterParams.selectedMonth + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
@@ -192,7 +189,6 @@ export const useSyncFilterToUrl = (filterParams) => {
         const newSearch = params.toString();
         const currentSearch = location.search.substring(1);
 
-        // Only navigate if the search params actually changed
         if (newSearch !== currentSearch) {
             navigate(`${location.pathname}?${newSearch}`, { replace: true });
         }
