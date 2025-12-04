@@ -2,60 +2,46 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
 class ApiService {
   async request(endpoint, options = {}) {
-  const token = localStorage.getItem("token");
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  const isFormData = options.body instanceof FormData;
-  
-  const config = {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-      ...(!isFormData && { "Content-Type": "application/json" }),
-    },
-    ...options,
-  };
-
-<<<<<<< HEAD
-  if (config.body && !isFormData && typeof config.body !== "string") {
-    config.body = JSON.stringify(config.body);
-  }
-=======
+    const token = localStorage.getItem("token");
     const url = `${API_BASE_URL}${endpoint}`;
+
+    const isFormData = options.body instanceof FormData;
+
     const config = {
       headers: {
-        "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": "true"
+        "ngrok-skip-browser-warning": "true",
+        ...(!isFormData && { "Content-Type": "application/json" }),
       },
       ...options,
     };
->>>>>>> 65b88578d9db9fb003a4d16fe0d3049032924560
 
-  const response = await fetch(url, config);
+    if (config.body && !isFormData && typeof config.body !== "string") {
+      config.body = JSON.stringify(config.body);
+    }
 
-<<<<<<< HEAD
-  if (response.status === 401) {
-    const publicEndpoints = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/activate-account'];
-    const isPublicEndpoint = publicEndpoints.some(ep => endpoint.includes(ep));
-    
-    if (isPublicEndpoint) {
-      let errorMessage = "Invalid credentials";
-=======
     const response = await fetch(url, config);
 
     if (response.status === 401) {
-      const publicEndpoints = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/activate-account'];
-      const isPublicEndpoint = publicEndpoints.some(ep => endpoint.includes(ep));
+      const publicEndpoints = [
+        "/login",
+        "/register",
+        "/forgot-password",
+        "/reset-password",
+        "/verify-email",
+        "/activate-account",
+      ];
+      const isPublicEndpoint = publicEndpoints.some((ep) =>
+        endpoint.includes(ep)
+      );
 
       if (isPublicEndpoint) {
         let errorMessage = "Invalid credentials";
         try {
           const errData = await response.json();
           errorMessage = errData.message || errorMessage;
-        } catch {
-        }
+        } catch {}
         throw new Error(errorMessage);
       } else {
         localStorage.removeItem("token");
@@ -69,48 +55,28 @@ class ApiService {
 
     if (!response.ok) {
       let errorMessage = `HTTP error! status: ${response.status}`;
->>>>>>> 65b88578d9db9fb003a4d16fe0d3049032924560
+      let errorDetails = null;
+
       try {
         const errData = await response.json();
+        errorDetails = errData;
         errorMessage = errData.message || errorMessage;
       } catch {}
+
       throw new Error(errorMessage);
-    } else {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("token_expiry");
-      
-      window.location.href = "/login";
-      throw new Error("Session expired. Please login again.");
     }
-  }
 
-  if (!response.ok) {
-    let errorMessage = `HTTP error! status: ${response.status}`;
-    let errorDetails = null;
-    
-    try {
-      const errData = await response.json();
-      errorDetails = errData;
-      errorMessage = errData.message || errorMessage;
-  
-    } catch {}
-    
-    
-    throw new Error(errorMessage);
-  }
+    if (response.status === 204) {
+      return null;
+    }
 
-  if (response.status === 204) {
-    return null;
-  }
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return { success: true, message: "Request berhasil!" };
+    }
 
-  const contentType = response.headers.get("content-type");
-  if (!contentType || !contentType.includes("application/json")) {
-    return { success: true, message: "Request berhasil!" };
+    return response.json();
   }
-
-  return response.json();
-}
 
   async getCurrentUser() {
     return this.request("/auth/me");
@@ -264,7 +230,7 @@ class ApiService {
   async deleteDivision(id) {
     return this.request(`/divisions/${id}`, {
       method: "DELETE",
-    })
+    });
   }
 
   //POSITION
