@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Pagination } from "@common";
 import { Table, Filter } from "@contentbooking";
 import { AlertStyles } from "@alert";
-import { paginateData, filterBySearch } from "@utils";
+import { filterBySearch } from "@utils";
 import { Detail } from "@bookings";
 import { useGetReservations } from "@hooks/reservation-meeting-room/useGetReservations";
 import { useGetRooms } from "@hooks/meeting-room/useGetRooms";
@@ -10,8 +10,15 @@ import { useDeleteReservation } from "@hooks/reservation-meeting-room/useDeleteR
 import { useUpdateReservationStatus } from "@hooks/reservation-meeting-room/useUpdateReservationStatus";
 
 export const Content = ({ user }) => {
-  const { data: reservations = [], isLoading: reservationLoading } =
-    useGetReservations();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data: reservationResponse, isLoading: reservationLoading } =
+    useGetReservations(currentPage);
+
+  const reservations = reservationResponse?.data || [];
+  const totalPages = reservationResponse?.last_page || 1;
+  const totalItems = reservationResponse?.total || 0;
+
   const { data: rooms = [], isLoading: roomLoading } = useGetRooms();
   const { mutateAsync: deleteReservation } = useDeleteReservation();
   const { mutate: updateStatus, isPending: isUpdating } =
@@ -27,7 +34,6 @@ export const Content = ({ user }) => {
   const [filterStatus, setFilterStatus] = useState("");
   const [filterRoom, setFilterRoom] = useState("");
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
   const handleOpenModal = (mode, reservation = null) => {
@@ -61,12 +67,6 @@ export const Content = ({ user }) => {
     return matchesStatus && matchesRoom;
   });
 
-  const { currentData: currentReservations, totalPages } = paginateData(
-    filteredReservations,
-    currentPage,
-    itemsPerPage
-  );
-
   return (
     <>
       <AlertStyles />
@@ -85,7 +85,7 @@ export const Content = ({ user }) => {
 
         <Table
           user={user}
-          reservations={currentReservations}
+          reservations={filteredReservations}
           onDetail={(reservations) => handleOpenModal("detail", reservations)}
           onApprove={(id) => handleUpdateStatus(id, "approved")}
           onReject={(id) => handleUpdateStatus(id, "rejected")}
@@ -98,7 +98,7 @@ export const Content = ({ user }) => {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
           itemsPerPage={itemsPerPage}
-          totalItems={filteredReservations.length}
+          totalItems={totalItems}
         />
 
         {isModalOpen && selectedReservation && (

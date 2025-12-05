@@ -22,9 +22,12 @@ const Update = () => {
     parent_id: "",
     capacity: "",
     facilities: [],
-    
+    images: [],
+    images_to_remove: [],
+    replace_images: false,
   });
   const [facilityInput, setFacilityInput] = useState("");
+  const [newImageFiles, setNewImageFiles] = useState([]);
   const [errors, setErrors] = useState({});
 
   const loading = updateRoom.isPending || roomsLoading || roomLoading;
@@ -51,6 +54,9 @@ const Update = () => {
         parent_id: roomData.parent_id || "",
         capacity: roomData.capacity || "",
         facilities: roomData.facilities || [],
+        images: roomData.images || [],
+        images_to_remove: [],
+        replace_images: false,
       });
     }
   }, [roomData]);
@@ -100,6 +106,55 @@ const Update = () => {
     }));
   };
 
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    
+    // Validasi ukuran dan tipe file
+    const validFiles = files.filter(file => {
+      const isValidType = ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type);
+      const isValidSize = file.size <= 2048 * 1024; // 2MB
+      
+      if (!isValidType) {
+        setErrors(prev => ({...prev, images: 'Format gambar harus JPG, JPEG, atau PNG'}));
+        return false;
+      }
+      if (!isValidSize) {
+        setErrors(prev => ({...prev, images: 'Ukuran gambar maksimal 2MB'}));
+        return false;
+      }
+      return true;
+    });
+
+    setNewImageFiles(prev => [...prev, ...validFiles]);
+    
+    if (errors.images) {
+      setErrors(prev => {
+        const newErr = { ...prev };
+        delete newErr.images;
+        return newErr;
+      });
+    }
+  };
+
+  const removeExistingImage = (imageUrl) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter(img => img !== imageUrl),
+      images_to_remove: [...prev.images_to_remove, imageUrl],
+    }));
+  };
+
+  const removeNewImage = (index) => {
+    setNewImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleReplaceImagesToggle = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      replace_images: e.target.checked
+    }));
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -130,29 +185,67 @@ const Update = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const submitData = {
-      ...formData,
-      capacity: parseInt(formData.capacity),
-      parent_id: formData.parent_id ? parseInt(formData.parent_id) : null,
-      facilities: formData.facilities.length > 0 ? formData.facilities : [],
-    };
+    // Buat FormData untuk mendukung file upload
+    const submitData = new FormData();
 
-    Object.keys(submitData).forEach((key) => {
-      if (
-        submitData[key] === "" ||
-        (submitData[key] === null && key !== "parent_id")
-      ) {
-        delete submitData[key];
-      }
-    });
+    // Append data biasa
+    submitData.append('name', formData.name);
+    submitData.append('type', formData.type);
+    submitData.append('capacity', parseInt(formData.capacity));
+    
+    if (formData.location) {
+      submitData.append('location', formData.location);
+    }
+
+    if (formData.type === 'sub' && formData.parent_id) {
+      submitData.append('parent_id', parseInt(formData.parent_id));
+    }
+
+    // Append facilities
+    if (formData.facilities.length > 0) {
+      formData.facilities.forEach((facility, index) => {
+        submitData.append(`facilities[${index}]`, facility);
+      });
+    }
+
+    // Append images to remove
+    if (formData.images_to_remove.length > 0) {
+      formData.images_to_remove.forEach((url, index) => {
+        submitData.append(`images_to_remove[${index}]`, url);
+      });
+    }
+
+    // Append new image files
+    if (newImageFiles.length > 0) {
+      newImageFiles.forEach((file) => {
+        submitData.append('images[]', file);
+      });
+    }
+
+    // Append replace_images flag
+    submitData.append('replace_images', formData.replace_images ? 'true' : 'false');
 
     try {
       await updateRoom.mutateAsync({ id, updatedData: submitData });
       navigate("/room");
     } catch (error) {
-      setErrors({
-        submit: error.message || "Terjadi kesalahan saat mengupdate data",
-      });
+      const errorMessage = error.response?.data?.message || error.message || "Terjadi kesalahan saat mengupdate data";
+      
+      // Handle validation errors dari backend
+      if (error.response?.data?.errors) {
+        const backendErrors = error.response.data.errors;
+        const formattedErrors = {};
+        
+        Object.keys(backendErrors).forEach(key => {
+          formattedErrors[key] = Array.isArray(backendErrors[key]) 
+            ? backendErrors[key][0] 
+            : backendErrors[key];
+        });
+        
+        setErrors(formattedErrors);
+      } else {
+        setErrors({ submit: errorMessage });
+      }
     }
   };
 
@@ -168,10 +261,15 @@ const Update = () => {
       companyName={companyName}
       filteredMainRooms={filteredMainRooms}
       facilityInput={facilityInput}
+      newImageFiles={newImageFiles}
       onInputChange={handleInputChange}
       onFacilityInputChange={handleFacilityInputChange}
       onAddFacility={addFacility}
       onRemoveFacility={removeFacility}
+      onImageUpload={handleImageUpload}
+      onRemoveExistingImage={removeExistingImage}
+      onRemoveNewImage={removeNewImage}
+      onReplaceImagesToggle={handleReplaceImagesToggle}
       onSubmit={handleSubmit}
       onCancel={handleCancel}
     />

@@ -1,22 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
-import { X, Search, ChevronDown, DoorOpen, Users, MapPin, Maximize2 } from "lucide-react";
+import {
+  X,
+  Search,
+  ChevronDown,
+  DoorOpen,
+  Users,
+  MapPin,
+  Maximize2,
+} from "lucide-react";
 
 const ImageModal = ({ imageUrl, roomName, onClose }) => {
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    document.addEventListener('keydown', handleEscape);
-    document.body.style.overflow = 'hidden';
-    
+    document.addEventListener("keydown", handleEscape);
+    document.body.style.overflow = "hidden";
+
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [onClose]);
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[9999] bg-black bg-opacity-90 flex items-center justify-center p-4"
       onClick={onClose}
     >
@@ -26,14 +34,19 @@ const ImageModal = ({ imageUrl, roomName, onClose }) => {
       >
         <X className="w-6 h-6 text-gray-800" />
       </button>
-      
-      <div className="max-w-7xl max-h-full" onClick={(e) => e.stopPropagation()}>
+
+      <div
+        className="max-w-7xl max-h-full"
+        onClick={(e) => e.stopPropagation()}
+      >
         <img
           src={imageUrl}
           alt={roomName}
           className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
         />
-        <p className="text-white text-center mt-4 text-lg font-medium">{roomName}</p>
+        <p className="text-white text-center mt-4 text-lg font-medium">
+          {roomName}
+        </p>
       </div>
     </div>
   );
@@ -85,9 +98,9 @@ const SearchableRoomDropdown = ({ rooms, value, onChange, placeholder }) => {
           <span className={selectedRoom ? "text-gray-900" : "text-gray-400"}>
             {selectedRoom ? (
               <div className="flex items-center gap-3">
-                {selectedRoom.images && (
+                {selectedRoom.images?.length > 0 && (
                   <img
-                    src={selectedRoom.images}
+                    src={selectedRoom.images[0]}
                     alt={selectedRoom.name}
                     className="w-10 h-10 rounded object-cover"
                   />
@@ -104,7 +117,11 @@ const SearchableRoomDropdown = ({ rooms, value, onChange, placeholder }) => {
               placeholder || "Pilih Ruangan"
             )}
           </span>
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            className={`w-4 h-4 text-gray-400 transition-transform ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          />
         </button>
 
         {isOpen && (
@@ -144,17 +161,24 @@ const SearchableRoomDropdown = ({ rooms, value, onChange, placeholder }) => {
                       {room.images && (
                         <div className="relative flex-shrink-0">
                           <img
-                            src={room.images}
+                            src={
+                              Array.isArray(room.images)
+                                ? room.images[0]
+                                : room.images?.includes(",")
+                                ? room.images.split(",")[0]
+                                : room.images
+                            }
                             alt={room.name}
                             className="w-20 h-20 rounded-lg object-cover border border-gray-200"
                           />
-                          <button
-                            type="button"
+                          <div
+                            role="button"
+                            tabIndex={0}
                             onClick={(e) => handleImageClick(e, room)}
                             className="absolute inset-0 bg-opacity-0 hover:bg-opacity-40 transition-all rounded-lg flex items-center justify-center group-hover:bg-opacity-20"
                           >
                             <Maximize2 className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </button>
+                          </div>
                         </div>
                       )}
 
@@ -162,7 +186,7 @@ const SearchableRoomDropdown = ({ rooms, value, onChange, placeholder }) => {
                         <div className="font-medium text-gray-900 mb-1">
                           {room.name}
                         </div>
-                        
+
                         <div className="space-y-1">
                           {room.location && (
                             <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -170,7 +194,7 @@ const SearchableRoomDropdown = ({ rooms, value, onChange, placeholder }) => {
                               <span>{room.location}</span>
                             </div>
                           )}
-                          
+
                           <div className="flex items-center gap-1 text-xs text-gray-500">
                             <Users className="w-3 h-3" />
                             <span>Kapasitas: {room.capacity} orang</span>
@@ -178,14 +202,16 @@ const SearchableRoomDropdown = ({ rooms, value, onChange, placeholder }) => {
 
                           {room.facilities && room.facilities.length > 0 && (
                             <div className="flex flex-wrap gap-1 mt-2">
-                              {room.facilities.slice(0, 3).map((facility, idx) => (
-                                <span
-                                  key={idx}
-                                  className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs"
-                                >
-                                  {facility}
-                                </span>
-                              ))}
+                              {room.facilities
+                                .slice(0, 3)
+                                .map((facility, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs"
+                                  >
+                                    {facility}
+                                  </span>
+                                ))}
                               {room.facilities.length > 3 && (
                                 <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
                                   +{room.facilities.length - 3}
@@ -211,7 +237,13 @@ const SearchableRoomDropdown = ({ rooms, value, onChange, placeholder }) => {
 
       {selectedImageModal && (
         <ImageModal
-          imageUrl={selectedImageModal.images}
+          imageUrl={
+            Array.isArray(selectedImageModal.images)
+              ? selectedImageModal.images[0]
+              : selectedImageModal.images?.includes(",")
+              ? selectedImageModal.images.split(",")[0]
+              : selectedImageModal.images
+          }
           roomName={selectedImageModal.name}
           onClose={() => setSelectedImageModal(null)}
         />

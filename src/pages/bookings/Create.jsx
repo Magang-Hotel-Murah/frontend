@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCreateReservation } from "@hooks/reservation-meeting-room";
+import {
+  useCreateReservation,
+  useGetReservations,
+} from "@hooks/reservation-meeting-room";
 import { useGetPosition } from "@hooks/position";
 import { useGetDivisions } from "@hooks/division";
 import { useGetRooms } from "@hooks/meeting-room";
@@ -47,12 +50,42 @@ const Create = () => {
   const [newSnack, setNewSnack] = useState("");
   const [newEquipment, setNewEquipment] = useState("");
 
+  // Fetch reservations based on selected room
+  const {
+    data: existingReservations = [],
+    isLoading: reservationsLoading,
+    refetch: refetchReservations,
+  } = useGetReservations(
+    formData.meeting_room_id
+      ? { meeting_room_id: formData.meeting_room_id }
+      : {},
+    { enabled: !!formData.meeting_room_id } // Only fetch when room is selected
+  );
+
+  // Refetch reservations when room changes
+  useEffect(() => {
+    if (formData.meeting_room_id) {
+      refetchReservations();
+    }
+  }, [formData.meeting_room_id, refetchReservations]);
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+
+    // If room changes, reset date/time selections
+    if (name === "meeting_room_id") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+        start_time: "", // Reset start time when room changes
+        end_time: "", // Reset end time when room changes
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
 
     if (errors[name]) {
       setErrors((prev) => {
@@ -205,6 +238,17 @@ const Create = () => {
       if (end <= start) {
         newErrors.datetime = "Waktu selesai harus lebih dari waktu mulai";
       }
+
+      // Check for reservation conflicts
+      const hasConflict = existingReservations.some((reservation) => {
+        const resStart = new Date(reservation.start_time);
+        const resEnd = new Date(reservation.end_time);
+        return start < resEnd && end > resStart;
+      });
+
+      if (hasConflict) {
+        newErrors.datetime = "Waktu yang dipilih bentrok dengan reservasi lain";
+      }
     }
 
     if (
@@ -239,41 +283,41 @@ const Create = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     try {
       const jsonData = {
-        meeting_room_id: parseInt(formData.meeting_room_id),
+        meeting_room_id: Number(formData.meeting_room_id),
         title: formData.title,
-        description: formData.description,
+        description: formData.description || null,
         start_time: formData.start_time,
         end_time: formData.end_time,
-        participants: formData.participants,
-        division_ids: formData.division_ids,
-        position_ids: formData.position_ids,
-        all_users: formData.all_users,
+
+        participants: formData.participants ?? [],
+        division_ids: formData.division_ids ?? [],
+        position_ids: formData.position_ids ?? [],
+        all_users: Boolean(formData.all_users),
+
         request: {
-          funds_amount: parseInt(formData.request.funds_amount) || 0,
-          funds_reason: formData.request.funds_reason,
-          snacks: formData.request.snacks,
-          equipment: formData.request.equipment,
+          funds_amount: Number(formData.request?.funds_amount) || 0,
+          funds_reason: formData.request?.funds_reason || null,
+          snacks: formData.request?.snacks || null,
+          equipment: formData.request?.equipment || null,
         },
       };
 
-      const response = await createReservation(jsonData);
+      console.log("body", jsonData);
 
-      setErrors({});
+      await createReservation(jsonData);
 
-      // Reset form atau redirect setelah sukses
-      // navigate('/reservations'); // jika menggunakan react-router
-      // atau reset form:
-      // resetForm();
+      handleReset();
+      navigate("/reservations");
     } catch (error) {
       setErrors({
         submit: error.message || "Terjadi Kesalahan saat menyimpan data",
-      })
+      });
     }
   };
 
@@ -302,8 +346,9 @@ const Create = () => {
       email: "",
       whatsapp_number: "",
     });
+    setNewSnack("");
     setNewEquipment("");
-    setNewParticipant("");
+    setErrors({});
   };
 
   return (
@@ -333,6 +378,8 @@ const Create = () => {
       rooms={room}
       loading={loading}
       onReset={handleReset}
+      existingReservations={existingReservations}
+      reservationsLoading={reservationsLoading}
     />
   );
 };

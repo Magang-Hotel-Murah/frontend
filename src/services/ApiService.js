@@ -268,8 +268,8 @@ class ApiService {
   }
 
   //RESERVATION MEETING ROOM
-  async getReservations() {
-    return this.request("/meeting-room-reservations");
+  async getReservations(page = 1) {
+    return this.request(`/meeting-room-reservations?page=${page}`);
   }
 
   async getReservationsByRoom(roomId) {

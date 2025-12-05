@@ -33,16 +33,19 @@ const CreateForm = ({
   setNewEquipment,
   onReset,
   errors,
+  existingReservations,
+  reservationsLoading,
 }) => {
   return (
     <div className="mx-auto p-1">
-
       <div className="space-y-6">
         <InformationForm
           rooms={rooms}
           formData={formData}
           handleInputChange={handleInputChange}
           errors={errors}
+          existingReservations={existingReservations}
+          reservationsLoading={reservationsLoading}
         />
 
         <ParticipantForm
