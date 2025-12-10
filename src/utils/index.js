@@ -10,3 +10,4 @@ export {
     getStatusTableBooking,
     getTypeColor,
 } from './color';
+export * from './dateUtils';

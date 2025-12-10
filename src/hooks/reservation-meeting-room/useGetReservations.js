@@ -7,7 +7,6 @@ export const useGetReservations = (page = 1) => {
 
     queryFn: async () => {
       const response = await ApiService.getReservations(page);
-      console.log("RESPONSE API:", response);
       return response?.data || {};
     },
     staleTime: 5 * 60 * 1000,
