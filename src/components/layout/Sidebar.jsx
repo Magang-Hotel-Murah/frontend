@@ -8,6 +8,7 @@ import {
   UserPlus,
   Presentation,
   Cast,
+  GitPullRequest,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
@@ -31,6 +32,9 @@ const Sidebar = ({
         break;
       case "/organization":
         setActiveMenu("organizations");
+        break;
+      case "/request":
+        setActiveMenu("requests");
         break;
       case "/room":
         setActiveMenu("room");
@@ -59,6 +63,9 @@ const Sidebar = ({
         break;
       case "organizations":
         navigate("/organization");
+        break;
+      case "requests":
+        navigate("/request");
         break;
       case "room":
         navigate("/room");
@@ -104,8 +111,10 @@ const Sidebar = ({
     ],
     finance_officer: [
       { id: "home", name: "Home", icon: Home },
-      { id: "reports", name: "Laporan Keuangan", icon: BarChart3 },
-      { id: "settings", name: "Pengaturan", icon: Settings },
+      { id: "requests", name: "Permintaan", icon: GitPullRequest},
+      { id: "room", name: "Ruangan", icon: Presentation },
+      { id: "bookings", name: "Reservasi", icon: Book },
+      { id: "settings", name: "Pengaturan", icon: Settings},
     ],
     support_staff: [
       { id: "home", name: "Home", icon: Home },
@@ -115,11 +124,11 @@ const Sidebar = ({
   };
 
   if (isLoading) {
-    return null; // atau tampilkan skeleton sidebar
+    return null;
   }
 
   if (!user) {
-    return null; // hindari render sebelum user tersedia
+    return null;
   }
 
   if (user.role === "employee") {

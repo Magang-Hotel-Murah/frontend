@@ -16,6 +16,7 @@ import {
   Room,
   Organization,
   Display,
+  Request,
 } from "@pages";
 import {
   Login,
@@ -45,7 +46,6 @@ const App = () => {
 
   const isAuthenticated = !!user && !isError;
 
-  // Helper function untuk mendapatkan default route berdasarkan role
   const getDefaultRoute = (user) => {
     if (!user) return "/";
     if (user.role === "employee") return "/booking";
@@ -166,15 +166,30 @@ const App = () => {
         />
 
         <Route
+          path="/request"
+          element={
+            <ProtectedRoute
+              isAuthenticated={isAuthenticated}
+              user={user}
+              allowedRoles={["finance_officer"]}
+            >
+              <MainLayout user={user} onLogout={logout}>
+                <Request />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/room"
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
               user={user}
-              allowedRoles={["company_admin"]}
+              allowedRoles={["company_admin", "finance_officer"]}
             >
               <MainLayout user={user} onLogout={logout}>
-                <Room />
+                <Room user={user}/>
               </MainLayout>
             </ProtectedRoute>
           }
@@ -201,7 +216,7 @@ const App = () => {
             <ProtectedRoute
               isAuthenticated={isAuthenticated}
               user={user}
-              allowedRoles={["super_admin", "company_admin", "employee"]}
+              allowedRoles={["super_admin", "company_admin", "employee", "finance_officer"]}
             >
               <MainLayout user={user} onLogout={logout}>
                 <Booking user={user} />

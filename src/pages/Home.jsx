@@ -9,7 +9,7 @@ import {
   Activity,
 } from "lucide-react";
 import { useGetRooms } from "@hooks/meeting-room";
-import { useGetReservations } from "@hooks/reservation-meeting-room";
+import { useGetReservationAll } from "@hooks/reservation-meeting-room";
 import { useDerivedReservation } from "@hooks/reservation-meeting-room";
 import { Card, StatCard } from "@ui";
 
@@ -18,7 +18,7 @@ const Home = () => {
 
   const { data: meetingRooms, isLoading: isLoadingRooms } = useGetRooms();
   const { data: allReservations, isLoading: isLoadingAll } =
-    useGetReservations();
+    useGetReservationAll();
   const {
     activeReservations,
     todayReservations,

@@ -8,3 +8,4 @@ export { default as Room } from './Room';
 export { default as Organization } from './Organization';
 export { default as Display } from './Display';
 export { default as BotFAB } from './BotFAB';
+export { default as Request } from './Request';

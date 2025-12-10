@@ -26,7 +26,7 @@ const BotFAB = () => {
   // }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 left-6 z-50">
       {/* Expanded Card */}
       {isExpanded && (
         <div className="absolute bottom-16 right-0 mb-2 w-72 bg-white rounded-lg shadow-2xl p-4 animate-in slide-in-from-bottom-5 duration-300">

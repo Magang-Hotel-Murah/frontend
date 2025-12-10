@@ -1,16 +1,14 @@
 import React from "react";
-import {
-  Edit,
-  Trash2,
-  MapPin,
-  UsersRoundIcon,
-  ImageOff,
-} from "lucide-react";
+import { Edit, Trash2, MapPin, UsersRoundIcon, ImageOff } from "lucide-react";
 import { BaseTable } from "@common";
 import { getTypeColor } from "@utils";
 
-const Table = ({ rooms, onDelete, onEdit, loading }) => {
-  const columns = [
+const Table = ({ user, rooms, onDelete, onEdit, loading }) => {
+  const isAdmin = user?.role === "company_admin";
+  const isEmployee = user?.role === "employee";
+  const isFinance = user?.role === "finance_officer";
+
+  const baseColumns = [
     {
       header: "Foto",
 
@@ -100,30 +98,35 @@ const Table = ({ rooms, onDelete, onEdit, loading }) => {
         );
       },
     },
-
-    {
-      header: "Aksi",
-      headerClassName: "text-right",
-      render: (row) => (
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => onEdit(row)}
-            className="p-2 text-primary-500 hover:text-primary-900"
-            title="Edit"
-          >
-            <Edit className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => onDelete(row)}
-            className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-150"
-            title="Hapus"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      ),
-    },
   ];
+
+  const columns = isAdmin
+    ? [
+        ...baseColumns,
+        {
+          header: "Aksi",
+          headerClassName: "text-right",
+          render: (row) => (
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => onEdit(row)}
+                className="p-2 text-primary-500 hover:text-primary-900"
+                title="Edit"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(row)}
+                className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                title="Hapus"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ),
+        },
+      ]
+    : baseColumns;
 
   return (
     <BaseTable

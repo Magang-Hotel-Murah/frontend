@@ -4,3 +4,4 @@ export * from "./useGetReservationById";
 export * from "./useGetReservations";
 export * from "./useUpdateReservationStatus";
 export * from "./useDerivedReservation";
+export * from "./useGetReservationAll";

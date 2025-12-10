@@ -1,32 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content, Create } from "@rooms";
-import { PlusCircleIcon, Presentation } from "lucide-react";
+import { Book, PlusCircleIcon, Presentation } from "lucide-react";
 
-const Room = () => {
+const Room = ({ user }) => {
   const [activeTab, setActiveTab] = useState(() => {
-      const saved = localStorage.getItem("activeTab");
-      if(saved === "room" || saved === "create") {
-        return saved;
-      }
-      return "room";
+    const saved = localStorage.getItem("activeTab");
+
+    if (saved === "room") return "room";
+    if (saved === "create" && user?.role === "company_admin") return "create";
+
+    return "room";
   });
 
   useEffect(() => {
     localStorage.setItem("activeTab", activeTab);
   }, [activeTab]);
 
-  const tabs = [
-    { key: "room", label: "List", icon: Presentation },
-    { key: "create", label: "Baru", icon: PlusCircleIcon },
-  ];
+  const tabs =
+    user?.role === "company_admin"
+      ? [
+          { key: "room", label: "List", icon: Presentation },
+          { key: "create", label: "Baru", icon: PlusCircleIcon },
+        ]
+      : [{ key: "room", label: "List", icon: Book}];
 
   const renderContent = () => {
     switch (activeTab) {
       case "room":
-        return <Content />;
+        return <Content user={user} />;
       case "create":
-        return <Create onSuccess={() => setActiveTab("room")} />;
+        return user?.role === "company_admin" ? (
+          <Create onSuccess={() => setActiveTab("room")} />
+        ) : null;
       default:
         return null;
     }
@@ -42,9 +48,7 @@ const Room = () => {
           variant="underline"
         />
 
-        <div className="mt-5">
-          {renderContent()}
-        </div>
+        <div className="mt-5">{renderContent()}</div>
       </div>
     </div>
   );

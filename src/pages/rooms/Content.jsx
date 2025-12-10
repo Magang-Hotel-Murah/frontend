@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { Pagination } from "@common";
 import { Filter, Table } from "@contentroom";
 import { paginateData, filterBySearch } from "@utils";
@@ -7,7 +7,7 @@ import { useGetRooms } from '@hooks/meeting-room/useGetRooms';
 import { ConfirmationAlert, ToastAlert, AlertStyles } from "@alert";
 import { useNavigate } from "react-router-dom";
 
-export const Content = () => {
+export const Content = ({ user }) => {
   const { data: rooms = [], isLoading } = useGetRooms();
   const { mutateAsync: deleteRoom } = useDeleteRoom();
   const navigate = useNavigate("");
@@ -83,6 +83,7 @@ export const Content = () => {
         <Table
           rooms={currentRooms}
           loading={isLoading}
+          user={user}
           onEdit={(room) => handleEdit("edit", room)}
           onDelete={handleDelete}
         />

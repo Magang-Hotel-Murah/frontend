@@ -15,6 +15,7 @@ const MainLayout = ({ children, user, onLogout }) => {
   const routeToMenuMap = {
     "/home": "home",
     "/organization": "organizations",
+    "/request" : "requests",
     "/booking": "bookings",
     "/room": "room",
     "/invite-user": "invite-user",

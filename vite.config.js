@@ -41,11 +41,13 @@ export default defineConfig({
       '@invite': path.resolve(__dirname, './src/pages/invite'),
       '@home': path.resolve(__dirname, './src/pages/homes'),
       '@organizations': path.resolve(__dirname, './src/pages/organization'),
+      '@requests': path.resolve(__dirname, './src/pages/requests'),
 
       '@contentuser': path.resolve(__dirname, './src/modules/user'),
       '@contentbooking': path.resolve(__dirname, './src/modules/booking'),
       '@contentroom': path.resolve(__dirname, './src/modules/room'),
       '@contentorganization': path.resolve(__dirname, './src/modules/organization'),
+      '@contentrequest': path.resolve(__dirname, './src/modules/requests'),
 
     },
   },

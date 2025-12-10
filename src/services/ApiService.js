@@ -272,6 +272,10 @@ class ApiService {
     return this.request(`/meeting-room-reservations?page=${page}`);
   }
 
+  async getReservationsAll() {
+    return this.request(`/meeting-room-reservations?all=${false}`);
+  }
+
   async getReservationsByRoom(roomId) {
     return this.request(`/meeting-room-reservations/${roomId}`);
   }
@@ -294,6 +298,48 @@ class ApiService {
     });
   }
 
+  //REQUEST RESERVATION
+  async getMeetingRequest(params = {}) {
+    const queryParams = new URLSearchParams();
+
+    const finalParams = {
+      period: 'all',
+      ...params
+    };
+    Object.keys(finalParams).forEach(key => {
+      const value = finalParams[key];
+
+      if(value !== undefined && value !== null &&  value !== ''){
+        queryParams.append(key, value);
+      }
+    });
+
+    const queryString = queryParams.toString();
+    const endpoint = `/meeting-requests${queryString ? `?${queryString}` : ''}`;
+
+    console.log('API Request URL:' , `${API_BASE_URL}${endpoint}`);
+
+    return this.request(endpoint);
+  }
+
+  async getMeetingRequestDetail(id) {
+    return this.request(`/meeting-requests/${id}`)
+  }
+
+  async updateRequestStatus(id, status) {
+    return this.request(`/meeting-requests/${id}/status`, {
+      method: "PUT",
+      body: { status },
+      });
+  }
+
+  async deleteMeetingRequest(id) {
+    return this.request(`/meeting-requests/${id}`, {
+      method: "DELETE",
+    });
+  }
+  
+  //DISPLAY RESERVATION
   async displayReservation(companyCode, filter = "?filter=year") {
     const url = `/meeting-display/${companyCode}${filter}`;
     return this.request(url, {

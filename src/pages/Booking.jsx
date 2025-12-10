@@ -8,7 +8,7 @@ const Booking = ({ user }) => {
     const saved = localStorage.getItem("activeTab");
 
     if (saved === "reservation") return "reservation";
-    if (saved === "create" && user?.role === "employee") return "create";
+    if (saved === "create") return "create";
     if (saved === "request" && user?.role === "employee") return "request";
 
     return "reservation";
@@ -25,14 +25,17 @@ const Booking = ({ user }) => {
           { key: "create", label: "Baru", icon: PlusCircle },
           { key: "request", label: "Permintaan", icon: GitPullRequest },
         ]
-      : [{ key: "reservation", label: "List", icon: Book }];
+      : [
+          { key: "reservation", label: "List", icon: Book },
+          { key: "create", label: "Baru", icon: PlusCircle },
+        ];
 
   const renderContent = () => {
     switch (activeTab) {
       case "reservation":
         return <Content user={user} />;
       case "create":
-        return user?.role === "employee" ? <Create /> : null;
+        return <Create />;
       default:
         return null;
     }
