@@ -5,8 +5,9 @@ export const useUpdateRequestStatus = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, status }) =>
-            ApiService.updateRequestStatus(id, status),
+        mutationFn: ({ id, status, rejection_reason }) =>
+            ApiService.updateRequestStatus(id, status, rejection_reason),
+
         onSuccess: () => {
             queryClient.invalidateQueries(["meetingRequest"]);
         },

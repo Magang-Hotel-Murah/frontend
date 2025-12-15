@@ -33,7 +33,7 @@ const Sidebar = ({
       case "/organization":
         setActiveMenu("organizations");
         break;
-      case "/request":
+      case "/requests":
         setActiveMenu("requests");
         break;
       case "/room":
@@ -65,7 +65,7 @@ const Sidebar = ({
         navigate("/organization");
         break;
       case "requests":
-        navigate("/request");
+        navigate("/requests");
         break;
       case "room":
         navigate("/room");

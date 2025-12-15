@@ -109,10 +109,9 @@ const Update = () => {
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     
-    // Validasi ukuran dan tipe file
     const validFiles = files.filter(file => {
       const isValidType = ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type);
-      const isValidSize = file.size <= 2048 * 1024; // 2MB
+      const isValidSize = file.size <= 2048 * 1024;
       
       if (!isValidType) {
         setErrors(prev => ({...prev, images: 'Format gambar harus JPG, JPEG, atau PNG'}));
@@ -185,10 +184,8 @@ const Update = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    // Buat FormData untuk mendukung file upload
     const submitData = new FormData();
 
-    // Append data biasa
     submitData.append('name', formData.name);
     submitData.append('type', formData.type);
     submitData.append('capacity', parseInt(formData.capacity));
@@ -201,28 +198,24 @@ const Update = () => {
       submitData.append('parent_id', parseInt(formData.parent_id));
     }
 
-    // Append facilities
     if (formData.facilities.length > 0) {
       formData.facilities.forEach((facility, index) => {
         submitData.append(`facilities[${index}]`, facility);
       });
     }
 
-    // Append images to remove
     if (formData.images_to_remove.length > 0) {
       formData.images_to_remove.forEach((url, index) => {
         submitData.append(`images_to_remove[${index}]`, url);
       });
     }
 
-    // Append new image files
     if (newImageFiles.length > 0) {
       newImageFiles.forEach((file) => {
         submitData.append('images[]', file);
       });
     }
 
-    // Append replace_images flag
     submitData.append('replace_images', formData.replace_images ? 'true' : 'false');
 
     try {
@@ -231,7 +224,6 @@ const Update = () => {
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "Terjadi kesalahan saat mengupdate data";
       
-      // Handle validation errors dari backend
       if (error.response?.data?.errors) {
         const backendErrors = error.response.data.errors;
         const formattedErrors = {};

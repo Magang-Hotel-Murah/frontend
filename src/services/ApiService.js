@@ -316,9 +316,7 @@ class ApiService {
 
     const queryString = queryParams.toString();
     const endpoint = `/meeting-requests${queryString ? `?${queryString}` : ''}`;
-
-    console.log('API Request URL:' , `${API_BASE_URL}${endpoint}`);
-
+    
     return this.request(endpoint);
   }
 
@@ -326,10 +324,16 @@ class ApiService {
     return this.request(`/meeting-requests/${id}`)
   }
 
-  async updateRequestStatus(id, status) {
+  async updateRequestStatus(id, status, rejection_reason) {
+    const body = { status};
+
+    if(rejection_reason){
+      body.rejection_reason = rejection_reason
+    }
+
     return this.request(`/meeting-requests/${id}/status`, {
       method: "PUT",
-      body: { status },
+      body: body,
       });
   }
 

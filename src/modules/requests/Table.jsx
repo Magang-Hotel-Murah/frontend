@@ -20,7 +20,6 @@ const Table = ({
   onDelete,
   loading,
 }) => {
-  const isFinanceOfficer = user?.role === "finance_officer";
 
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -134,7 +133,7 @@ const Table = ({
       headerClassName: "text-right",
       render: (row) => (
         <div className="flex justify-end gap-2">
-          {isFinanceOfficer && row.status === "waiting_finance" && (
+          {row.status === "waiting_finance" && (
             <>
               <button
                 onClick={() => onApprove(row.id)}

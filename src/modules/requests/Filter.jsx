@@ -22,9 +22,9 @@ const Filter = ({
           onChange: (e) => setFilterStatus(e.target.value),
           options: [
             { label: "Semua Status", value: "" },
-            { label: "Pending", value: "pending" },
-            { label: "Approved", value: "approved" },
-            { label: "Rejected", value: "rejected" },
+            { label: "Menunggu Persetujuan", value: "waiting_finance" },
+            { label: "Disetujui", value: "approved" },
+            { label: "Ditolak", value: "rejected" },
           ],
         },
       ]}

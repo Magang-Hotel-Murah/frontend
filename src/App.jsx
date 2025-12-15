@@ -166,7 +166,7 @@ const App = () => {
         />
 
         <Route
-          path="/request"
+          path="/requests"
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}

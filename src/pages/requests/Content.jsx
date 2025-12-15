@@ -8,6 +8,7 @@ import {
   useUpdateRequestStatus,
 } from "@hooks/meeting-request";
 import { ConfirmationAlert, ToastAlert, AlertStyles } from "@alert";
+import { set } from "react-hook-form";
 
 export const Content = ({ user }) => {
   const { data: meetingRequestsData, isLoading: requestLoading } =
@@ -16,11 +17,7 @@ export const Content = ({ user }) => {
   const { mutate: updateStatus, isPending: isUpdating } =
     useUpdateRequestStatus();
 
-  // Backend response structure: { data: [...], message, period, count }
   const meetingRequests = meetingRequestsData?.data || [];
-  
-  console.log("Meeting Requests Data:", meetingRequestsData);
-  console.log("Meeting Requests Array:", meetingRequests);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -30,7 +27,7 @@ export const Content = ({ user }) => {
 
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [showConfirmReject, setShowConfirmReject] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   
   const [showToast, setShowToast] = useState(false);
@@ -55,33 +52,50 @@ export const Content = ({ user }) => {
 
   const handleRejectClick = (id) => {
     setSelectedRequest({ id });
-    setShowConfirmReject(true);
+    setShowRejectModal(true);
   };
 
   const handleConfirmReject = () => {
-    if (!rejectionReason.trim()) {
+    const trimmedReason = rejectionReason.trim();
+    if (!trimmedReason || trimmedReason.length < 10) {
       showToastNotification("error", "Alasan penolakan harus diisi");
       return;
     }
+
+    // Logging untuk debug
+    console.log("Rejecting request with data:", {
+      id: selectedRequest.id,
+      status: "rejected",
+      rejection_reason: trimmedReason,
+    });
 
     updateStatus(
       {
         id: selectedRequest.id,
         status: "rejected",
-        rejection_reason: rejectionReason,
+        rejection_reason: rejectionReason.trim(),
       },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
+          console.log("Reject success:", response);
           showToastNotification("success", "Request berhasil ditolak");
-          setShowConfirmReject(false);
-          setRejectionReason("");
-          setSelectedRequest(null);
+          handleCloseRejectModal();
         },
-        onError: () => {
-          showToastNotification("error", "Gagal menolak request");
+        onError: (error) => {
+          console.error("Reject error:", error);
+          const errorMessage = error?.response?.data?.message || 
+                             error?.message || 
+                             "Gagal menolak request";
+          showToastNotification("error", errorMessage);
         },
       }
     );
+  };
+
+  const handleCloseRejectModal = () => {
+    setShowRejectModal(false);
+    setRejectionReason("");
+    setSelectedRequest(null);
   };
 
   const handleDeleteClick = (id) => {
@@ -165,39 +179,62 @@ export const Content = ({ user }) => {
         isLoading={isDelete}
       />
 
-      {/* Confirmation Reject with Reason */}
-      {showConfirmReject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Tolak Request</h3>
-            <p className="text-gray-600 mb-4">
-              Masukkan alasan penolakan request ini:
-            </p>
-            <textarea
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2 mb-4 min-h-[100px]"
-              placeholder="Tuliskan alasan penolakan..."
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => {
-                  setShowConfirmReject(false);
-                  setRejectionReason("");
-                  setSelectedRequest(null);
-                }}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                disabled={isUpdating}
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleConfirmReject}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-                disabled={isUpdating || !rejectionReason.trim()}
-              >
-                {isUpdating ? "Menolak..." : "Tolak Request"}
-              </button>
+      {/* Modal Reject with Reason Input */}
+      {showRejectModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full animate-fadeIn">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Tolak Request Meeting
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Silakan masukkan alasan penolakan request ini. Alasan akan dikirimkan kepada pemohon.
+              </p>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Alasan Penolakan <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  onBlur={(e) => setRejectionReason(e.target.value.trim())}
+                  className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                  placeholder="Contoh: Dana yang diminta melebihi budget yang tersedia untuk bulan ini..."
+                  rows={4}
+                  disabled={isUpdating}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Minimal 10 karakter
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={handleCloseRejectModal}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isUpdating}
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={handleConfirmReject}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isUpdating || !rejectionReason.trim() || rejectionReason.trim().length < 10}
+                >
+                  {isUpdating ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Menolak...
+                    </span>
+                  ) : (
+                    "Tolak Request"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
