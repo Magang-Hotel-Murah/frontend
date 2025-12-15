@@ -35,10 +35,14 @@ const CreateForm = ({
   errors,
   existingReservations,
   reservationsLoading,
+  availableSlots,
+  slotsLoading,
+  slotsError,
+  onDateSelected,
 }) => {
   return (
     <div className="mx-auto p-1">
-      <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <InformationForm
           rooms={rooms}
           formData={formData}
@@ -46,6 +50,10 @@ const CreateForm = ({
           errors={errors}
           existingReservations={existingReservations}
           reservationsLoading={reservationsLoading}
+          availableSlots={availableSlots}
+          slotsLoading={slotsLoading}
+          slotsError={slotsError}
+          onDateSelected={onDateSelected}
         />
 
         <ParticipantForm
@@ -84,10 +92,10 @@ const CreateForm = ({
 
         <div className="flex gap-4">
           <Button
-            onClick={handleSubmit}
             size="medium"
             type="submit"
             variant="submit"
+            disabled={loading}
           >
             {loading ? "Menyimpan..." : "Buat Reservasi"}
           </Button>
@@ -100,7 +108,7 @@ const CreateForm = ({
             Reset
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

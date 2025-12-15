@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Calendar, Clock, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Calendar, Clock, ChevronLeft, ChevronRight, X, Zap } from "lucide-react";
 
 const DateTimePicker = ({
   startTime,
@@ -7,6 +7,9 @@ const DateTimePicker = ({
   onStartTimeChange,
   onEndTimeChange,
   errors,
+  availableSlots = [],
+  slotsLoading = false,
+  onDateSelected,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -101,7 +104,6 @@ const DateTimePicker = ({
       const startDateTime = new Date(selectedStartDate);
       startDateTime.setHours(startHour, startMinute, 0, 0);
 
-      // Jika tanggal sama, waktu end harus lebih besar dari start
       if (selectedEndDate.toDateString() === selectedStartDate.toDateString()) {
         return selectedDateTime <= startDateTime;
       }
@@ -123,17 +125,56 @@ const DateTimePicker = ({
       setSelectedStartDate(selected);
       setSelectingEnd(true);
 
-      // Auto set end date sama dengan start date
       if (!selectedEndDate) {
         setSelectedEndDate(selected);
       }
+
+      const formatDateOnly = (date) => {
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      };
+
+      if (onDateSelected) {
+        onDateSelected(formatDateOnly(selected)); 
+      }
+
     } else {
-      // End date tidak boleh sebelum start date
       if (selectedStartDate && selected < selectedStartDate) {
+        setSelectedStartDate(selected);
+        setSelectedEndDate(selected);
+        if (onDateSelected) {
+          onDateSelected(selected);
+        }
         return;
       }
       setSelectedEndDate(selected);
     }
+  };
+
+  const handleSlotClick = (slot) => {
+    if (!selectedStartDate) return;
+
+    const [startH, startM] = slot.start_time.split(':').map(Number);
+    const [endH, endM] = slot.end_time.split(':').map(Number);
+
+    setStartHour(startH);
+    setStartMinute(startM);
+    setEndHour(endH);
+    setEndMinute(endM);
+
+    if (!selectedEndDate || selectedEndDate < selectedStartDate) {
+      setSelectedEndDate(selectedStartDate);
+    }
+  };
+
+  const isSlotSelected = (slot) => {
+    const [slotStartH, slotStartM] = slot.start_time.split(':').map(Number);
+    const [slotEndH, slotEndM] = slot.end_time.split(':').map(Number);
+    
+    return startHour === slotStartH && 
+           startMinute === slotStartM && 
+           endHour === slotEndH && 
+           endMinute === slotEndM;
   };
 
   const handleApply = () => {
@@ -226,14 +267,19 @@ const DateTimePicker = ({
             ${
               disabled
                 ? "text-gray-300 cursor-not-allowed"
-                : "hover:bg-primary-50"
+                : "hover:bg-blue-50"
             }
             ${
-              isStart || isEnd
-                ? "bg-primary-600 text-white font-semibold hover:bg-primary-700"
+              isStart
+                ? "bg-blue-500 text-white font-semibold hover:bg-blue-600 ring-2 ring-blue-300"
                 : ""
             }
-            ${isInRange ? "bg-primary-100 text-primary-600" : ""}
+            ${
+              isEnd && !isStart
+                ? "bg-orange-500 text-white font-semibold hover:bg-orange-600 ring-2 ring-orange-300"
+                : ""
+            }
+            ${isInRange ? "bg-green-100 text-green-700" : ""}
             ${
               !disabled && !isStart && !isEnd && !isInRange
                 ? "text-gray-700"
@@ -278,12 +324,10 @@ const DateTimePicker = ({
       endMinute
     ).padStart(2, "0")}`;
 
-    // Jika tanggal sama, tampilkan sekali saja
     if (startStr === endStr) {
       return `${startStr}, ${startTimeStr} - ${endTimeStr}`;
     }
 
-    // Jika beda tanggal, tampilkan lengkap
     return `${startStr} ${startTimeStr} - ${endStr} ${endTimeStr}`;
   };
 
@@ -345,22 +389,32 @@ const DateTimePicker = ({
     return options;
   };
 
+  const shouldShowSlots = selectedStartDate && availableSlots.length > 0;
+  const shouldShowLoading = selectedStartDate && slotsLoading;
+
   return (
     <div className="relative" ref={pickerRef}>
       <label className="block text-sm font-medium text-gray-700 mb-2">
         Tanggal & Waktu <span className="text-red-500">*</span>
       </label>
 
-      <button
-        type="button"
+      <div
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          w-full px-4 py-3 border rounded-lg text-left flex items-center justify-between
-          focus:outline-none focus:ring-2 focus:ring-primary-500 transition
+          w-full px-4 py-3 border rounded-lg text-left flex items-center justify-between cursor-pointer
+          focus-within:ring-2 focus-within:ring-primary-500 transition
           ${errors ? "border-red-500" : "border-gray-300 hover:border-gray-400"}
         `}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pointer-events-none">
           <Calendar className="w-5 h-5 text-gray-400" />
           <span
             className={selectedStartDate ? "text-gray-900" : "text-gray-400"}
@@ -369,18 +423,19 @@ const DateTimePicker = ({
           </span>
         </div>
         {selectedStartDate && (
-          <span
+          <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               handleClear();
             }}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 pointer-events-auto"
+            aria-label="Clear date"
           >
             <X className="w-4 h-4" />
-          </span>
+          </button>
         )}
-      </button>
+      </div>
 
       {errors && <p className="mt-1 text-sm text-red-500">{errors}</p>}
 
@@ -398,6 +453,7 @@ const DateTimePicker = ({
                 )
               }
               className="p-2 hover:bg-gray-100 rounded-lg transition"
+              aria-label="Previous month"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -418,37 +474,121 @@ const DateTimePicker = ({
                 )
               }
               className="p-2 hover:bg-gray-100 rounded-lg transition"
+              aria-label="Next month"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="mb-4 px-3 py-2 bg-blue-50 text-blue-700 text-sm rounded-lg flex items-center justify-between">
-            <span>ℹ️ Pilih tanggal mulai dan selesai (bisa 1 hari atau lebih)</span>
+          <div className="mb-4 px-3 py-2 bg-gradient-to-r from-blue-50 to-orange-50 text-gray-700 text-sm rounded-lg border border-blue-200">
+            <div className="flex items-center justify-between gap-4">
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-blue-500 rounded"></span>
+                <span className="text-xs">Tanggal Mulai</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-orange-500 rounded"></span>
+                <span className="text-xs">Tanggal Selesai</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-green-100 border border-green-300 rounded"></span>
+                <span className="text-xs">Rentang</span>
+              </span>
+            </div>
           </div>
 
-          <div className="mb-4 flex gap-2 text-sm">
-            <div
-              className={`px-3 py-1 rounded-full ${
+          <div className="mb-4 flex gap-2 text-sm items-center flex-wrap">
+            <button
+              type="button"
+              onClick={() => setSelectingEnd(false)}
+              className={`px-3 py-1.5 rounded-full transition-all ${
                 !selectingEnd
-                  ? "bg-primary-100 text-primary-600"
-                  : "bg-gray-100 text-gray-600"
+                  ? "bg-blue-500 text-white shadow-md ring-2 ring-blue-200"
+                  : selectedStartDate
+                  ? "bg-green-100 text-green-700 hover:bg-green-200"
+                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
               }`}
             >
-              {selectedStartDate ? "✓ Tanggal Mulai" : "1. Pilih Tanggal Mulai"}
-            </div>
-            <div
-              className={`px-3 py-1 rounded-full ${
-                selectingEnd
-                  ? "bg-primary-100 text-primary-600"
-                  : "bg-gray-100 text-gray-600"
+              {selectedStartDate ? "✓ Tanggal Mulai" : "Tanggal Mulai"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (selectedStartDate) {
+                  setSelectingEnd(true);
+                }
+              }}
+              disabled={!selectedStartDate}
+              className={`px-3 py-1.5 rounded-full transition-all ${
+                selectingEnd && selectedStartDate
+                  ? "bg-orange-500 text-white shadow-md ring-2 ring-orange-200"
+                  : selectedEndDate
+                  ? "bg-green-100 text-green-700 hover:bg-green-200"
+                  : selectedStartDate
+                  ? "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
               }`}
             >
-              {selectedEndDate ? "✓ Tanggal Selesai" : "2. Pilih Tanggal Selesai"}
-            </div>
+              {selectedEndDate ? "✓ Tanggal Selesai" : "Tanggal Selesai"}
+            </button>
           </div>
 
           <div className="mb-6">{renderCalendar()}</div>
+
+          {/* Available Slots Section */}
+          {shouldShowSlots && (
+            <div className="mb-6 pb-6 border-b">
+              <div className="flex items-center gap-2 mb-3">
+                <Zap className="w-4 h-4 text-green-600" />
+                <h4 className="text-sm font-semibold text-gray-800">
+                  {availableSlots.length} Slot Tersedia
+                </h4>
+                <span className="text-xs text-gray-500">- Klik untuk pilih otomatis</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 max-h-32 overflow-y-auto p-1">
+                {availableSlots.map((slot, idx) => {
+                  const selected = isSlotSelected(slot);
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleSlotClick(slot)}
+                      className={`
+                        relative px-2 py-2 rounded-md text-xs font-medium transition-all
+                        ${selected 
+                          ? 'bg-green-500 text-white ring-2 ring-green-300 shadow-md' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-green-50 hover:text-green-700 hover:ring-1 hover:ring-green-200'
+                        }
+                      `}
+                    >
+                      <div className="flex flex-col items-center">
+                        <span className="font-semibold">{slot.start_time}</span>
+                        <span className="text-[10px] opacity-75">-</span>
+                        <span className="font-semibold">{slot.end_time}</span>
+                      </div>
+                      {selected && (
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center">
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {shouldShowLoading && (
+            <div className="mb-6 pb-6 border-b">
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 py-4">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                Memuat slot tersedia...
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b">
             <div>

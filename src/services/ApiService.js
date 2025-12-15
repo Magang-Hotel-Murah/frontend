@@ -285,6 +285,7 @@ class ApiService {
   }
 
   async createReservation(data) {
+    console.log(data);
     return this.request("/meeting-room-reservations", {
       method: "POST",
       body: data,
@@ -309,14 +310,14 @@ class ApiService {
     Object.keys(finalParams).forEach(key => {
       const value = finalParams[key];
 
-      if(value !== undefined && value !== null &&  value !== ''){
+      if (value !== undefined && value !== null && value !== '') {
         queryParams.append(key, value);
       }
     });
 
     const queryString = queryParams.toString();
     const endpoint = `/meeting-requests${queryString ? `?${queryString}` : ''}`;
-    
+
     return this.request(endpoint);
   }
 
@@ -325,16 +326,16 @@ class ApiService {
   }
 
   async updateRequestStatus(id, status, rejection_reason) {
-    const body = { status};
+    const body = { status };
 
-    if(rejection_reason){
+    if (rejection_reason) {
       body.rejection_reason = rejection_reason
     }
 
     return this.request(`/meeting-requests/${id}/status`, {
       method: "PUT",
       body: body,
-      });
+    });
   }
 
   async deleteMeetingRequest(id) {
@@ -342,7 +343,7 @@ class ApiService {
       method: "DELETE",
     });
   }
-  
+
   //DISPLAY RESERVATION
   async displayReservation(companyCode, filter = "?filter=year") {
     const url = `/meeting-display/${companyCode}${filter}`;
@@ -351,12 +352,20 @@ class ApiService {
     });
   }
 
-  async searchMeetingRooms(params) {
-    return this.request(`/meeting-rooms/search?${params}`, {
+  async searchMeetingRooms(payload) {
+    return this.request(`/meeting-rooms/search?${payload}`, {
       method: "POST",
-      body: params,
+      body: payload,
     });
   }
+
+  async getAvailableSlots(payload) {
+    return this.request(`/meeting-rooms/search`, {
+      method: "POST",
+      body: payload,
+    });
+  }
+
 }
 
 export default new ApiService();
