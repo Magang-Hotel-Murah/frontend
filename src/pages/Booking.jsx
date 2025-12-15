@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
-import { Content, Create } from "@bookings";
-import { Book, GitPullRequest, PlusCircle } from "lucide-react";
+import { Content, Create, SearchRoom } from "@bookings";
+import { Book, GitPullRequest, PlusCircle, SearchIcon } from "lucide-react";
 
 const Booking = ({ user }) => {
   const [activeTab, setActiveTab] = useState(() => {
@@ -10,8 +10,21 @@ const Booking = ({ user }) => {
     if (saved === "reservation") return "reservation";
     if (saved === "create") return "create";
     if (saved === "request" && user?.role === "employee") return "request";
+    if (saved === "search" && user?.role === "employee") return "search";
 
     return "reservation";
+  });
+
+  const [searchState, setSearchState] = useState({
+    searchParams: {
+      date: '',
+      startTime: '',
+      endTime: '',
+      participants_count: '',
+      facilities: []
+    },
+    searchResults: [],
+    message: ''
   });
 
   useEffect(() => {
@@ -24,18 +37,31 @@ const Booking = ({ user }) => {
           { key: "reservation", label: "List", icon: Book },
           { key: "create", label: "Baru", icon: PlusCircle },
           { key: "request", label: "Permintaan", icon: GitPullRequest },
+          { key: "search", label: "Cari", icon: SearchIcon },
         ]
       : [
           { key: "reservation", label: "List", icon: Book },
           { key: "create", label: "Baru", icon: PlusCircle },
         ];
 
+  const handleBookFromSearch = () => {
+    setActiveTab("create");
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case "reservation":
         return <Content user={user} />;
       case "create":
-        return <Create />;
+        return user?.role === "employee" ? <Create /> : null;
+      case "search":
+        return (
+          <SearchRoom
+            state={searchState}
+            setState={setSearchState}
+            onBookRoom={handleBookFromSearch}
+          />
+        );      
       default:
         return null;
     }
@@ -43,7 +69,7 @@ const Booking = ({ user }) => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white overflow-hidden">
+      <div className="bg-white overflow-visible">
         <TabNavigation
           tabs={tabs}
           activeTab={activeTab}

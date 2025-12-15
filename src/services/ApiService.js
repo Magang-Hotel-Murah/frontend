@@ -41,7 +41,7 @@ class ApiService {
         try {
           const errData = await response.json();
           errorMessage = errData.message || errorMessage;
-        } catch {}
+        } catch { }
         throw new Error(errorMessage);
       } else {
         localStorage.removeItem("token");
@@ -61,7 +61,7 @@ class ApiService {
         const errData = await response.json();
         errorDetails = errData;
         errorMessage = errData.message || errorMessage;
-      } catch {}
+      } catch { }
 
       throw new Error(errorMessage);
     }
@@ -348,6 +348,13 @@ class ApiService {
     const url = `/meeting-display/${companyCode}${filter}`;
     return this.request(url, {
       method: "GET",
+    });
+  }
+
+  async searchMeetingRooms(params) {
+    return this.request(`/meeting-rooms/search?${params}`, {
+      method: "POST",
+      body: params,
     });
   }
 }

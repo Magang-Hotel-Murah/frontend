@@ -33,6 +33,28 @@ const DateTimePicker = ({
   const pickerRef = useRef(null);
 
   useEffect(() => {
+    if (startTime) {
+      const start = new Date(startTime);
+      setSelectedStartDate(start);
+      setStartHour(start.getHours());
+      setStartMinute(start.getMinutes());
+    } else {
+      setSelectedStartDate(null);
+    }
+  }, [startTime]);
+
+  useEffect(() => {
+    if (endTime) {
+      const end = new Date(endTime);
+      setSelectedEndDate(end);
+      setEndHour(end.getHours());
+      setEndMinute(end.getMinutes());
+    } else {
+      setSelectedEndDate(null);
+    }
+  }, [endTime]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (pickerRef.current && !pickerRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -129,11 +151,9 @@ const DateTimePicker = ({
 
       const formatLocalDateTime = (date) => {
         const pad = (n) => String(n).padStart(2, "0");
-        return (
-          `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
-            date.getDate()
-          )} ` + `${pad(date.getHours())}:${pad(date.getMinutes())}:00`
-        );
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+          date.getDate()
+        )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
       };
 
       onStartTimeChange(formatLocalDateTime(start));

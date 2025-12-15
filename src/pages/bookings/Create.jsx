@@ -27,6 +27,7 @@ const Create = () => {
     description: "",
     start_time: "",
     end_time: "",
+    time_slot: "",
     participants: [],
     division_ids: [],
     position_ids: [],
@@ -38,6 +39,26 @@ const Create = () => {
       equipment: [],
     },
   });
+
+  useEffect(() => {
+    const bookingData = localStorage.getItem("bookingData");
+    if (!bookingData) return;
+
+    const data = JSON.parse(bookingData);
+
+    const toDateTimeLocal = (date, time) =>
+      date && time ? `${date}T${time}` : "";
+
+    setFormData(prev => ({
+      ...prev,
+      meeting_room_id: data.meeting_room_id,
+      start_time: toDateTimeLocal(data.date, data.start_time),
+      end_time: toDateTimeLocal(data.date, data.end_time),
+      time_slot: data.time_slot || "",
+    }));
+
+    localStorage.removeItem("bookingData");
+  }, []);
 
   const [errors, setErrors] = useState({});
   const [newParticipant, setNewParticipant] = useState({
