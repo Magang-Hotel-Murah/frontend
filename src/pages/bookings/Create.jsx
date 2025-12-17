@@ -508,7 +508,35 @@ const Create = () => {
     }
 
     if (Object.keys(newErrors).length > 0) {
-      toast.error("Mohon lengkapi semua field yang diperlukan");
+      const errorMessages = Object.entries(newErrors).map(([field, message]) => {
+        const fieldNames = {
+          meeting_room_id: "Ruangan",
+          title: "Judul",
+          datetime: "Waktu",
+          participants: "Peserta",
+          newParticipant: "Data Peserta",
+          funds_reason: "Alasan Dana",
+          capacity: "Kapasitas",
+        };
+        
+        return `• ${fieldNames[field] || field}: ${message}`;
+      });
+
+        toast.error(
+        <div>
+          <div className="font-semibold mb-1">Mohon lengkapi field berikut:</div>
+          {errorMessages.slice(0, 4).map((msg, idx) => (
+            <div key={idx} className="text-sm">{msg}</div>
+          ))}
+          {errorMessages.length > 4 && (
+            <div className="text-sm mt-1 opacity-75">
+              +{errorMessages.length - 4} error lainnya
+            </div>
+          )}
+        </div>,
+        { autoClose: 5000 }
+      );
+      
       return false;
     }
 

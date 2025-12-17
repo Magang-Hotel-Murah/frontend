@@ -128,7 +128,7 @@ const InformationForm = ({
             value={formData.title}
             onChange={handleInputChange}
             inputProps={{ maxLength: 255 }}
-            errors={errors.title}
+            error={errors.title} 
           />
         </div>
 
@@ -142,7 +142,7 @@ const InformationForm = ({
             value={formData.description}
             onChange={handleInputChange}
             inputProps={{ maxLength: 255, rows: 4 }}
-            errors={errors.description}
+            error={errors.description}
           />
         </div>
       </div>
