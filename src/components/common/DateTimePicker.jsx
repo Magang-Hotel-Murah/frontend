@@ -392,6 +392,12 @@ const DateTimePicker = ({
   const shouldShowSlots = selectedStartDate && availableSlots.length > 0;
   const shouldShowLoading = selectedStartDate && slotsLoading;
 
+  const shouldShowNoSlots =
+  selectedStartDate &&
+  !slotsLoading &&
+  Array.isArray(availableSlots) &&
+  availableSlots.length === 0;
+
   return (
     <div className="relative" ref={pickerRef}>
       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -589,6 +595,26 @@ const DateTimePicker = ({
               </div>
             </div>
           )}
+
+          {/* Slot Penuh / Tidak Tersedia */}
+          {shouldShowNoSlots && (
+            <div className="mb-6 pb-6 border-b">
+              <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex-shrink-0">
+                  <X className="w-5 h-5 text-red-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-red-700">
+                    Semua slot sudah penuh
+                  </p>
+                  <p className="text-xs text-red-600">
+                    Silakan pilih tanggal lain atau ruangan berbeda
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
 
           <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b">
             <div>

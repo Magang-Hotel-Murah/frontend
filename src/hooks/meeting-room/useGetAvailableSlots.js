@@ -22,15 +22,17 @@ export const useGetAvailableSlots = () => {
                 participants_count,
             });
 
+            console.log(response);
+
             let slots = [];
+            let isFull = false;
 
             if (response.data?.rooms && Array.isArray(response.data.rooms)) {
                 const room = response.data.rooms.find(r => r.id === room_id);
 
                 if (room && Array.isArray(room.free_slots)) {
                     slots = room.free_slots;
-                } else {
-                    console.warn(`No free_slots found for room ${room_id}`);
+                    isFull = room.free_slots.length === 0;
                 }
             }
             else if (Array.isArray(response.data?.slots)) {
@@ -41,9 +43,12 @@ export const useGetAvailableSlots = () => {
             }
 
             return {
-                success: true,
+                success: !isFull,
                 data: slots,
-                message: response.data?.message || "Slot berhasil diambil",
+                isFull,
+                message: isFull
+                    ? "Semua slot sudah penuh untuk tanggal ini"
+                    : "Slot tersedia",
             };
         } catch (err) {
             console.error("Error fetching available slots:", err);
