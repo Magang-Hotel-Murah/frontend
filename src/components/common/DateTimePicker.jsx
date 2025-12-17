@@ -121,35 +121,32 @@ const DateTimePicker = ({
 
     if (isDateDisabled(selected)) return;
 
+    // PILIH TANGGAL MULAI
     if (!selectingEnd) {
       setSelectedStartDate(selected);
-      setSelectingEnd(true);
 
-      if (!selectedEndDate) {
-        setSelectedEndDate(selected);
-      }
-
-      const formatDateOnly = (date) => {
-        const pad = (n) => String(n).padStart(2, "0");
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-      };
+      // ❗ JANGAN set end date di sini
+      setSelectedEndDate(null);
 
       if (onDateSelected) {
-        onDateSelected(formatDateOnly(selected)); 
+        const pad = (n) => String(n).padStart(2, "0");
+        onDateSelected(
+          `${selected.getFullYear()}-${pad(selected.getMonth() + 1)}-${pad(
+            selected.getDate()
+          )}`
+        );
       }
 
-    } else {
-      if (selectedStartDate && selected < selectedStartDate) {
-        setSelectedStartDate(selected);
-        setSelectedEndDate(selected);
-        if (onDateSelected) {
-          onDateSelected(selected);
-        }
-        return;
-      }
+      return;
+    }
+
+    // PILIH TANGGAL SELESAI (HARUS lewat tombol dulu)
+    if (selectingEnd && selectedStartDate) {
+      if (selected < selectedStartDate) return;
       setSelectedEndDate(selected);
     }
   };
+
 
   const handleSlotClick = (slot) => {
     if (!selectedStartDate) return;
