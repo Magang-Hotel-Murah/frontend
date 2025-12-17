@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Pagination } from "@common";
 import { Table, Filter } from "@contentbooking";
 import { AlertStyles } from "@alert";
@@ -12,8 +12,27 @@ import { useUpdateReservationStatus } from "@hooks/reservation-meeting-room/useU
 export const Content = ({ user }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState(null);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterRoom, setFilterRoom] = useState("");
+
+  const [itemsPerPage] = useState(10);
+
+  useEffect(() => {
+      setCurrentPage(1);
+    }, [filterStatus, filterRoom]);
+
   const { data: reservationResponse, isLoading: reservationLoading } =
-    useGetReservations(currentPage);
+    useGetReservations(
+      currentPage,
+      user,
+      filterStatus,
+      filterRoom
+    );
 
   const reservations = reservationResponse?.data || [];
   const totalPages = reservationResponse?.last_page || 1;
@@ -26,15 +45,6 @@ export const Content = ({ user }) => {
 
   const loading = updateStatus.isPending || reservationLoading || roomLoading;
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState(null);
-  const [selectedReservation, setSelectedReservation] = useState(null);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [filterRoom, setFilterRoom] = useState("");
-
-  const [itemsPerPage] = useState(10);
 
   const handleOpenModal = (mode, reservation = null) => {
     setModalMode(mode);

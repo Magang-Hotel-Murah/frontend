@@ -267,9 +267,15 @@ class ApiService {
     });
   }
 
-  //RESERVATION MEETING ROOM
-  async getReservations(page = 1) {
-    return this.request(`/meeting-room-reservations?page=${page}`);
+  async getReservations({ page = 1, userOnly, status, roomId }) {
+    const params = new URLSearchParams({
+      page,
+      ...(userOnly && { user: true }),
+      ...(status && { status }),
+      ...(roomId && { room_id: roomId }),
+    });
+
+    return this.request(`/meeting-room-reservations?${params.toString()}`);
   }
 
   async getReservationsAll() {
@@ -285,7 +291,6 @@ class ApiService {
   }
 
   async createReservation(data) {
-    console.log(data);
     return this.request("/meeting-room-reservations", {
       method: "POST",
       body: data,

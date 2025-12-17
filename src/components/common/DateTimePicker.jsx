@@ -121,11 +121,9 @@ const DateTimePicker = ({
 
     if (isDateDisabled(selected)) return;
 
-    // PILIH TANGGAL MULAI
     if (!selectingEnd) {
       setSelectedStartDate(selected);
 
-      // ❗ JANGAN set end date di sini
       setSelectedEndDate(null);
 
       if (onDateSelected) {
@@ -140,7 +138,6 @@ const DateTimePicker = ({
       return;
     }
 
-    // PILIH TANGGAL SELESAI (HARUS lewat tombol dulu)
     if (selectingEnd && selectedStartDate) {
       if (selected < selectedStartDate) return;
       setSelectedEndDate(selected);
