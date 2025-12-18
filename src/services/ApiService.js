@@ -82,12 +82,13 @@ class ApiService {
     return this.request("/auth/me");
   }
 
-  //Auth
-  async login(email, password) {
-    return this.request("/login", {
+  async login(email, password, remember = false) {
+    const response = await this.request("/login", {
       method: "POST",
-      body: { email, password },
+      body: { email, password, remember },
     });
+
+    return response;
   }
 
   async register(name, email, password, confirmPassword, company_name) {

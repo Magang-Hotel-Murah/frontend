@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, Lock, Mail, LogIn } from "lucide-react";
 import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [userRole, setUserRole] = useState(null);
 
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -28,6 +29,14 @@ const Login = () => {
   const [toastType, setToastType] = useState("info");
   const [toastMessage, setToastMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -46,12 +55,19 @@ const Login = () => {
     setShowLoadingAlert(true);
 
     login(
-      { email, password },
+      { email, password, remember: rememberMe },
       {
         onSuccess: (response) => {
           setShowLoadingAlert(false);
           setShowSuccessAlert(true);
           setUserRole(response?.user?.role || response?.data?.user?.role);
+          
+          if (rememberMe) {
+            localStorage.setItem("rememberedEmail", email);
+          } else {
+            localStorage.removeItem("rememberedEmail");
+          }
+          
           showToastNotification(
             "success",
             "Login berhasil! Mengarahkan ke dashboard..."
@@ -192,11 +208,13 @@ const Login = () => {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
                   />
                   <label
                     htmlFor="remember-me"
-                    className="ml-2 block text-sm text-gray-700"
+                    className="ml-2 block text-sm text-gray-700 cursor-pointer"
                   >
                     Remember me
                   </label>
