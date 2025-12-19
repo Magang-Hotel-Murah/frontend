@@ -13,6 +13,8 @@ const Booking = ({ user }) => {
     if (saved === "create") return "create";
     if (saved === "search") return "search";
 
+    return "reservation";
+
     });
 
   const [searchState, setSearchState] = useState({
