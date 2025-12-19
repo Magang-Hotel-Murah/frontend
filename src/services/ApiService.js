@@ -1,10 +1,49 @@
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
 class ApiService {
-  async request(endpoint, options = {}) {
-    const token = localStorage.getItem("token");
-    const url = `${API_BASE_URL}${endpoint}`;
+  constructor() {
+    this.isRedirecting = false;
+    this.pendingRequests = new Map();
+  }
 
+  handleLogout() {
+    if (this.isRedirecting) return;
+
+    this.isRedirecting = true;
+
+    // Clear all localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token_expiry");
+    localStorage.removeItem("remember_me");
+
+    // Cancel all pending requests
+    this.pendingRequests.clear();
+
+    // Single redirect with small delay
+    setTimeout(() => {
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }, 100);
+  }
+
+  async request(endpoint, options = {}) {
+    // Check if already redirecting
+    if (this.isRedirecting) {
+      throw new Error("Session expired");
+    }
+
+    const token = localStorage.getItem("token");
+
+    // Check token expiry BEFORE making request
+    const tokenExpiry = localStorage.getItem("token_expiry");
+    if (tokenExpiry && Date.now() > parseInt(tokenExpiry)) {
+      this.handleLogout();
+      throw new Error("Session expired");
+    }
+
+    const url = `${API_BASE_URL}${endpoint}`;
     const isFormData = options.body instanceof FormData;
 
     const config = {
@@ -21,61 +60,68 @@ class ApiService {
       config.body = JSON.stringify(config.body);
     }
 
-    const response = await fetch(url, config);
+    // Track pending request
+    const requestId = `${endpoint}-${Date.now()}`;
+    const controller = new AbortController();
+    config.signal = controller.signal;
+    this.pendingRequests.set(requestId, controller);
 
-    if (response.status === 401) {
-      const publicEndpoints = [
-        "/login",
-        "/register",
-        "/forgot-password",
-        "/reset-password",
-        "/verify-email",
-        "/activate-account",
-      ];
-      const isPublicEndpoint = publicEndpoints.some((ep) =>
-        endpoint.includes(ep)
-      );
+    try {
+      const response = await fetch(url, config);
 
-      if (isPublicEndpoint) {
-        let errorMessage = "Invalid credentials";
+      // Remove from pending
+      this.pendingRequests.delete(requestId);
+
+      if (response.status === 401) {
+        const publicEndpoints = [
+          "/login",
+          "/register",
+          "/forgot-password",
+          "/reset-password",
+          "/verify-email",
+          "/activate-account",
+        ];
+        const isPublicEndpoint = publicEndpoints.some((ep) =>
+          endpoint.includes(ep)
+        );
+
+        if (isPublicEndpoint) {
+          let errorMessage = "Invalid credentials";
+          try {
+            const errData = await response.json();
+            errorMessage = errData.message || errorMessage;
+          } catch { }
+          throw new Error(errorMessage);
+        } else {
+          // Use single logout handler
+          this.handleLogout();
+          throw new Error("Session expired. Please login again.");
+        }
+      }
+
+      if (!response.ok) {
+        let errorMessage = `HTTP error! status: ${response.status}`;
         try {
           const errData = await response.json();
           errorMessage = errData.message || errorMessage;
         } catch { }
         throw new Error(errorMessage);
-      } else {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("token_expiry");
-
-        window.location.href = "/login";
-        throw new Error("Session expired. Please login again.");
       }
+
+      if (response.status === 204) {
+        return null;
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        return { success: true, message: "Request berhasil!" };
+      }
+
+      return response.json();
+    } catch (error) {
+      this.pendingRequests.delete(requestId);
+      throw error;
     }
-
-    if (!response.ok) {
-      let errorMessage = `HTTP error! status: ${response.status}`;
-      let errorDetails = null;
-
-      try {
-        const errData = await response.json();
-        errorDetails = errData;
-        errorMessage = errData.message || errorMessage;
-      } catch { }
-
-      throw new Error(errorMessage);
-    }
-
-    if (response.status === 204) {
-      return null;
-    }
-
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      return { success: true, message: "Request berhasil!" };
-    }
-
-    return response.json();
   }
 
   async getCurrentUser() {
@@ -371,7 +417,6 @@ class ApiService {
       body: payload,
     });
   }
-
 }
 
 export default new ApiService();
