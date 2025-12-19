@@ -141,7 +141,7 @@ const Sidebar = ({
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 z-20 bg-white bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-20 bg-transparant lg:hidden"
           onClick={onClose}
         />
       )}

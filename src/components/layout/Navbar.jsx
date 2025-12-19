@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Logo from "../../assets/logo.png";
-import { Menu, Bell, User, LogOut, ChevronLeft, Settings } from "lucide-react";
+import { Menu, Bell, User, LogOut, ChevronLeft, Settings, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "@hooks/auth";
 import { useGetUserProfile } from "@hooks/user-profile";
@@ -13,7 +13,7 @@ import {
   AlertStyles,
 } from "@alert";
 
-const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
+const Navbar = ({ user, toggleCollapse, isCollapsed, toggleSidebar, sidebarOpen }) => {
   const navigate = useNavigate();
   const { mutateAsync: logout } = useLogout();
   const { data: userProfile, isLoading: isLoadingProfile } =
@@ -77,6 +77,18 @@ const Navbar = ({ user, toggleCollapse, isCollapsed }) => {
         <div className="px-4 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-start">
+              <button
+                onClick={toggleSidebar}
+                className="lg:hidden p-2 text-gray-500 rounded-lg hover:bg-primary-50 mr-2 transition-colors"
+                title={sidebarOpen ? "Tutup Menu" : "Buka Menu"}
+              >
+                {sidebarOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
+              </button>
+              
               <button
                 onClick={toggleCollapse}
                 className="hidden lg:block p-2 text-gray-500 rounded-lg hover:bg-primary-50 mr-2 transition-colors"
