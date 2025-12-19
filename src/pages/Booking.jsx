@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content, Create, SearchRoom } from "@bookings";
-import { Book, GitPullRequest, PlusCircle, SearchIcon } from "lucide-react";
+import { Book, PlusCircle, SearchIcon } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const Booking = ({ user }) => {
@@ -11,11 +11,11 @@ const Booking = ({ user }) => {
 
     if (saved === "reservation") return "reservation";
     if (saved === "create") return "create";
-    if (saved === "request" && user?.role === "employee") return "request";
-    if (saved === "search" && user?.role === "employee") return "search";
+    if (saved === "search") return "search";
 
     return "reservation";
-  });
+
+    });
 
   const [searchState, setSearchState] = useState({
     searchParams: {
@@ -29,28 +29,21 @@ const Booking = ({ user }) => {
     message: ''
   });
 
+    const handleBookFromSearch = () => {
+    setActiveTab("create");
+  };
+
   useEffect(() => {
     if (state?.tab){
       setActiveTab(state.tab);
     }
   }, [state]);
 
-  const tabs =
-    user?.role === "employee"
-      ? [
-          { key: "reservation", label: "List", icon: Book },
-          { key: "create", label: "Baru", icon: PlusCircle },
-          { key: "request", label: "Permintaan", icon: GitPullRequest },
-          { key: "search", label: "Cari", icon: SearchIcon },
-        ]
-      : [
-          { key: "reservation", label: "List", icon: Book },
-          { key: "create", label: "Baru", icon: PlusCircle },
-        ];
-
-  const handleBookFromSearch = () => {
-    setActiveTab("create");
-  };
+  const tabs = [
+    { key: "reservation", label: "List", icon: Book },
+    { key: "create", label: "Baru", icon: PlusCircle },
+    { key: "search", label: "Cari", icon: SearchIcon },
+  ]
 
   const renderContent = () => {
     switch (activeTab) {

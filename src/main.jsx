@@ -11,11 +11,29 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      refetchOnMount: true,
+      refetchOnMount: false,
       refetchOnReconnect: true,
-      retry: 1,
+      retry: false,
       staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      throwOnError: false,
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
+
+queryClient.setDefaultOptions({
+  queries: {
+    onError: (error) => {
+      console.error('Query error:', error);
+
+      if (error.message?.includes('Session expired')) {
+        return;
+      }
     },
   },
 });
@@ -25,7 +43,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <App />
       <ReactQueryDevtools initialIsOpen={false} buttonPosition="none" />
-      
+
       <ToastContainer
         position="top-right"
         autoClose={3000}

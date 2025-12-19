@@ -19,8 +19,7 @@ export const useGetReservations = (
     queryFn: async () => {
       const response = await ApiService.getReservations({
         page,
-        userOnly: user?.role === "employee",
-        status: filterStatus || undefined,
+        userOnly: user?.role !== "company_admin" && user?.role !== "super_admin", status: filterStatus || undefined,
         roomId: filterRoom || undefined,
       });
 

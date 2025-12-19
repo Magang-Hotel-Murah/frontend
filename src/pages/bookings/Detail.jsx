@@ -26,6 +26,7 @@ const Detail = ({ reservations, onClose }) => {
   }
 
   const data = reservation || reservations;
+  console.log(data);
   const statusConfig = getStatusBooking(data?.status);
   const StatusIcon = statusConfig?.icon;
 
@@ -53,7 +54,7 @@ const Detail = ({ reservations, onClose }) => {
               </p>
             </div>
             <p className="text-sm text-blue-900 font-semibold">
-              {data?.companies?.name || "Company Name"}
+              {data?.company?.name || "Company Name"}
             </p>
           </Card>
 
