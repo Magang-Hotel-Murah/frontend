@@ -97,7 +97,7 @@ const LandingPage = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button
-                variant="gradient"
+                variant="primary"
                 size="large"
                 onClick={() => navigate("/login")}
               >

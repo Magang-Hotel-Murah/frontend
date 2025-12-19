@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content, Create, SearchRoom } from "@bookings";
 import { Book, GitPullRequest, PlusCircle, SearchIcon } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const Booking = ({ user }) => {
+  const { state } = useLocation();
   const [activeTab, setActiveTab] = useState(() => {
     const saved = localStorage.getItem("activeTab");
 
@@ -28,8 +30,10 @@ const Booking = ({ user }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem("activeTab", activeTab);
-  }, [activeTab]);
+    if (state?.tab){
+      setActiveTab(state.tab);
+    }
+  }, [state]);
 
   const tabs =
     user?.role === "employee"
@@ -53,7 +57,7 @@ const Booking = ({ user }) => {
       case "reservation":
         return <Content user={user} />;
       case "create":
-        return user?.role === "employee" ? <Create /> : null;
+        return <Create />;
       case "search":
         return (
           <SearchRoom

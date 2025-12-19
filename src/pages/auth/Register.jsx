@@ -20,6 +20,7 @@ const Register = ({ onRegister }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [company_name, setCompanyName] = useState("");
+   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [showEmailVerificationAlert, setShowEmailVerificationAlert] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -44,6 +45,8 @@ const Register = ({ onRegister }) => {
       return showToastNotification("error", "Password minimal 6 karakter");
     if (password !== confirmPassword)
       return showToastNotification("error", "Konfirmasi password tidak sama");
+    if (!agreedToTerms)
+      return showToastNotification("error", "Anda harus menyetujui Terms of Service dan Privacy Policy");
 
     setShowLoadingAlert(true);
 
@@ -91,7 +94,7 @@ const Register = ({ onRegister }) => {
     <>
       <AlertStyles />
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br g-gradient-to-br from-primary-50 via-white to-indigo-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-4">
@@ -104,7 +107,7 @@ const Register = ({ onRegister }) => {
               MeetWise
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Registrasi untuk bisa login ke Admin Dashboard Transaksi
+              Dapatkan akun untuk memulai Reservasi Ruangan.
             </p>
           </div>
 
@@ -248,6 +251,39 @@ const Register = ({ onRegister }) => {
                     placeholder="Masukkan nama lengkap"
                   />
                 </div>
+              </div>
+
+              <div className="flex items-start">
+                <input
+                  id="terms"
+                  name="terms"
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="h-4 w-4 mt-1 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
+                />
+                <label htmlFor="terms" className="ml-3 block text-sm text-gray-600">
+                  Saya telah membaca dan menyetujui{" "}
+                  <a
+                    href="/terms-of-service"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary-600 hover:text-primary-700 underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Terms of Service
+                  </a>
+                  {" "}dan{" "}
+                  <a
+                    href="/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary-600 hover:text-primary-700 underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Privacy Policy
+                  </a>
+                </label>
               </div>
 
               <div>

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content, Create } from "@rooms";
 import { Book, PlusCircleIcon, Presentation } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const Room = ({ user }) => {
+  const { state } = useLocation();
   const [activeTab, setActiveTab] = useState(() => {
     const saved = localStorage.getItem("activeTab");
 
@@ -14,8 +16,10 @@ const Room = ({ user }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem("activeTab", activeTab);
-  }, [activeTab]);
+    if (state?.tab) {
+      setActiveTab(state.tab);
+    }
+  }, [state]);
 
   const tabs =
     user?.role === "company_admin"

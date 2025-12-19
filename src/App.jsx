@@ -37,6 +37,8 @@ import {
 } from "@hooks/auth";
 import { Update } from "@rooms";
 import { ProtectedRoute } from "@components/layout";
+import PrivacyPolicy from "./pages/landing/PrivacyPolicy";
+import { ToS } from "./pages/landing";
 
 const TokenChecker = ({ children }) => {
   const navigate = useNavigate();
@@ -57,6 +59,8 @@ const TokenChecker = ({ children }) => {
         "/reset-password",
         "/activate-account",
         "/verify-email",
+        "/privacy-policy",
+        "/terms-of-service",
         "/",
       ];
       
@@ -141,6 +145,28 @@ const AppContent = () => {
               <Navigate to={getDefaultRoute(user)} replace />
             ) : (
               <LandingPage />
+            )
+          }
+        />
+
+        <Route
+          path="/privacy-policy"
+          element={
+            isAuthenticated ? (
+              <Navigate to={getDefaultRoute(user)} replace />
+            ) : (
+              <PrivacyPolicy />
+            )
+          }
+        />
+
+        <Route
+          path="/terms-of-service"
+          element={
+            isAuthenticated ? (
+              <Navigate to={getDefaultRoute(user)} replace />
+            ) : (
+              <ToS />
             )
           }
         />

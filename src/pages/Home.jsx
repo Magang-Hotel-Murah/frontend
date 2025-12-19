@@ -7,11 +7,13 @@ import {
   Clock,
   TrendingUp,
   Activity,
+  Table,
 } from "lucide-react";
 import { useGetRooms } from "@hooks/meeting-room";
 import { useGetReservationAll } from "@hooks/reservation-meeting-room";
 import { useDerivedReservation } from "@hooks/reservation-meeting-room";
 import { Card, StatCard } from "@ui";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [search, setSearch] = useState("");
@@ -190,24 +192,36 @@ const Home = () => {
           </Card.Header>
           <Card.Body>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+              <Link
+                to="/booking"
+                state={{ tab: "create" }}
+                className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+              >
                 <Calendar className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-700">
+                <p className="text-sm font-medium text-gray-600 text-center">
                   Buat Reservasi
                 </p>
-              </button>
-              <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+              </Link>
+              <Link
+                to="/room"
+                state={{ tab: "room" }}
+                className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+              >
                 <DoorOpen className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-700">
+                <p className="text-sm font-medium text-gray-600 text-center">
                   Kelola Ruangan
                 </p>
-              </button>
-              <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+              </Link>
+              <Link
+                to="/user"
+                state={{ tab: "user" }}
+                className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
+              >
                 <Users className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-700">
+                <p className="text-sm font-medium text-gray-600 text-center">
                   Kelola Pengguna
                 </p>
-              </button>
+              </Link>
               <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
                 <Activity className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm font-medium text-gray-700">
