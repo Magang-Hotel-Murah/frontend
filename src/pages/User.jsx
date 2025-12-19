@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { TabNavigation } from "@common";
 import { Content } from "@users";
 import { Users } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const User = () => {
+  const { state } = useLocation();
   const [activeTab, setActiveTab] = useState(() => {
     const saved = localStorage.getItem("activeTab");
     if(saved === "user") {
@@ -13,8 +15,10 @@ const User = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem("activeTab", activeTab);
-  }, [activeTab])
+    if (state?.tab) {
+      setActiveTab(state.tab);
+    }
+  }, [state])
 
   const tabs = [
     { key: "user", label: "List", icon: Users },

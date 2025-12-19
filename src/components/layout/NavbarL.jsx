@@ -22,6 +22,7 @@ const NavbarL = () => {
     { name: "Fitur", href: "#features" },
     { name: "Pricing", href: "#pricing" },
     { name: "About", href: "#about" },
+    { name: "Help Center", href: "#helpcenter"}
   ];
 
   return (
