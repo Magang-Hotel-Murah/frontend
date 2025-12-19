@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Navbar, Sidebar, Footer } from "@layout";
+import { Navbar, Sidebar, SimpleFooter } from "@layout";
 import { NavbarEmployee } from "@layout";
 import { useToggle } from "@hooks";
 import { useLocation } from "react-router-dom";
@@ -104,6 +104,7 @@ const MainLayout = ({ children, user, onLogout }) => {
       </div>
       
       <BotFAB />
+      <SimpleFooter />
     </div>
   );
 };

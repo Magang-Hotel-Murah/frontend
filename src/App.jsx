@@ -35,7 +35,7 @@ import {
 import { Update } from "@rooms";
 import { ProtectedRoute } from "@components/layout";
 import PrivacyPolicy from "./pages/landing/PrivacyPolicy";
-import { ToS } from "./pages/landing";
+import { AboutUs, ToS } from "./pages/landing";
 
 
 const App = () => {
@@ -97,6 +97,17 @@ const App = () => {
               <Navigate to={getDefaultRoute(user)} replace />
             ) : (
               <ToS />
+            )
+          }
+        />
+
+        <Route
+          path="/about"
+          element={
+            isAuthenticated ? (
+              <Navigate to={getDefaultRoute(user)} replace />
+            ) : (
+              <AboutUs />
             )
           }
         />

@@ -15,13 +15,13 @@ export default function ModernFooter() {
   return (
     <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="pl-40 pr-40 mx-auto px-2 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           
           {/* Company Info */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-orange-500 bg-clip-text text-transparent">
                 MeetWise
               </h3>
               <p className="text-slate-400 mt-4 leading-relaxed">
@@ -30,15 +30,15 @@ export default function ModernFooter() {
             </div>
             
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-slate-300 hover:text-blue-400 transition-colors cursor-pointer">
+              <div className="flex items-center gap-3 text-slate-300 hover:text-primary-400 transition-colors cursor-pointer">
                 <Mail size={18} />
                 <span className="text-sm">contact@meetwise.com</span>
               </div>
-              <div className="flex items-center gap-3 text-slate-300 hover:text-blue-400 transition-colors cursor-pointer">
+              <div className="flex items-center gap-3 text-slate-300 hover:text-primary-400 transition-colors cursor-pointer">
                 <Phone size={18} />
                 <span className="text-sm">+62 823 8900 0468</span>
               </div>
-              <div className="flex items-center gap-3 text-slate-300 hover:text-blue-400 transition-colors cursor-pointer">
+              <div className="flex items-center gap-3 text-slate-300 hover:text-primary-400 transition-colors cursor-pointer">
                 <MapPin size={18} />
                 <span className="text-sm">Jakarta, Indonesia</span>
               </div>
@@ -92,7 +92,7 @@ export default function ModernFooter() {
               </div>
               <button
                 onClick={handleSubscribe}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/25"
+                className="w-full bg-gradient-to-r from-primary-500 to-orange-600 hover:from-primary-600 hover:to-orange-700 px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/25"
               >
                 Subscribe
                 <Send size={18} />

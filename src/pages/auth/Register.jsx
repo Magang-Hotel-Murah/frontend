@@ -10,6 +10,7 @@ import {
   ToastAlert,
   AlertStyles,
 } from "@alert";
+import { SimpleFooter } from "../../components/layout";
 
 const Register = ({ onRegister }) => {
   const navigate = useNavigate();
@@ -20,9 +21,10 @@ const Register = ({ onRegister }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [company_name, setCompanyName] = useState("");
-   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const [showEmailVerificationAlert, setShowEmailVerificationAlert] = useState(false);
+  const [showEmailVerificationAlert, setShowEmailVerificationAlert] =
+    useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -46,7 +48,10 @@ const Register = ({ onRegister }) => {
     if (password !== confirmPassword)
       return showToastNotification("error", "Konfirmasi password tidak sama");
     if (!agreedToTerms)
-      return showToastNotification("error", "Anda harus menyetujui Terms of Service dan Privacy Policy");
+      return showToastNotification(
+        "error",
+        "Anda harus menyetujui Terms of Service dan Privacy Policy"
+      );
 
     setShowLoadingAlert(true);
 
@@ -154,7 +159,7 @@ const Register = ({ onRegister }) => {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
+                    className="block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
                     placeholder="Masukkan alamat email"
                   />
                 </div>
@@ -165,7 +170,7 @@ const Register = ({ onRegister }) => {
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Password
+                  Kata Sandi
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -178,7 +183,7 @@ const Register = ({ onRegister }) => {
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
+                    className="block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
                     placeholder="Masukkan password (min. 6 karakter)"
                   />
                   <button
@@ -200,7 +205,7 @@ const Register = ({ onRegister }) => {
                   htmlFor="confirmPassword"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Konfirmasi Password
+                  Konfirmasi Kata Sandi
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -213,7 +218,7 @@ const Register = ({ onRegister }) => {
                     autoComplete="current-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
+                    className="block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors border-gray-300 hover:border-gray-400"
                     placeholder="Masukkan password (min. 6 karakter)"
                   />
                   <button
@@ -262,7 +267,10 @@ const Register = ({ onRegister }) => {
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
                   className="h-4 w-4 mt-1 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
                 />
-                <label htmlFor="terms" className="ml-3 block text-sm text-gray-600">
+                <label
+                  htmlFor="terms"
+                  className="ml-3 block text-sm text-gray-600"
+                >
                   Saya telah membaca dan menyetujui{" "}
                   <a
                     href="/terms-of-service"
@@ -272,8 +280,8 @@ const Register = ({ onRegister }) => {
                     onClick={(e) => e.stopPropagation()}
                   >
                     Terms of Service
-                  </a>
-                  {" "}dan{" "}
+                  </a>{" "}
+                  dan{" "}
                   <a
                     href="/privacy-policy"
                     target="_blank"
@@ -325,6 +333,7 @@ const Register = ({ onRegister }) => {
           </div>
         </div>
       </div>
+      <SimpleFooter />
 
       <SuccessAlert
         show={showSuccessAlert}

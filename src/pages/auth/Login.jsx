@@ -11,6 +11,7 @@ import {
   ToastAlert,
   AlertStyles,
 } from "@alert";
+import { SimpleFooter } from "../../components/layout";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -172,7 +173,7 @@ const Login = () => {
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Password
+                  Kata Sandi
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -216,7 +217,7 @@ const Login = () => {
                     htmlFor="remember-me"
                     className="ml-2 block text-sm text-gray-700 cursor-pointer"
                   >
-                    Remember me
+                    Ingatkan Saya
                   </label>
                 </div>
 
@@ -226,7 +227,7 @@ const Login = () => {
                     onClick={handleForgotPassword}
                     className="font-medium text-primary-500 hover:underline transition-colors"
                   >
-                    Forgot password?
+                    Lupa Kata Sandi?
                   </button>
                 </div>
               </div>
@@ -271,6 +272,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+      <SimpleFooter />
 
       <SuccessAlert
         show={showSuccessAlert}

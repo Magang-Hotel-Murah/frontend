@@ -25,7 +25,7 @@ const Table = ({
 
   const columns = [
     {
-      header: "Foto",
+      header: "Gambar",
       render: (row) => (
         <div className="flex items-center justify-center">
           {row.room?.images ? (

@@ -18,11 +18,11 @@ const NavbarL = () => {
   }, []);
 
   const navLinks = [
-    { name: "Home", href: "#home" },
-    { name: "Fitur", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "About", href: "#about" },
-    { name: "Help Center", href: "#helpcenter"}
+    { name: "Home", path: "/" },
+    { name: "Fitur", path: "/" },
+    { name: "Pricing", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Help Center", path: "/" },
   ];
 
   return (
@@ -35,7 +35,10 @@ const NavbarL = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 group cursor-pointer">
+          <div
+            className="flex items-center gap-3 group cursor-pointer"
+            onClick={() => navigate("/")}
+          >
             <img src={Logo} alt="meetwise" height={50} width={50} />
             <span className="text-2xl font-bold bg-primary-500 bg-clip-text text-transparent">
               MeetWise
@@ -45,7 +48,7 @@ const NavbarL = () => {
             {navLinks.map((link) => (
               <a
                 key={link.name}
-                href={link.href}
+                onClick={() => navigate(link.path)}
                 className="text-gray-600 hover:text-primary-500 font-medium transition-colors duration-200 relative group"
               >
                 {link.name}
@@ -90,14 +93,16 @@ const NavbarL = () => {
         >
           <div className="py-4 space-y-3 border-t border-gray-200">
             {navLinks.map((link) => (
-              <a
+              <button
                 key={link.name}
-                href={link.href}
+                onClick={() => {
+                  navigate(link.path);
+                  setIsMobileMenuOpen(false);
+                }}
                 className="block px-4 py-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg font-medium transition-all duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.name}
-              </a>
+              </button>
             ))}
             <div className="pt-3 space-y-2 px-4">
               <Button

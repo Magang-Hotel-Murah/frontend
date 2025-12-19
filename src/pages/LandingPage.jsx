@@ -64,10 +64,7 @@ const LandingPage = () => {
       <NavbarL />
 
       <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-        <div
-          id="home"
-          className="absolute top-20 left-10 w-72 h-72 bg-primary-100/30 rounded-full blur-3xl animate-pulse"
-        ></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-100/30 rounded-full blur-3xl animate-pulse"></div>
         <div
           className="absolute bottom-10 right-10 w-96 h-96 bg-yellow-100/30 rounded-full blur-3xl animate-pulse"
           style={{ animationDelay: "1s" }}
@@ -228,10 +225,7 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
-
-      <section id="about">
         <Footer />
-      </section>
 
       <style>{`
         @keyframes gradient {

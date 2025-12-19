@@ -10,8 +10,7 @@ const Table = ({ user, rooms, onDelete, onEdit, loading }) => {
 
   const baseColumns = [
     {
-      header: "Foto",
-
+      header: "Gambar",
       render: (row) => (
         <div className="flex-items-center justify-center">
           {row.images && row.images.length > 0 ? (
